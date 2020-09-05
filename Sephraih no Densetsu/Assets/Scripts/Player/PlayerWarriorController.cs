@@ -8,13 +8,14 @@ public class PlayerWarriorController : PlayerController
     // used in the process of determining whether the player wants to use a skill
     private bool _a;
     private bool _e;
+    private bool _q;
 
     public override void Skills()
     {
         // attacks and skills
         _a = Input.GetButtonUp("a");
         _e = Input.GetButtonUp("e");
-
+        _q = Input.GetButtonUp("q");
     }
 
     // using the skills assigned to the keys depending on input
@@ -29,6 +30,10 @@ public class PlayerWarriorController : PlayerController
         if (_e)
         {
             GetComponent<ChargeAttack>().Charge(enemy);
+        }
+        if (_q)
+        {
+            GetComponent<FireStorm>().Use();
         }
     }
 }
