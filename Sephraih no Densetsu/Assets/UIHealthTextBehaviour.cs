@@ -13,7 +13,7 @@ void Update()
     {
         health = p1.GetComponent<HealthController>().health;
         maxHealth = p1.GetComponent<HealthController>().maxHealth;
-        healthText.text = "Health: " + health +" / "+ maxHealth;
+        healthText.text = health +" / "+ maxHealth;
         
     }
 }

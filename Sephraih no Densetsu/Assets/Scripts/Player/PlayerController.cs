@@ -68,7 +68,6 @@ public class PlayerController : MonoBehaviour
         if (GetComponent<HealthController>().health <= 0)
         {
             GetComponent<HealthController>().Max();
-            GetComponent<BasicAgent>().ResetPosition(transform);
         }
     }
 }
