@@ -6,14 +6,14 @@ using UnityEngine;
 public class PlayerWarriorController : PlayerController
 {
     // used in the process of determining whether the player wants to use a skill
-    private bool _a;
+    private bool _r;
     private bool _e;
     private bool _q;
 
     public override void Skills()
     {
         // attacks and skills
-        _a = Input.GetButtonUp("a");
+        _r = Input.GetButtonUp("r");
         _e = Input.GetButtonUp("e");
         _q = Input.GetButtonUp("q");
     }
@@ -22,7 +22,7 @@ public class PlayerWarriorController : PlayerController
     public override void Attack()
     {
         enemy = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); //get closest enemy inside arena
-        if (_a)
+        if (_r)
         {
             GetComponent<MultiSlash>().Attack();
         }

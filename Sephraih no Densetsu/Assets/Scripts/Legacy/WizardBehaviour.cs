@@ -11,14 +11,17 @@ public class WizardBehaviour : MonoBehaviour
     private Vector2 movementDirection;
     private float msi; // between zero and one determining movement strength
     public float distanceToTarget;
+    public int teamID;
+
 
     private Transform target; // the derived target the wizard interacts with
 
     void Start()
     {
-        target = Camera.main.GetComponent<CameraFollow>().target; // initial target
+
+        Camera.main.GetComponent<GameBehaviour>().Register(transform); //upon creation add to list of enemies
+        teamID = GetComponent<StatusController>().teamID;
         GetComponent<FireBolt>().startcd = 1.0f; // initial cooldown of firebolt ability
-        Camera.main.GetComponent<CameraFollow>().enemylist.Add(transform); // add to list of enemies
         GetComponent<StatusController>().matk = 100; // set the wizard's default magical attack strenght value to 100
 
 
@@ -36,7 +39,7 @@ public class WizardBehaviour : MonoBehaviour
     void Move()
     {
 
-        target = Camera.main.GetComponent<CameraFollow>().ClosestPlayer(transform); // target is the closest player
+        target = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); // target is the closest player
         distanceToTarget = Vector2.Distance(transform.position, target.position); // distance to the player
 
 
@@ -87,7 +90,7 @@ public class WizardBehaviour : MonoBehaviour
         if (this.GetComponent<HealthController>().health <= 0)
         {
             //Instantiate((Resources.Load("Prefabs/Wizard") as GameObject), new Vector3(0, 0, 0), Quaternion.identity);
-            Camera.main.GetComponent<CameraFollow>().enemylist.Remove(transform);
+            Camera.main.GetComponent<GameBehaviour>().Remove(transform);
             Destroy(gameObject);
         }
     }

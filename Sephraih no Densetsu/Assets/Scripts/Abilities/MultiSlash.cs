@@ -13,7 +13,7 @@ public class MultiSlash : MonoBehaviour
     private float comboDelay = 0.1f;
 
 
-    public LayerMask whatIsEnemy; //string specified in editor, "enemy" or "player" then matched against tags of objects to be determined enmy or not
+    public LayerMask whatIsEnemy; //Layer specified in editor "player" then matched against tags of objects to be determined player or not
 
     private Transform attackPos; //direction of attack
 

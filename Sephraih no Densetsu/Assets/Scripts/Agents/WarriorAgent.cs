@@ -6,7 +6,7 @@ public class WarriorAgent : BasicAgent
 {
 
     //Skills
-    private bool _a;
+    private bool _q;
     private bool _e;
 
 
@@ -26,8 +26,8 @@ public class WarriorAgent : BasicAgent
         movementAction.y = vectorAction[1];
 
         //boolean triggers to enable the agents use abilities based on its policy
-        _a = vectorAction[2] >= 0.5f ? true : false;
-        if (_a)
+        _q = vectorAction[2] >= 0.5f ? true : false;
+        if (_q)
         {
             GetComponent<MultiSlash>().Attack();
         }

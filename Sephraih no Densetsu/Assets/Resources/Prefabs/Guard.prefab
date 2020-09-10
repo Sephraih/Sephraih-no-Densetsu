@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4134296759242243665}
   - component: {fileID: 4134296759242243664}
   - component: {fileID: 4134296759242243679}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 4134296760928720154}
   - component: {fileID: 4134296760928720156}
   - component: {fileID: 4134296760928720155}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -207,9 +207,9 @@ GameObject:
   - component: {fileID: 7592420667298902274}
   - component: {fileID: 1665300450}
   - component: {fileID: 2044990616}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Guard
-  m_TagString: Enemy
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -389,6 +389,7 @@ MonoBehaviour:
   guardSpot: {x: 0, y: 0, z: 0}
   guardMaxChaseRadius: 10
   guardRadius: 5
+  teamID: 0
 --- !u!114 &7592420667298902280
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -425,7 +426,7 @@ MonoBehaviour:
   crit: 0
   burnEffect: {fileID: 5987478075576669587, guid: b3cf8b2afe9be424a871a64504cd751b,
     type: 3}
-  playerControlled: 0
+  AIControlled: 0
 --- !u!114 &1665300451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -454,7 +455,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13281e180dec17b4985ef0b08e3d0595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
+  dmg: 0
   startDelay: 2
   whatIsEnemy:
     serializedVersion: 2
@@ -521,7 +522,7 @@ MonoBehaviour:
   projectile: {fileID: 1150724258750520066, guid: 818c5605413b00641b517b1f127b8ce0,
     type: 3}
   shotPoint: {fileID: 7592420667754977583}
-  user: {fileID: 0}
+  user: {fileID: 7592420666366508222}
   startcd: 5
   dmg: 50
   slow: 0.8
@@ -535,7 +536,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7592420667754977583}
   - component: {fileID: 7592420667754977580}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: AttackPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}

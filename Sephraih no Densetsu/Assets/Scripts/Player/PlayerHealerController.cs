@@ -8,7 +8,7 @@ public class PlayerHealerController : PlayerController
 
 
     // used in the process of determining whether the player wants to use a skill
-    private bool _a;
+    private bool _r;
     private bool _q;
     private bool _e;
 
@@ -19,7 +19,7 @@ public class PlayerHealerController : PlayerController
     public override void Skills()
     {
         // attacks and skills
-        _a = Input.GetButtonUp("a");
+        _r = Input.GetButtonUp("r");
         _q = Input.GetButtonUp("q");
         _e = Input.GetButtonUp("e");
     }
@@ -33,7 +33,7 @@ public class PlayerHealerController : PlayerController
         {
             GetComponent<HealWave>().Blast();
         }
-        if (_a)
+        if (_r)
         {
             GetComponent<SelfHeal>().Heal();
         }

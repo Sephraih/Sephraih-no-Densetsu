@@ -16,6 +16,8 @@ public class GuardBehaviour : MonoBehaviour
     // variables for movement
     private Vector2 movementDirection;
     private float msi;
+    public int teamID;
+
 
     // required for attacking, following and guard logic
     private float distanceToTarget;
@@ -30,9 +32,9 @@ public class GuardBehaviour : MonoBehaviour
     void Start()
     {
         transform.position = guardSpot;
-        player = Camera.main.GetComponent<CameraFollow>().target; // target the active player at start
+        Camera.main.GetComponent<GameBehaviour>().Register(transform); //upon creation add to list of enemies
+        teamID = GetComponent<StatusController>().teamID;
         GetComponent<FireBolt>().startcd = 5.0f; // define frequency of firebolt ability usage
-        Camera.main.GetComponent<CameraFollow>().enemylist.Add(transform); // add to list of enemies
     }
 
     void Update()
@@ -46,7 +48,7 @@ public class GuardBehaviour : MonoBehaviour
     void Move()
     {
 
-        player = Camera.main.GetComponent<CameraFollow>().ClosestPlayer(transform); // interact with closest player determined each frame
+        player = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); // interact with closest player determined each frame
 
         distanceToTarget = Vector2.Distance(transform.position, player.position);
         distanceToGuardSpot = Vector2.Distance(transform.position, guardSpot);
@@ -114,7 +116,7 @@ public class GuardBehaviour : MonoBehaviour
         if (this.GetComponent<HealthController>().health <= 0)
         {
             //Instantiate((Resources.Load("Prefabs/Guard") as GameObject), new Vector3(0, 7, 0), Quaternion.identity);
-            Camera.main.GetComponent<CameraFollow>().enemylist.Remove(transform);
+            Camera.main.GetComponent<GameBehaviour>().Remove(transform);
             Destroy(gameObject);
         }
     }

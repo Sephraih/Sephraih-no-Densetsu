@@ -10,7 +10,7 @@ public class HealerAgent : BasicAgent
     //Skills
     private bool _q;
     private bool _e;
-    private bool _a;
+    private bool _r;
     //targeting boolean
     private bool _t;
 
@@ -53,8 +53,8 @@ public class HealerAgent : BasicAgent
         {
             GetComponent<HealWave>().BlastTarget(target);
         }
-        _a = vectorAction[4] >= 0.5f ? true : false;
-        if (_a)
+        _r = vectorAction[4] >= 0.5f ? true : false;
+        if (_r)
         {
             GetComponent<SelfHeal>().Heal();
         }

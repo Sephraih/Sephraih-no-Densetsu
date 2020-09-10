@@ -6,9 +6,9 @@ public class PlayerAgent : BasicAgent
 {
 
     //Skills
-    private bool _a;
+    private bool _f;
     private bool _q;
-    private bool _w;
+    private bool _r;
     private bool _e;
     
     //observation Vector
@@ -48,8 +48,8 @@ public class PlayerAgent : BasicAgent
             //GetComponent<FireBolt>().Blast(); //frontal blast
             GetComponent<FireBolt>().BlastTarget(enemy);
         }
-        _a = vectorAction[3] >= 0.5f ? true : false;
-        if (_a)
+        _f = vectorAction[3] >= 0.5f ? true : false;
+        if (_f)
         {
             GetComponent<MultiSlash>().Attack();
         }

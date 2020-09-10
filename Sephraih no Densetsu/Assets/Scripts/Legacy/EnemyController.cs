@@ -8,13 +8,10 @@ public class EnemyController : MonoBehaviour
 
     public Animator animator; // animation
     public GameObject attackingDirection; //attacking direction object used to calculate vector of attack
-    
     public Vector2 movementDirection; // direction of movement
     private float msi; // movement speed input, in the case of a bot this is either zero or one
-
     public int teamID;
-
-    private Transform player; // the player character the bot interacts with
+    private Transform target; // the character the bot interacts with
 
     void Start()
     {
@@ -33,9 +30,9 @@ public class EnemyController : MonoBehaviour
     void Move()
     {
 
-        player = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); // the player this bot interacts with is the one closest to it
+        target = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); // the player this bot interacts with is the one closest to it
         
-        movementDirection = new Vector2(-1 * (transform.position.x - player.transform.position.x), -1 * (transform.position.y - player.transform.position.y)); // move towards the player
+        movementDirection = new Vector2(-1 * (transform.position.x - target.transform.position.x), -1 * (transform.position.y - target.transform.position.y)); // move towards the player
         movementDirection.Normalize(); // normalized so distance doesnt influence movement speed
 
         msi = Mathf.Clamp(movementDirection.magnitude, 0.0f, 1.0f); // zero or one depending on whether the bot moves not. it always moves.
@@ -54,7 +51,7 @@ public class EnemyController : MonoBehaviour
     //attack if close to the target player
     void Attack()
     {
-        if (Vector2.Distance(transform.position, player.position) < 1.0f)
+        if (Vector2.Distance(transform.position, target.position) < 1.0f)
         {
             this.GetComponent<BasicAttack>().Attack();
         }

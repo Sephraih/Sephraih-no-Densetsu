@@ -5,7 +5,7 @@ using UnityEngine;
 //simple basic attack, see multislash for explanation of functionality
 public class BasicAttack : MonoBehaviour
 {
-    public int damage;
+    public int dmg;
     public float startDelay;
     private float delay;
 
@@ -26,7 +26,7 @@ public class BasicAttack : MonoBehaviour
     {
         attackPos = transform.GetChild(0);
         slashEffect = Resources.Load("prefabs/ParticleSlashPrefab") as GameObject;
-        
+
     }
     void Update()
     {
@@ -52,12 +52,13 @@ public class BasicAttack : MonoBehaviour
             //determine damaged enemies, apply damage
             Collider2D[] enemiesToDamage = Physics2D.OverlapBoxAll(attackPos.position, new Vector2(attackRangeX, attackRangeY), attackPos.localPosition.x * 90, whatIsEnemy);
             for (int i = 0; i < enemiesToDamage.Length; i++)
-            {   
-                if(enemiesToDamage[i].isTrigger)
-                enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(damage,transform);
+            {
+                if (enemiesToDamage[i].isTrigger && enemiesToDamage[i].GetComponent<StatusController>().teamID != transform.GetComponent<StatusController>().teamID)
+                    enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(dmg, transform);
+
             }
-                delay = startDelay;
-            
+            delay = startDelay;
+
         }
     }
 

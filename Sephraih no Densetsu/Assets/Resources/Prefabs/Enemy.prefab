@@ -534,7 +534,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13281e180dec17b4985ef0b08e3d0595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 100
+  dmg: 0
   startDelay: 2
   whatIsEnemy:
     serializedVersion: 2
@@ -583,7 +583,7 @@ MonoBehaviour:
   projectile: {fileID: 1150724258750520066, guid: 818c5605413b00641b517b1f127b8ce0,
     type: 3}
   shotPoint: {fileID: 5765252529138207895}
-  user: {fileID: 0}
+  user: {fileID: 5765252530442742022}
   startcd: 0
   dmg: 50
   slow: 0.5
