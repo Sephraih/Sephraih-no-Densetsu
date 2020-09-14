@@ -29,12 +29,12 @@ public class WarriorAgent : BasicAgent
         _q = vectorAction[2] >= 0.5f ? true : false;
         if (_q)
         {
-            GetComponent<MultiSlash>().Attack();
+            GetComponent<MultiSlash>().Use();
         }
         _e = vectorAction[3] >= 0.5f ? true : false;
         if (_e)
         {
-            GetComponent<ChargeAttack>().Charge(enemy);
+            GetComponent<ChargeAttack>().UseTarget(enemy);
         }
 
         //normalize and apply the movement the agent's policy decides for the character it is in control of

@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MultiSlash : MonoBehaviour
+public class MultiSlash : Ability
 {
 
     public int basedmg;
-    public float startDelay; //cool down
-    private float delay; //cool down remaining
     private int maxCombo = 4;
     private int comboCount = 1;
     private float comboDelay = 0.1f;
@@ -29,18 +27,10 @@ public class MultiSlash : MonoBehaviour
         attackPos = transform.GetChild(0); //loaded automatically instead of assignment through editor
         slashEffect = Resources.Load("Prefabs/ParticleSlashPrefab") as GameObject;
     }
-    // each frame reduce cd
-    void Update()
+  
+    public override void Use()
     {
-        if (delay >= 0)
-        {
-            delay -= Time.deltaTime;
-        }
-    }
-
-    public void Attack()
-    {
-        if (delay <= 0) //can't attack if the attack isnt ready to be used again
+        if (cd <= 0) //can't attack if the attack isnt ready to be used again
         {
 
             int dmg = basedmg;
@@ -68,11 +58,11 @@ public class MultiSlash : MonoBehaviour
                 }
             }
             comboCount++;
-            delay = comboDelay;
+            cd = comboDelay;
 
             if (comboCount > maxCombo)
             {
-                delay = startDelay;
+                cd = acd;
                 comboCount = 1;
             }
 

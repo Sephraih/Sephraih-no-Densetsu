@@ -29,10 +29,13 @@ public class PlayerController : MonoBehaviour
     // called each frame
     void Update()
     {
-        Move();
-        Skills();
-        Aim();
-        Attack();
+        if (!GetComponent<MovementController>().stunned)
+        {
+            Move();
+            Skills();
+            Aim();
+            Attack();
+        }
         Reset();
     }
 
@@ -46,10 +49,11 @@ public class PlayerController : MonoBehaviour
         GetComponent<MovementController>().Move(movementDirection, msi);
     }
 
-    public virtual void Skills() { 
-    
+    public virtual void Skills()
+    {
+
     }
-    
+
     // set attacking direction object's position
     void Aim()
     {

@@ -66,7 +66,7 @@ public class DpsBotBehaviour : MonoBehaviour
     {
         if (Vector2.Distance(transform.position, target.position) < 1.0f)
         {
-            this.GetComponent<MultiSlash>().Attack();
+            this.GetComponent<MultiSlash>().Use();
         }
     }
 

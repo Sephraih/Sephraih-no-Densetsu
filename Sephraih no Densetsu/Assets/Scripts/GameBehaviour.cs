@@ -15,6 +15,24 @@ public class GameBehaviour : MonoBehaviour
         InstantiateEnemy();
     }
 
+    public Transform ClosestEnemyToLocation(Vector2 pos, Transform self) {
+
+        float distance = 10000;
+        int teamID = self.GetComponent<StatusController>().teamID;
+        Transform ce = self; //return itself if there is no other enemy - this means that a default enemy has to be asigned in the inspector no longer. Also the size of the characterList doesn't have to be checked anymore.
+        foreach (Transform e in characterList)
+        {
+            if (Vector2.Distance(pos, e.position) < distance && e.GetComponent<StatusController>().teamID != teamID) //search for the enemy with the shortest distance to calling agent (closer than max distance or distance to previous enemy, not on the same team)
+            {
+                distance = Vector2.Distance(pos, e.position);
+                ce = e;
+            }
+        }
+        return ce;
+
+
+    }
+
     //return a calling agent's closest enemy
     public Transform ClosestEnemy(Transform self)
     {

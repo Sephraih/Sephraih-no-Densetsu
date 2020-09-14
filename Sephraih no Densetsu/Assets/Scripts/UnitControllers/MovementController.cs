@@ -14,7 +14,7 @@ public class MovementController : MonoBehaviour
     private Rigidbody2D rb; // physical entity of the character, where velocity is applied to
     public bool stuck; // whether the character may not move aside from a fixed logic defined in the function causing the character to be stuck
     public bool stunned; // whether the character is stunned, meaning it cannot move at all.
-
+  
     // Start is called before the first frame update
     void Start()
     {

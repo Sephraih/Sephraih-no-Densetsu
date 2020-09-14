@@ -5,35 +5,23 @@ using UnityEngine;
 // The character controller that allows a player to control a warrior
 public class PlayerWarriorController : PlayerController
 {
-    // used in the process of determining whether the player wants to use a skill
-    private bool _r;
-    private bool _e;
-    private bool _q;
 
-    public override void Skills()
-    {
-        // attacks and skills
-        _r = Input.GetButtonUp("r");
-        _e = Input.GetButtonUp("e");
-        _q = Input.GetButtonUp("q");
-    }
 
     // using the skills assigned to the keys depending on input
     public override void Attack()
     {
-        enemy = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); //get closest enemy inside arena
-        if (_r)
+        if (Input.GetButtonUp("Mouse0"))
         {
-            GetComponent<MultiSlash>().Attack();
+            GetComponent<MultiSlash>().Use();
         }
 
-        if (_e)
+        if (Input.GetButtonUp("Mouse1"))
         {
-            GetComponent<ChargeAttack>().Charge(enemy);
+            GetComponent<ChargeAttack>().UseMouse();
         }
-        if (_q)
+        if (Input.GetButtonUp("q"))
         {
-            GetComponent<FireStorm>().Use();
+            GetComponent<FireBolt>().UseMouse();
         }
     }
 }

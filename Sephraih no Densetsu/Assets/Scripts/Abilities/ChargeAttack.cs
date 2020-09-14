@@ -2,54 +2,48 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChargeAttack : MonoBehaviour
+public class ChargeAttack : Ability
 {
-    public float acd; //ability cool down
-    public float range = 5.0f;
     public GameObject chargeEffect;
     public float stunTime = 1.0f;
-    private float cd; //cool down remaining
     public int dmg = 250;
-    
+
     private Vector2 chargeDirection;
     private float distanceToTarget;
     private Transform target;
-    private Rigidbody2D rb;
-
-    void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-    }
+   
 
     //run at a target, damage based on character attack*3 and stun it for a short time
-    public void Charge(Transform target)
+    public override void UseTarget(Transform target)
     {
-        if (cd <= 0f) // if ability ready to use
+        if (transform.GetComponent<StatusController>().teamID != target.GetComponent<StatusController>().teamID)
         {
-            //determine direction
-            distanceToTarget = Vector2.Distance(transform.position, target.position);
-            if (distanceToTarget <= range && distanceToTarget >= 2.0f)
+            if (cd <= 0f) // if ability ready to use
             {
-                chargeDirection = target.position - transform.position;
-                chargeDirection.Normalize();
-                this.target = target; //classwide access
-                StartCoroutine(ChargeCoroutine()); //execute the charge, this is a process happening over time and will hence not be completed in a single frame.
-                cd = acd; //reset cooldown
+                //determine direction
+                distanceToTarget = Vector2.Distance(transform.position, target.position);
+                if (distanceToTarget <= range) // && distanceToTarget >= 2.0f at point blank atm
+                {
+                    chargeDirection = target.position - transform.position;
+                    chargeDirection.Normalize();
+                    this.target = target; //classwide access
+                    StartCoroutine(ChargeCoroutine()); //execute the charge, this is a process happening over time and will hence not be completed in a single frame.
+                    cd = acd; //reset cooldown
+                }
+
             }
-
         }
 
     }
 
-    void Update()
+    public override void UseMouse()
     {
-        if (cd >= 0)
-        {
-            cd -= Time.deltaTime; //decrease cooldown
-        }
+
+        Transform t = Camera.main.GetComponent<GameBehaviour>().ClosestEnemyToLocation(MousePosition(), transform);
+        UseTarget(t);
 
     }
-
+    
     IEnumerator ChargeCoroutine()
     {
         float time = 0.1f;
@@ -65,18 +59,19 @@ public class ChargeAttack : MonoBehaviour
 
             GetComponent<MovementController>().stuck = true; //disalow any other movement of the charging character
             GetComponent<MovementController>().WalkTowards(chargeDirection); // set movement animation, as default is disabled due to being stuck
-            rb.velocity = chargeDirection * 70;
+            GetComponent<Rigidbody2D>().velocity = chargeDirection * 70;
             count += time;
             yield return new WaitForSeconds(time);
         }
         //after charging
-        target.GetComponent<MovementController>().Stun(stunTime);
+        if (target.GetComponent<HealthController>().health > dmg)
+        {
+            target.GetComponent<MovementController>().Stun(stunTime);
+        }
+        target.GetComponent<HealthController>().TakeDamage(dmg, transform);
         Camera.main.GetComponent<NeutralCam>().CamShake();
         GetComponent<MovementController>().stuck = false;
-        target.GetComponent<HealthController>().TakeDamage(dmg, transform);
-
-
-
+        
     }
 
 }

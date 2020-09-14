@@ -3,29 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //healwave ability launching healwave projectiles
-public class HealWave : MonoBehaviour
+public class HealWave : Ability
 {
-    private float offset = -90.0f; //make the sprite and particle system face upwards
-    public string friendly = "Player";  //default, may be inverted in inspector 
-    public string hostile = "Enemy";
-
+    private readonly float offset = -90.0f; //make the sprite and particle system face upwards
+    
     public GameObject projectile; // the healwave projectile prefab is attached to the editor in this public field
     public Transform shotPoint;
 
-    //ability cooldown and cooldown remaining
-    private float cd;
-    public float startcd;
-
     public int healAmount;
 
-    private void Update()
-    {
-        cd -= Time.deltaTime;
-
-    }
-
     //used to fire the projectile in the way the character is facing
-    public void Blast()
+    public override void Use()
     {
         Vector2 difference = transform.position - shotPoint.transform.position;
 
@@ -37,7 +25,7 @@ public class HealWave : MonoBehaviour
     
 
     //same use as blast but shooting towards mouse position
-    public void BlastMouse()
+    public override void UseMouse()
     {
 
 
@@ -72,7 +60,7 @@ public class HealWave : MonoBehaviour
             bolt.GetComponent<HealWaveProjectile>().healAmount = healAmount; //this.GetComponent<StatusController>().matk;
             bolt.GetComponent<HealWaveProjectile>().user = transform;
 
-            cd = startcd;
+            cd = acd;
 
         }
     }

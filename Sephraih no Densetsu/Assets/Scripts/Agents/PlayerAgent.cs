@@ -51,12 +51,12 @@ public class PlayerAgent : BasicAgent
         _f = vectorAction[3] >= 0.5f ? true : false;
         if (_f)
         {
-            GetComponent<MultiSlash>().Attack();
+            GetComponent<MultiSlash>().Use();
         }
         _e = vectorAction[4] >= 0.5f ? true : false;
         if (_e)
         {
-            GetComponent<ChargeAttack>().Charge(enemy);
+            GetComponent<ChargeAttack>().UseTarget(enemy);
         }
 
         movementDirection = new Vector2(movementAction.x * 100, movementAction.y * 100);

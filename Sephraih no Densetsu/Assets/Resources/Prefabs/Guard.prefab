@@ -402,8 +402,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3683b1e00d4e2a14b87f1a8ace30f7c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  health: 100
+  maxHealth: 1500
+  health: 1500
   ht: {fileID: 0}
 --- !u!114 &8757794724829583563
 MonoBehaviour:
@@ -519,11 +519,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e82ab83fa701c498069fa7b8e974a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  acd: 0
+  range: 0
   projectile: {fileID: 1150724258750520066, guid: 818c5605413b00641b517b1f127b8ce0,
     type: 3}
   shotPoint: {fileID: 7592420667754977583}
-  user: {fileID: 7592420666366508222}
-  startcd: 5
   dmg: 50
   slow: 0.8
 --- !u!1 &7592420667754977582

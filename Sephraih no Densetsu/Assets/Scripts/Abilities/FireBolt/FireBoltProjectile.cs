@@ -23,6 +23,7 @@ public class FireBoltProjectile : MonoBehaviour
     {
         Invoke("DestroyProjectile", lifetime);
         teamID = user.GetComponent<StatusController>().teamID;
+        transform.Translate(Vector2.up*1);
     }
 
     // every frame

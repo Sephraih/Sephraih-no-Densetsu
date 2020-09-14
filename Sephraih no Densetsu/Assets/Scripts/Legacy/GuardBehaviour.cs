@@ -34,7 +34,7 @@ public class GuardBehaviour : MonoBehaviour
         transform.position = guardSpot;
         Camera.main.GetComponent<GameBehaviour>().Register(transform); //upon creation add to list of enemies
         teamID = GetComponent<StatusController>().teamID;
-        GetComponent<FireBolt>().startcd = 5.0f; // define frequency of firebolt ability usage
+        GetComponent<FireBolt>().acd = 5.0f; // define frequency of firebolt ability usage
     }
 
     void Update()
@@ -101,12 +101,12 @@ public class GuardBehaviour : MonoBehaviour
         }
         else if (distanceToTarget < guardRadius && distanceToGuardSpot <= guardMaxChaseRadius)
         {
-            this.GetComponent<ChargeAttack>().Charge(player);
+            this.GetComponent<ChargeAttack>().UseTarget(player);
         }
 
         if (distanceToTarget > 5.0f && distanceToTarget < 10.0f)
         {
-            GetComponent<FireBolt>().Blast();
+            GetComponent<FireBolt>().Use();
         }
     }
 

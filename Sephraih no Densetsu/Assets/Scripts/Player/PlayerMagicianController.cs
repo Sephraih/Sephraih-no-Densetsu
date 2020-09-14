@@ -6,37 +6,23 @@ using UnityEngine;
 public class PlayerMagicianController : PlayerController
 {
 
-    // used in the process of determining whether the player wants to use a skill
-    private bool _q;
-    private bool _e;
-    private bool _mouse0;
-
-
-    public override void Skills()
-    {
-        // attacks and skills
-        _q = Input.GetButtonUp("q");
-        _e = Input.GetButtonUp("e");
-        _mouse0 = Input.GetButtonUp("mouse0");
-    }
-
+    
     // using the skills assigned to the keys depending on input
     public override void Attack()
     {
-        enemy = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); //get closest enemy inside arena
-
-        if (_q)
+        
+        if (Input.GetButtonUp("r"))
         {
-            GetComponent<FireBolt>().Blast();
+            GetComponent<FireStorm>().UseMouse();
         }
-        if (_e)
+        if (Input.GetButtonUp("e"))
         {
-            GetComponent<Teleport>().Backjump();
+            GetComponent<Teleport>().UseMouse();
         }
 
-        if (_mouse0)
+        if (Input.GetButtonUp("q"))
         {
-            GetComponent<FireBolt>().BlastMouse();
+            GetComponent<FireBolt>().UseMouse();
         }
 
     }

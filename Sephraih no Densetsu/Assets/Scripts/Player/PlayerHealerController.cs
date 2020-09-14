@@ -6,40 +6,21 @@ using UnityEngine;
 public class PlayerHealerController : PlayerController
 {
 
-
-    // used in the process of determining whether the player wants to use a skill
-    private bool _r;
-    private bool _q;
-    private bool _e;
-
-    public Transform ally;
-    public Transform target;
-
-
-    public override void Skills()
-    {
-        // attacks and skills
-        _r = Input.GetButtonUp("r");
-        _q = Input.GetButtonUp("q");
-        _e = Input.GetButtonUp("e");
-    }
-
-
     // using the skills assigned to the keys depending on input
     public override void Attack()
     {
 
-        if (_e)
+        if (Input.GetButtonUp("q"))
         {
-            GetComponent<HealWave>().Blast();
+            GetComponent<HealWave>().Use();
         }
-        if (_r)
+        if (Input.GetButtonUp("e"))
         {
-            GetComponent<SelfHeal>().Heal();
+            GetComponent<SelfHeal>().Use();
         }
-        if (_q)
+        if (Input.GetButtonUp("r"))
         {
-            GetComponent<HealBolt>().Blast();
+            GetComponent<HealBolt>().Use();
         }
 
     }

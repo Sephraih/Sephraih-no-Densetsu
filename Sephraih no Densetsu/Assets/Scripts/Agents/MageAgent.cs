@@ -35,7 +35,7 @@ public class MageAgent : BasicAgent
         _e = vectorAction[3] >= 0.5f ? true : false;
         if (_e)
         {
-            GetComponent<Teleport>().Backjump();
+            GetComponent<Teleport>().Use();
         }
 
         //normalize and apply the movement the agent's policy decides for the character it is in control of

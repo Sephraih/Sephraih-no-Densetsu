@@ -56,7 +56,7 @@ public class HealerAgent : BasicAgent
         _r = vectorAction[4] >= 0.5f ? true : false;
         if (_r)
         {
-            GetComponent<SelfHeal>().Heal();
+            GetComponent<SelfHeal>().Use();
         }
         _q = vectorAction[5] >= 0.5f ? true : false;
         if (_q)

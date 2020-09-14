@@ -21,7 +21,7 @@ public class WizardBehaviour : MonoBehaviour
 
         Camera.main.GetComponent<GameBehaviour>().Register(transform); //upon creation add to list of enemies
         teamID = GetComponent<StatusController>().teamID;
-        GetComponent<FireBolt>().startcd = 1.0f; // initial cooldown of firebolt ability
+        GetComponent<FireBolt>().acd = 1.0f; // initial cooldown of firebolt ability
         GetComponent<StatusController>().matk = 100; // set the wizard's default magical attack strenght value to 100
 
 
@@ -51,7 +51,7 @@ public class WizardBehaviour : MonoBehaviour
         if (distanceToTarget <= 10.0f && distanceToTarget > 5.0f || distanceToTarget > 20.0f) movementDirection = Vector2.zero; // don't move
         if (distanceToTarget <= 5.0f)
         {
-            GetComponent<Teleport>().Backjump();
+            GetComponent<Teleport>().Use();
             movementDirection = transform.position - target.transform.position; //walk away from target
         }
 
@@ -80,7 +80,7 @@ public class WizardBehaviour : MonoBehaviour
     {
         if (distanceToTarget >= 3.0f && distanceToTarget <= 15.0f)
         {
-            GetComponent<FireBolt>().Blast();
+            GetComponent<FireBolt>().Use();
         }
     }
 

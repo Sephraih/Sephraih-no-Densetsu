@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //an ability launching a projectile healing characters friendly to the caster, see documentation of firebolt
-public class HealBolt : MonoBehaviour
+public class HealBolt : Ability
 {
-    private float offset = -90.0f;
+    private readonly float offset = -90.0f;
     
 
     public GameObject projectile;
@@ -13,16 +13,8 @@ public class HealBolt : MonoBehaviour
 
     public int healAmount =100;
 
-    private float cd;
-    public float startcd;
 
-    private void Update()
-    {
-        cd -= Time.deltaTime;
-
-    }
-
-    public void Blast()
+    public override void Use()
     {
         Vector2 difference = transform.position - shotPoint.transform.position;
 
@@ -35,7 +27,7 @@ public class HealBolt : MonoBehaviour
 
 
     //same use as blast but shooting towards mouse position, delay zero for testing
-    public void BlastMouse()
+    public override void UseMouse()
     {
         Vector2 difference = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
 
@@ -67,7 +59,7 @@ public class HealBolt : MonoBehaviour
             bolt.GetComponent<HealBoltProjectile>().heal = healAmount; //this.GetComponent<StatusController>().matk;
             bolt.GetComponent<HealBoltProjectile>().user = transform;
 
-            cd = startcd;
+            cd = acd;
 
         }
     }
