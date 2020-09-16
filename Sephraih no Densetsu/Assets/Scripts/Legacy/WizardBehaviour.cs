@@ -22,7 +22,7 @@ public class WizardBehaviour : MonoBehaviour
         Camera.main.GetComponent<GameBehaviour>().Register(transform); //upon creation add to list of enemies
         teamID = GetComponent<StatusController>().teamID;
         GetComponent<FireBolt>().acd = 1.0f; // initial cooldown of firebolt ability
-        GetComponent<StatusController>().matk = 100; // set the wizard's default magical attack strenght value to 100
+        GetComponent<StatusController>().Int = 10; // set the wizard's default magical attack strenght value to 100
 
 
     }

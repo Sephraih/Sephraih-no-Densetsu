@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
             Skills();
             Aim();
             Attack();
+            SaveLoad();
         }
         Reset();
     }
@@ -73,5 +74,45 @@ public class PlayerController : MonoBehaviour
         {
             GetComponent<HealthController>().Max();
         }
+    }
+
+
+    public void SaveLoad()
+    {
+        if (Input.GetButtonUp("Load"))
+        {
+
+            Debug.Log("loading");
+            Load();
+        }
+
+        if (Input.GetButtonUp("Save"))
+        {
+
+            Debug.Log("saving");
+            Save();
+        }
+
+    }
+    public void Save()
+    {
+        SaveSystem.SavePlayer(transform);
+        Debug.Log("saved");
+    }
+
+    public void Load()
+    {
+        PlayerData data = SaveSystem.LoadPlayer();
+
+        StatusController stats = GetComponent<StatusController>();
+        stats.lvl = data.lvl;
+        stats.Str = data.Str;
+        stats.Int = data.Int;
+        stats.Agi = data.Agi;
+        stats.Vit = data.Vit;
+
+        transform.position = new Vector3(data.pos[0], data.pos[1], 0);
+
+        Debug.Log("loaded");
     }
 }

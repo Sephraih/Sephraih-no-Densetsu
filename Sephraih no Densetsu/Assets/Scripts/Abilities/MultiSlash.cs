@@ -5,7 +5,7 @@ using UnityEngine;
 public class MultiSlash : Ability
 {
 
-    public int basedmg;
+    private int basedmg =100;
     private int maxCombo = 4;
     private int comboCount = 1;
     private float comboDelay = 0.1f;
@@ -53,7 +53,7 @@ public class MultiSlash : Ability
                 {
                     if (enemiesToDamage[i].GetComponent<StatusController>().teamID != transform.GetComponent<StatusController>().teamID)
                     {
-                        enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(dmg, transform);
+                        enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str), transform);
                     }
                 }
             }

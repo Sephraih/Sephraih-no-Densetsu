@@ -6,7 +6,7 @@ public class ChargeAttack : Ability
 {
     public GameObject chargeEffect;
     public float stunTime = 1.0f;
-    public int dmg = 250;
+    private int dmg = 80;
 
     private Vector2 chargeDirection;
     private float distanceToTarget;
@@ -64,11 +64,11 @@ public class ChargeAttack : Ability
             yield return new WaitForSeconds(time);
         }
         //after charging
-        if (target.GetComponent<HealthController>().health > dmg)
+        if (target.GetComponent<HealthController>().health > dmg *(GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str))
         {
             target.GetComponent<MovementController>().Stun(stunTime);
         }
-        target.GetComponent<HealthController>().TakeDamage(dmg, transform);
+        target.GetComponent<HealthController>().TakeDamage(dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str), transform);
         Camera.main.GetComponent<NeutralCam>().CamShake();
         GetComponent<MovementController>().stuck = false;
         

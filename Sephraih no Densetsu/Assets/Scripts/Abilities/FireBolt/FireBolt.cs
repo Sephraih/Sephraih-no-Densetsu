@@ -12,7 +12,7 @@ public class FireBolt : Ability
     public Transform shotPoint; // infront of character
    
 
-    public int dmg = 50;
+    private int dmg = 50;
     
     public float slow = 0.5f; //default movement speed * slow
 
@@ -47,7 +47,7 @@ public class FireBolt : Ability
             //instantiate and assign values to a firebolt projectile, which handles damaging, position and collision logic based on the fireboltprojectile script attached to it.
             var bolt = Instantiate(projectile, transform.position, shotPoint.transform.rotation);
             bolt.GetComponent<FireBoltProjectile>().user = transform;
-            bolt.GetComponent<FireBoltProjectile>().dmg = dmg; //+= this.GetComponent<StatusController>().matk;
+            bolt.GetComponent<FireBoltProjectile>().dmg = dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Int); //+= this.GetComponent<StatusController>().matk;
             //bolt.GetComponent<FireBoltProjectile>().dotd += this.GetComponent<StatusController>().matk;
             //bolt.GetComponent<FireBoltProjectile>().slow = slow;
 

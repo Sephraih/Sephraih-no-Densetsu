@@ -722,7 +722,6 @@ MonoBehaviour:
   chargeEffect: {fileID: 4909902925158851423, guid: 66417a4e2cfe2ef44a04fd7cc1b5c505,
     type: 3}
   stunTime: 2
-  dmg: 100
 --- !u!114 &373541535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -737,7 +736,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 0
   range: 0
-  basedmg: 200
   whatIsEnemy:
     serializedVersion: 2
     m_Bits: 512
@@ -774,12 +772,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teamID: 0
-  atk: 50
-  matk: 50
-  aspd: 1
   mvspd: 0
   dmvspd: 10
-  crit: 0
+  Int: 0
+  Str: 0
+  Agi: 0
+  Vit: 0
+  lvl: 0
   burnEffect: {fileID: 5987478075576669587, guid: b3cf8b2afe9be424a871a64504cd751b,
     type: 3}
   AIControlled: 0
@@ -827,10 +826,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   acd: 0
-  range: 0
+  range: 15
   projectile: {fileID: 1150724258750520066, guid: 574dcccba4dbc4046b5a249f0978af57,
     type: 3}
-  dmg: 250
   slow: 0.3
 --- !u!114 &373541541
 MonoBehaviour:
@@ -1028,7 +1026,6 @@ MonoBehaviour:
   acd: 0
   range: 0
   effect: {fileID: 5802651140264993763, guid: fdb6ef943056669448a4d958f58b46e6, type: 3}
-  healAmount: 50
 --- !u!114 &373541550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1046,7 +1043,6 @@ MonoBehaviour:
   projectile: {fileID: 6419949315111818092, guid: b72bd4923ff9afb42a80bf7304fd0fb2,
     type: 3}
   shotPoint: {fileID: 1440271540}
-  healAmount: 150
 --- !u!114 &373541551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1064,7 +1060,6 @@ MonoBehaviour:
   projectile: {fileID: 377115153599935253, guid: 937abaceb1382274482cceaa3e075edf,
     type: 3}
   shotPoint: {fileID: 1440271540}
-  healAmount: 100
 --- !u!114 &373541552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1082,7 +1077,6 @@ MonoBehaviour:
   projectile: {fileID: 1150724258750520066, guid: 818c5605413b00641b517b1f127b8ce0,
     type: 3}
   shotPoint: {fileID: 1440271540}
-  dmg: 150
   slow: 0.5
 --- !u!4 &390465422 stripped
 Transform:

@@ -11,7 +11,7 @@ public class HealBolt : Ability
     public GameObject projectile;
     public Transform shotPoint;
 
-    public int healAmount =100;
+    private int healAmount =70;
 
 
     public override void Use()

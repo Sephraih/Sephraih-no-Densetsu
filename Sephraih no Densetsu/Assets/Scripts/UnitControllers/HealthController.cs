@@ -6,8 +6,8 @@ public class HealthController : MonoBehaviour
 {
     //the script is attached to all character objects.
 
-    public int maxHealth = 100; // maximal health the number here is default, overwritten in inspector
-    public int health = 100; // current health - default set to avoid errors
+    public int maxHealth = 2000; // maximal health the number here is default, overwritten in inspector
+    public int health = 2000; // current health - default set to avoid errors
     //private float rewardmodifier = 0.0001f; //for health and damage loss
     private GameObject dmgText; // a damage text prefab to be displayed when the character takes damage
     private GameObject healText; // a text prefab to display the amount of health recovered as a number
@@ -20,6 +20,7 @@ public class HealthController : MonoBehaviour
 
     void Start()
     {
+        maxHealth = 1000 *(GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Vit);
         Max(); // initialize character to start at max health
 
         //loading prefabs to be instantiated later
@@ -29,6 +30,10 @@ public class HealthController : MonoBehaviour
         dmgText = Resources.Load("Prefabs/DmgTextPrefab") as GameObject;
         healText = Resources.Load("Prefabs/HealTextPrefab") as GameObject;
 
+    }
+    private void Update()
+    {
+        maxHealth = 1000 * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Vit);
     }
 
     // take damage, display number and blood effect

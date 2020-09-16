@@ -10,7 +10,7 @@ public class HealWave : Ability
     public GameObject projectile; // the healwave projectile prefab is attached to the editor in this public field
     public Transform shotPoint;
 
-    public int healAmount;
+    private int healAmount = 40;
 
     //used to fire the projectile in the way the character is facing
     public override void Use()
@@ -57,7 +57,7 @@ public class HealWave : Ability
         {
 
             var bolt = Instantiate(projectile, transform.position, shotPoint.transform.rotation);
-            bolt.GetComponent<HealWaveProjectile>().healAmount = healAmount; //this.GetComponent<StatusController>().matk;
+            bolt.GetComponent<HealWaveProjectile>().healAmount = healAmount * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Int); //this.GetComponent<StatusController>().matk;
             bolt.GetComponent<HealWaveProjectile>().user = transform;
 
             cd = acd;
