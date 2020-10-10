@@ -11,8 +11,8 @@ public static class SaveSystem
     {
 
         BinaryFormatter formatter = new BinaryFormatter();
-        
-        string path = Application.persistentDataPath + "/player.stats";
+        string name = "Link";
+        string path = Application.persistentDataPath + "/" + name + "/player.stats";
         FileStream stream = new FileStream(path, FileMode.Create);
 
         PlayerData data = new PlayerData(player);
@@ -21,10 +21,10 @@ public static class SaveSystem
         stream.Close();
     }
 
-    public static PlayerData LoadPlayer()
+    public static PlayerData LoadPlayer(string name)
     {
 
-        string path = Application.persistentDataPath + "/player.stats";
+        string path = Application.persistentDataPath + "/" + name + "/player.stats";
         if (File.Exists(path))
         {
             BinaryFormatter formatter = new BinaryFormatter();

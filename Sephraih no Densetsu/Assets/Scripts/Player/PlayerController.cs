@@ -102,7 +102,7 @@ public class PlayerController : MonoBehaviour
 
     public void Load()
     {
-        PlayerData data = SaveSystem.LoadPlayer();
+        PlayerData data = SaveSystem.LoadPlayer("Link");
 
         StatusController stats = GetComponent<StatusController>();
         stats.lvl = data.lvl;
@@ -111,8 +111,8 @@ public class PlayerController : MonoBehaviour
         stats.Agi = data.Agi;
         stats.Vit = data.Vit;
 
-        transform.position = new Vector3(data.pos[0], data.pos[1], 0);
-
+        //transform.position = new Vector3(data.pos[0], data.pos[1], 0);
+        
         Debug.Log("loaded");
     }
 }
