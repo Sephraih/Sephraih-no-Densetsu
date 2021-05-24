@@ -15,7 +15,6 @@ public class StatusController : MonoBehaviour
     private int slows = 0; // counter to reset movement speed only when no slows are applied
     private int mvspdBoni = 0; // opposite of slows
 
-    public string name;
 
     public int Int =1; //Intellect - affects magical damage and healing
     public int Str =1; //Strength - affects melee damage

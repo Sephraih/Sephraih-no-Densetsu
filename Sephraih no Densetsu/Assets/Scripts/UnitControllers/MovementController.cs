@@ -93,6 +93,7 @@ public class MovementController : MonoBehaviour
         if (animator.isInitialized)
         {
             target = target - new Vector2(transform.position.x,transform.position.y);
+            target.Normalize();
             animator.SetFloat("moveX", target.x);
             animator.SetFloat("moveY", target.y);
             attackPos.transform.localPosition = target.normalized;
