@@ -162,7 +162,7 @@ TextureImporter:
       213: 6658260376826993496
     second: gsaernb6_52
   externalObjects: {}
-  serializedVersion: 10
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -182,6 +182,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -190,9 +192,9 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
-    aniso: -1
-    mipBias: -100
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -213,9 +215,14 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -255,6 +262,30 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -1391,6 +1422,60 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      gsaernb6_12: -6287759312773340
+      gsaernb6_41: 2982538262439115786
+      gsaernb6_49: -8919366270082336931
+      gsaernb6_43: -3517454303013363501
+      gsaernb6_16: -1101218704832309635
+      gsaernb6_48: 3523917822118946792
+      gsaernb6_17: 4617007638548532808
+      gsaernb6_0: -1888405239356951315
+      gsaernb6_15: 7016684385112332772
+      gsaernb6_20: 2323923980255193904
+      gsaernb6_18: -3893253909502998685
+      gsaernb6_46: -1861567988561770132
+      gsaernb6_50: 8516724788316389755
+      gsaernb6_21: -885005697425634668
+      gsaernb6_24: 1071838287247052245
+      gsaernb6_14: 3894683982315054058
+      gsaernb6_23: 4826697129960556522
+      gsaernb6_32: 5625992195970566053
+      gsaernb6_1: -4558961365864408419
+      gsaernb6_31: -8340828588692975593
+      gsaernb6_45: 4487646008086716623
+      gsaernb6_8: -1929067706940088000
+      gsaernb6_27: 2509910284758124901
+      gsaernb6_13: -1165291846861596195
+      gsaernb6_26: -5890729579837763473
+      gsaernb6_2: 315474220285388988
+      gsaernb6_38: -3180780123462888700
+      gsaernb6_3: 3490998851553928965
+      gsaernb6_7: -8324425654141471260
+      gsaernb6_11: -4192120734742747270
+      gsaernb6_9: 8762435054047416747
+      gsaernb6_40: -7342258610913936449
+      gsaernb6_22: -5689180592445044538
+      gsaernb6_34: 4244899579579234420
+      gsaernb6_19: 2622602614378414342
+      gsaernb6_33: 1823401733826713095
+      gsaernb6_47: -8797024324048134007
+      gsaernb6_10: 8006734465623220164
+      gsaernb6_39: 3339065224470891746
+      gsaernb6_28: -4541452645759025838
+      gsaernb6_25: -4514829078661148135
+      gsaernb6_29: 7355708424666092897
+      gsaernb6_30: -7645420405564001865
+      gsaernb6_35: 3792424931922756391
+      gsaernb6_44: 6587700337225015039
+      gsaernb6_4: -8276211145153540860
+      gsaernb6_5: 5543182846006013989
+      gsaernb6_37: 5022941856741591466
+      gsaernb6_51: 8708055948908256414
+      gsaernb6_52: 6658260376826993496
+      gsaernb6_42: -6157977622433544698
+      gsaernb6_36: -7427754593913092184
+      gsaernb6_6: 3057973411984745845
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
