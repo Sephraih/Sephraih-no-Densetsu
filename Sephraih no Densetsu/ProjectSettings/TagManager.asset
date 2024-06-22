@@ -40,6 +40,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: tiles
+    uniqueID: 2359364183
+    locked: 0
   - name: effects
     uniqueID: 4169905155
     locked: 0

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class Teleport : Ability
@@ -7,7 +8,7 @@ public class Teleport : Ability
     public GameObject teleportEffect; //effect to be displayed on teleport
     public Transform attackPos; // object to determine the direction
     public LayerMask boundaries; // all objects that act as game world boundaries belong to this layermask
-
+    public LayerMask colliders;
 
     public override void Use()
     {
@@ -16,7 +17,7 @@ public class Teleport : Ability
 
         for (float range = this.range; range > 0; range--) //shorter jump distance if location jumped at was out of boundary
         {
-            RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, direction, range, boundaries); //check for boundary colliders
+            RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, direction, range+0.2f, boundaries); //check for boundary colliders
             if (hitInfo.collider == null)
             {
                 if (cd <= 0f) // if ability ready to use
@@ -45,10 +46,10 @@ public class Teleport : Ability
 
         float distance = direction.magnitude;
         direction.Normalize(); // ignore distance
-        if (distance > range) distance = range;
+        if (distance > range) distance = range; //set to max tp range if mouse further away
         for (float range = distance; range > 0; range--) //shorter jump distance if location jumped at was out of boundary
         {
-            RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, direction, range, boundaries); //check for boundary colliders
+            RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, direction, range+0.2f, boundaries); //check for boundary colliders
             if (hitInfo.collider == null)
             {
                 if (cd <= 0f) // if ability ready to use
