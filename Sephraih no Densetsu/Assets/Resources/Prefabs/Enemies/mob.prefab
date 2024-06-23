@@ -597,6 +597,8 @@ MonoBehaviour:
   whatIsEnemy:
     serializedVersion: 2
     m_Bits: 512
+  slashEffect: {fileID: 1011458117992520537, guid: 4a1aa3580c0998344bbb22c4b7bcec5b,
+    type: 3}
   particleColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}

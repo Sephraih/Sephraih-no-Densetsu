@@ -25,7 +25,7 @@ public class MultiSlash : Ability
     private void Start()
     {
         attackPos = transform.GetChild(0); //loaded automatically instead of assignment through editor
-        slashEffect = Resources.Load("Prefabs/ParticleSlashPrefab") as GameObject;
+        slashEffect = Resources.Load("Prefabs/Effects/ParticleSlashPrefab") as GameObject;
     }
   
     public override void Use()

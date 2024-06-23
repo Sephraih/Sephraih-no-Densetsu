@@ -24,11 +24,11 @@ public class HealthController : MonoBehaviour
         Max(); // initialize character to start at max health
 
         //loading prefabs to be instantiated later
-        bloodEffect = Resources.Load("Prefabs/BloodEffectPrefab") as GameObject;
-        healedEffect = Resources.Load("Prefabs/HealedEffectPrefab") as GameObject;
+        bloodEffect = Resources.Load("Prefabs/Effects/BloodEffectPrefab") as GameObject;
+        healedEffect = Resources.Load("Prefabs/Effects/HealedEffectPrefab") as GameObject;
 
-        dmgText = Resources.Load("Prefabs/DmgTextPrefab") as GameObject;
-        healText = Resources.Load("Prefabs/HealTextPrefab") as GameObject;
+        dmgText = Resources.Load("Prefabs/TextEffects/DmgTextPrefab") as GameObject;
+        healText = Resources.Load("Prefabs/TextEffects/HealTextPrefab") as GameObject;
 
     }
     private void Update()

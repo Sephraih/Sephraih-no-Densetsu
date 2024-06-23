@@ -72,7 +72,7 @@ public class LevelBehaviour : MonoBehaviour
         portal.SetActive(false);
         Level++;
         LevelMaps.transform.GetChild(Level - 2).gameObject.SetActive(false);
-        LevelMaps.transform.GetChild(Level - 1).gameObject.SetActive(true);
+        LevelMaps.transform.GetChild(Level - 1).gameObject.SetActive(true); // out of bounds, temporary
         Player.transform.position = new Vector3(0, 0, 0);
         CurrentWave = 0;
         cleared = false;
