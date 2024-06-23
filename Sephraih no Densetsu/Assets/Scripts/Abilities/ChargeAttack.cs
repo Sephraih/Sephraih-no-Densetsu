@@ -56,7 +56,7 @@ public class ChargeAttack : Ability
             cef.transform.parent = transform; // make child of the charging character so its emission point moves along with it
             Destroy(cef, 0.5f); //free up memory
 
-
+            
             GetComponent<MovementController>().stuck = true; //disalow any other movement of the charging character
             GetComponent<MovementController>().WalkTowards(chargeDirection); // set movement animation, as default is disabled due to being stuck
             GetComponent<Rigidbody2D>().velocity = chargeDirection * 70;
@@ -66,12 +66,14 @@ public class ChargeAttack : Ability
         //after charging
         if (target != null)
         {
+            GetComponent<MovementController>().LookAt(target.position);
             if (target.GetComponent<HealthController>().health > dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str))
             {
                 target.GetComponent<MovementController>().Stun(stunTime);
             }
             target.GetComponent<HealthController>().TakeDamage(dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str), transform);
             Camera.main.GetComponent<NeutralCam>().CamShake();
+            
         }
         GetComponent<MovementController>().stuck = false;
     }

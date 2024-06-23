@@ -98,12 +98,12 @@ public class LevelBehaviour : MonoBehaviour
             Waves = 3; // [0, n-1]
                     
 
-            mobs.Add(new LevelMob(1, 0, "mob", new Vector3(10, 10, 1)));
-            mobs.Add(new LevelMob(1, 1, "mob", new Vector3(10, 10, 1)));
-            mobs.Add(new LevelMob(1, 1, "mob", new Vector3(-10, 10, 1)));
-            mobs.Add(new LevelMob(1, 2, "mob", new Vector3(10, 10, 1)));
-            mobs.Add(new LevelMob(1, 2, "mob", new Vector3(-10, 10, 1)));
-            mobs.Add(new LevelMob(1, 2, "mob", new Vector3(0, -10, 1)));
+            mobs.Add(new LevelMob(1, 0, "mob", new Vector3(10, 10, 0)));
+            mobs.Add(new LevelMob(1, 1, "mob", new Vector3(10, 10, 0)));
+            mobs.Add(new LevelMob(1, 1, "mob", new Vector3(-10, 10, 0)));
+            mobs.Add(new LevelMob(1, 2, "mob", new Vector3(10, 10, 0)));
+            mobs.Add(new LevelMob(1, 2, "mob", new Vector3(-10, 10, 0)));
+            mobs.Add(new LevelMob(1, 2, "mob", new Vector3(0, -10, 0)));
         }
 
         if (Level == 2)
