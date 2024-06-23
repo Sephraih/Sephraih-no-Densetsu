@@ -15,7 +15,8 @@ public class PortalBehaviour : MonoBehaviour
         foreach (Collider2D collider in overlapColliders)
             if (collider.isTrigger && collider.CompareTag("Player")) // all enemy colliders, each character has 2 colliders, only the trigger collider is used
             {
-                Camera.main.GetComponent<LevelBehaviour>().LoadNext();
+                Camera.main.GetComponent<LevelBehaviour>().LoadNextLevel();
+                //Destroy(gameObject);
             }
     }  
         

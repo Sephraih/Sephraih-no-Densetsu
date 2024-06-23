@@ -81,7 +81,7 @@ public class CameraFollow : MonoBehaviour
         {
             // load an enemy at current mouse position, transformed to game world position
             GameObject a = Instantiate((Resources.Load("Prefabs/Guard") as GameObject), Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1), Quaternion.identity);
-            a.GetComponent<GuardBehaviour>().guardSpot = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1);
+          //  a.GetComponent<GuardBehaviour>().guardSpot = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1);
         }
         if (Input.GetButtonDown("enemy3"))
         {

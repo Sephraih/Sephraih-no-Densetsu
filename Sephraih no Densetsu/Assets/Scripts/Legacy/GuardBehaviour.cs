@@ -9,7 +9,7 @@ public class GuardBehaviour : MonoBehaviour
     public GameObject attackingDirection; // object required to define attacking direction
 
     // definition of the guard spot and chase radius
-    public Vector3 guardSpot = new Vector3(5.0f, 5.0f, 0f);
+    private Vector3 guardSpot = new Vector3(5.0f, 5.0f, 0f);
     public float guardMaxChaseRadius = 25.0f;
     public float guardRadius = 5.0f;
 
@@ -31,7 +31,7 @@ public class GuardBehaviour : MonoBehaviour
     //initialization
     void Start()
     {
-        transform.position = guardSpot;
+        guardSpot = transform.position;
         Camera.main.GetComponent<GameBehaviour>().Register(transform); //upon creation add to list of enemies
         teamID = GetComponent<StatusController>().teamID;
         GetComponent<FireBolt>().acd = 5.0f; // define frequency of firebolt ability usage

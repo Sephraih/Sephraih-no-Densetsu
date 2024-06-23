@@ -64,14 +64,16 @@ public class ChargeAttack : Ability
             yield return new WaitForSeconds(time);
         }
         //after charging
-        if (target.GetComponent<HealthController>().health > dmg *(GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str))
+        if (target != null)
         {
-            target.GetComponent<MovementController>().Stun(stunTime);
+            if (target.GetComponent<HealthController>().health > dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str))
+            {
+                target.GetComponent<MovementController>().Stun(stunTime);
+            }
+            target.GetComponent<HealthController>().TakeDamage(dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str), transform);
+            Camera.main.GetComponent<NeutralCam>().CamShake();
         }
-        target.GetComponent<HealthController>().TakeDamage(dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str), transform);
-        Camera.main.GetComponent<NeutralCam>().CamShake();
         GetComponent<MovementController>().stuck = false;
-        
     }
 
 }
