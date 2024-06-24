@@ -14,7 +14,7 @@ public class Teleport : Ability
     {
         Vector3 direction = transform.position - attackPos.position; // get the direction the caster is facing
         direction.Normalize(); // ignore distance
-
+        transform.GetComponent<UnitController>().SetSaveSpot(transform.position);
         for (float range = this.range; range > 0; range--) //shorter jump distance if location jumped at was out of boundary
         {
             RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, direction, range+0.2f, boundaries); //check for boundary colliders
@@ -43,13 +43,16 @@ public class Teleport : Ability
 
         Vector2 mp = MousePosition();
         Vector2 direction = mp - new Vector2(transform.position.x, transform.position.y); // get the direction the caster is facing
+        transform.GetComponent<PlayerController>().SetSaveSpot(transform.position);
 
+        
         float distance = direction.magnitude;
         direction.Normalize(); // ignore distance
         if (distance > range) distance = range; //set to max tp range if mouse further away
         for (float range = distance; range > 0; range--) //shorter jump distance if location jumped at was out of boundary
         {
             RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, direction, range+0.2f, boundaries); //check for boundary colliders
+         
             if (hitInfo.collider == null)
             {
                 if (cd <= 0f) // if ability ready to use

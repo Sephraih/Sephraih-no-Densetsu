@@ -52,7 +52,7 @@ public class FireBoltProjectile : MonoBehaviour
                         }
                     }
                 }
-                else DestroyProjectile();
+                else DestroyProjectile(); // destroy on any collider
             }
 
         }

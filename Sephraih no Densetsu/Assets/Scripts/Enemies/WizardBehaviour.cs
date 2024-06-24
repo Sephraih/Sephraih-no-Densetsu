@@ -3,19 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // bot behaviour attached to the wizard enemy character and prefab
-public class WizardBehaviour : MonoBehaviour
+public class WizardBehaviour : EnemyController
 {
     
-    public GameObject attackingDirection; //object used to determine attacking direction vector
-    
-    private Vector2 movementDirection;
-    private float msi; // between zero and one determining movement strength
+   
     public float distanceToTarget;
-    public int teamID;
 
-
-    private Transform target; // the derived target the wizard interacts with
-
+       
     void Start()
     {
 
@@ -36,7 +30,7 @@ public class WizardBehaviour : MonoBehaviour
         Die();
     }
 
-    void Move()
+    public override void Move()
     {
 
         target = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); // target is the closest player
@@ -62,21 +56,10 @@ public class WizardBehaviour : MonoBehaviour
     }
 
     //aim at the target
-    void Aim()
-    {
-        var x = target.position - transform.position;
-        x.Normalize();
-        attackingDirection.transform.localPosition = x;
 
-        //if not moving use the animator to look at the target
-        if (movementDirection == Vector2.zero)
-        {
-            GetComponent<MovementController>().LookAt(target.position);
-        }
-    }
 
     // shoot a firebolt whenever ready and within the defined range
-    void Attack()
+    public override void Attack()
     {
         if (distanceToTarget >= 3.0f && distanceToTarget <= 15.0f)
         {
@@ -84,15 +67,5 @@ public class WizardBehaviour : MonoBehaviour
         }
     }
 
-    // death and respawn when health is zero
-    private void Die()
-    {
-        if (this.GetComponent<HealthController>().health <= 0)
-        {
-            //Instantiate((Resources.Load("Prefabs/Wizard") as GameObject), new Vector3(0, 0, 0), Quaternion.identity);
-            Camera.main.GetComponent<GameBehaviour>().Remove(transform);
-            Destroy(gameObject);
-        }
-    }
 
 }

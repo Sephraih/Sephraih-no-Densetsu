@@ -3,27 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //bot behaviour attached to the "guard" type enemy character and its prefab
-public class GuardBehaviour : MonoBehaviour
+public class GuardBehaviour : EnemyController
 {
-
-    public GameObject attackingDirection; // object required to define attacking direction
 
     // definition of the guard spot and chase radius
     private Vector3 guardSpot = new Vector3(5.0f, 5.0f, 0f);
     public float guardMaxChaseRadius = 25.0f;
     public float guardRadius = 5.0f;
 
-    // variables for movement
-    private Vector2 movementDirection;
-    private float msi;
-    public int teamID;
-
 
     // required for attacking, following and guard logic
     private float distanceToTarget;
     private float distanceToGuardSpot;
     private bool returning = false;
-
 
 
     private Transform player; // target player
@@ -45,7 +37,7 @@ public class GuardBehaviour : MonoBehaviour
         Die();
     }
 
-    void Move()
+    public override void Move()
     {
 
         player = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); // interact with closest player determined each frame
@@ -76,7 +68,7 @@ public class GuardBehaviour : MonoBehaviour
     }
 
     // aim towards movement direction if moving, else, if within sight aim at the closest player
-    void Aim()
+    public new void Aim()
     {
         if (movementDirection != Vector2.zero)
         {
@@ -93,7 +85,7 @@ public class GuardBehaviour : MonoBehaviour
     }
 
     // basic attack if next to enemy, charge if within charge range, firebolt if within sight and out of chase radius
-    void Attack()
+    public override void Attack()
     {
         if (distanceToTarget < 1.0f)
         {
@@ -110,15 +102,5 @@ public class GuardBehaviour : MonoBehaviour
         }
     }
 
-    // handle death and respawn
-    private void Die()
-    {
-        if (this.GetComponent<HealthController>().health <= 0)
-        {
-            //Instantiate((Resources.Load("Prefabs/Guard") as GameObject), new Vector3(0, 7, 0), Quaternion.identity);
-            Camera.main.GetComponent<GameBehaviour>().Remove(transform);
-            Destroy(gameObject);
-        }
-    }
 
 }

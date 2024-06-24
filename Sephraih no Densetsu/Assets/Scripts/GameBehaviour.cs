@@ -109,4 +109,7 @@ public class GameBehaviour : MonoBehaviour
             Instantiate((Resources.Load("Prefabs/Wizard") as GameObject), Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1), Quaternion.identity);
         }
     }
+
+
+
 }

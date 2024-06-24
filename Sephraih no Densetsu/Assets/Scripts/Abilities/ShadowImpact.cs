@@ -46,7 +46,7 @@ public class ShadowImpact : Ability
 
     public override void UseMouse()
     {
-
+        transform.GetComponent<UnitController>().SetSaveSpot(transform.position);//reset if stuck in a wall
         Transform t = Camera.main.GetComponent<GameBehaviour>().ClosestEnemyToLocation(MousePosition(), transform);
         UseTarget(t);
 
@@ -88,7 +88,6 @@ public class ShadowImpact : Ability
 
     private Vector3 offset(float count) {
 
-        Debug.Log(count);
          Vector3 v = new Vector3(0, 1, 0);
         
         if (count >= 0.25f)

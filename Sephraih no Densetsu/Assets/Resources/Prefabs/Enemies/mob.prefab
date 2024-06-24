@@ -289,7 +289,7 @@ GameObject:
   - component: {fileID: 5765252530442742072}
   - component: {fileID: 5765252530442742074}
   - component: {fileID: 4047496929096329682}
-  - component: {fileID: 5765252530442742077}
+  - component: {fileID: 9213856871393036685}
   - component: {fileID: 5765252528384337072}
   - component: {fileID: 4671947060057722227}
   - component: {fileID: 2006246590}
@@ -510,7 +510,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.8848281, y: 1.0820003}
   m_EdgeRadius: 0
---- !u!114 &5765252530442742077
+--- !u!114 &9213856871393036685
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -519,13 +519,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 5765252530442742076}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9801c5922da99744a8e2405f8b9a83e2, type: 3}
+  m_Script: {fileID: 11500000, guid: c585a2b4cb258f94d8ede1ed6269b0b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 5765252530442742075}
-  attackingDirection: {fileID: 5765252529138207894}
   movementDirection: {x: 0, y: 0}
+  attackingDirection: {fileID: 5765252529138207894}
   teamID: 1
+  saveSpot: {x: 0, y: 0, z: 0}
 --- !u!114 &5765252528384337072
 MonoBehaviour:
   m_ObjectHideFlags: 0

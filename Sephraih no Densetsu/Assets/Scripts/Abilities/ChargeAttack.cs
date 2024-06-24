@@ -38,7 +38,7 @@ public class ChargeAttack : Ability
 
     public override void UseMouse()
     {
-
+        transform.GetComponent<UnitController>().SetSaveSpot(transform.position);
         Transform t = Camera.main.GetComponent<GameBehaviour>().ClosestEnemyToLocation(MousePosition(), transform);
         UseTarget(t);
 

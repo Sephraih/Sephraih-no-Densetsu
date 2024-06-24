@@ -1,33 +1,29 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 // the character controller of character one (and three, which is an identical copy)
-public class PlayerController : MonoBehaviour
+public class PlayerController : UnitController
 {
 
 
-    public Vector2 movementDirection; // from input based on x and y axis
-    public float msi; // strength of input between zero and one
-
-    public Transform enemy;
-    public GameObject arena;
-    public int teamID;
-
-
-    public GameObject attackingDirection; // object used to calculate a vector of attack
+    protected Transform enemy;
+     
 
     // called once
-    private void Start()
+    public void Start()
     {
         attackingDirection.transform.localPosition = new Vector2(0, -0.5f); // set an attacking direction before the player moves for the first time
         enemy = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); //get closest enemy inside arena
         Camera.main.GetComponent<GameBehaviour>().Register(transform);
         GetComponent<StatusController>().teamID = teamID;
+        saveSpot = Vector3.zero;
     }
 
     // called each frame
-    void Update()
+    public void Update()
     {
         if (!GetComponent<MovementController>().stunned)
         {
@@ -35,13 +31,13 @@ public class PlayerController : MonoBehaviour
             Skills();
             Aim();
             Attack();
-            SaveLoad();
         }
+        SaveLoad();
         Reset();
     }
 
     //process movement input
-    void Move()
+    public override void Move()
     {
         // movement based on input
         movementDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
@@ -49,24 +45,7 @@ public class PlayerController : MonoBehaviour
         msi = Mathf.Clamp(movementDirection.magnitude, 0.0f, 1.0f);
         GetComponent<MovementController>().Move(movementDirection, msi);
     }
-
-    public virtual void Skills()
-    {
-
-    }
-
-    // set attacking direction object's position
-    void Aim()
-    {
-        //position the attacking direction object infront of the character, keep position when it stops moving
-        if (movementDirection != Vector2.zero)
-        {
-            attackingDirection.transform.localPosition = movementDirection * 0.5f;
-        }
-    }
-
-    public virtual void Attack() { }
-
+       
 
     void Reset()
     {
@@ -115,4 +94,9 @@ public class PlayerController : MonoBehaviour
         
         Debug.Log("loaded");
     }
+
+  
+  
+
+
 }

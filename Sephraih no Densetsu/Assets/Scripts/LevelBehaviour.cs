@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 using static UnityEditor.PlayerSettings;
 
 public class LevelBehaviour : MonoBehaviour
@@ -17,6 +19,10 @@ public class LevelBehaviour : MonoBehaviour
     public GameObject Player;
     public GameObject LevelMaps;
     private GameObject portal;
+
+    private Vector2 worldPoint;
+    [SerializeField] private Tilemap obstacleMap;
+    [SerializeField] private Tilemap boundaryMap;
 
     // Start is called before the first frame update
     void Start()
@@ -38,7 +44,7 @@ public class LevelBehaviour : MonoBehaviour
             if (CurrentWave == Waves) { StageClear(); return; }
             LoadEnemies();
         }
-
+        Unstuck();
     //  Debug.Log(Camera.main.GetComponent<GameBehaviour>().characterList.Count);
 
 
@@ -73,6 +79,8 @@ public class LevelBehaviour : MonoBehaviour
         Level++;
         LevelMaps.transform.GetChild(Level - 2).gameObject.SetActive(false);
         LevelMaps.transform.GetChild(Level - 1).gameObject.SetActive(true); // out of bounds, temporary
+        obstacleMap = LevelMaps.transform.GetChild(Level - 1).GetChild(1).GetChild(0).GetComponent<Tilemap>();
+        boundaryMap = LevelMaps.transform.GetChild(Level - 1).GetChild(2).GetChild(0).GetComponent<Tilemap>();
         Player.transform.position = new Vector3(0, 0, 0);
         CurrentWave = 0;
         cleared = false;
@@ -95,6 +103,8 @@ public class LevelBehaviour : MonoBehaviour
         if (Level == 1)
         {
             LevelMaps.transform.GetChild(Level - 1).gameObject.SetActive(true); // set first level (child 0) as active
+            obstacleMap = LevelMaps.transform.GetChild(Level - 1).GetChild(1).GetChild(0).GetComponent<Tilemap>();
+            boundaryMap = LevelMaps.transform.GetChild(Level - 1).GetChild(2).GetChild(0).GetComponent<Tilemap>();
             Waves = 3; // [0, n-1]
                     
 
@@ -148,6 +158,24 @@ public class LevelBehaviour : MonoBehaviour
 
 
         }
+
+    }
+
+
+    public void Unstuck()
+    {
+        // change to a foreach loop to loop over all active units
+
+        // Try to get a tile from cell position matching player position
+        var obstacle = obstacleMap.GetTile(obstacleMap.WorldToCell(Player.transform.position));
+        var boundary = boundaryMap.GetTile(boundaryMap.WorldToCell(Player.transform.position));
+
+
+        if (obstacle || boundary) // if a tile (obstacle or boundary) was found -> move player
+        {
+            Player.transform.position = Player.GetComponent<PlayerController>().saveSpot; // unstuck to last savespot triggered by critical abilities.
+        }
+
 
     }
 
