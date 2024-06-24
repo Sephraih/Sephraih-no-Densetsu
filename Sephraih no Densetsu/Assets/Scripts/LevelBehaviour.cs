@@ -14,7 +14,8 @@ public class LevelBehaviour : MonoBehaviour
     private int Waves;
     private int CurrentWave;
     private bool cleared = false;
-    private int Level = 1;
+    private int Level = 0;
+    private int MaxLevel = 3;
     private List<LevelMob> mobs = new List<LevelMob>();
     public GameObject Player;
     public GameObject LevelMaps;
@@ -29,11 +30,11 @@ public class LevelBehaviour : MonoBehaviour
     {
         LoadLevel();
         portal = Instantiate((Resources.Load("Prefabs/GameObjects/Portal") as GameObject), new Vector3(0, 5, 1), Quaternion.identity);
-        portal.SetActive(false);
+        portal.SetActive(true);
 
-        //Debug.Log(mobs);
-        //LoadEnemies();
-
+        obstacleMap = LevelMaps.transform.GetChild(Level).GetChild(1).GetChild(0).GetComponent<Tilemap>();
+        boundaryMap = LevelMaps.transform.GetChild(Level).GetChild(2).GetChild(0).GetComponent<Tilemap>();
+       
     }
 
     // Update is called once per frame
@@ -65,7 +66,16 @@ public class LevelBehaviour : MonoBehaviour
         Player.transform.position = new Vector3(0, 0, 0);
         portal.SetActive(true);
         cleared = true;
+       
+    }
 
+    public void DungeonClear() {
+        LevelMaps.transform.GetChild(0).gameObject.SetActive(true);
+        obstacleMap = LevelMaps.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Tilemap>();
+        boundaryMap = LevelMaps.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<Tilemap>();
+        // instantiate start Portal
+        Level = 0;
+        portal.SetActive(true);
     }
 
 
@@ -77,14 +87,19 @@ public class LevelBehaviour : MonoBehaviour
         //SceneManager.LoadScene("Main");
         portal.SetActive(false);
         Level++;
-        LevelMaps.transform.GetChild(Level - 2).gameObject.SetActive(false);
-        LevelMaps.transform.GetChild(Level - 1).gameObject.SetActive(true); // out of bounds, temporary
-        obstacleMap = LevelMaps.transform.GetChild(Level - 1).GetChild(1).GetChild(0).GetComponent<Tilemap>();
-        boundaryMap = LevelMaps.transform.GetChild(Level - 1).GetChild(2).GetChild(0).GetComponent<Tilemap>();
-        Player.transform.position = new Vector3(0, 0, 0);
+        LevelMaps.transform.GetChild(Level - 1).gameObject.SetActive(false);
         CurrentWave = 0;
         cleared = false;
-        LoadLevel();
+        Player.transform.position = new Vector3(0, 0, 0);
+
+        if (Level <= MaxLevel) {
+            LevelMaps.transform.GetChild(Level).gameObject.SetActive(true); 
+            obstacleMap = LevelMaps.transform.GetChild(Level).GetChild(1).GetChild(0).GetComponent<Tilemap>();
+            boundaryMap = LevelMaps.transform.GetChild(Level).GetChild(2).GetChild(0).GetComponent<Tilemap>();
+            LoadLevel();
+        } else DungeonClear();
+        
+        
     }
 
     public void ReloadLevel() {
@@ -102,9 +117,9 @@ public class LevelBehaviour : MonoBehaviour
 
         if (Level == 1)
         {
-            LevelMaps.transform.GetChild(Level - 1).gameObject.SetActive(true); // set first level (child 0) as active
-            obstacleMap = LevelMaps.transform.GetChild(Level - 1).GetChild(1).GetChild(0).GetComponent<Tilemap>();
-            boundaryMap = LevelMaps.transform.GetChild(Level - 1).GetChild(2).GetChild(0).GetComponent<Tilemap>();
+            LevelMaps.transform.GetChild(Level).gameObject.SetActive(true); 
+            obstacleMap = LevelMaps.transform.GetChild(Level).GetChild(1).GetChild(0).GetComponent<Tilemap>();
+            boundaryMap = LevelMaps.transform.GetChild(Level).GetChild(2).GetChild(0).GetComponent<Tilemap>();
             Waves = 3; // [0, n-1]
                     
 
