@@ -138,7 +138,7 @@ GameObject:
   - component: {fileID: 11936858}
   - component: {fileID: 11936857}
   m_Layer: 11
-  m_Name: Boundarytiles
+  m_Name: BoundaryTiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8882,7 +8882,7 @@ GameObject:
   - component: {fileID: 32630456}
   - component: {fileID: 32630455}
   m_Layer: 0
-  m_Name: Groundtiles
+  m_Name: GroundTiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10750,7 +10750,7 @@ GameObject:
   - component: {fileID: 208515098}
   - component: {fileID: 208515097}
   m_Layer: 0
-  m_Name: Groundtiles
+  m_Name: GroundTiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11979,6 +11979,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 222323007}
+  - component: {fileID: 222323008}
   m_Layer: 0
   m_Name: Level2
   m_TagString: Untagged
@@ -12004,6 +12005,20 @@ Transform:
   - {fileID: 1023597088}
   m_Father: {fileID: 914955922}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &222323008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 222323006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27d1198bb8ba6c44fabf12b6e58f9f47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obstacleMap: {fileID: 2019367282}
+  boundaryMap: {fileID: 1605234587}
 --- !u!1 &233064895
 GameObject:
   m_ObjectHideFlags: 0
@@ -12501,8 +12516,8 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
+  m_Mass: 70
+  m_LinearDrag: 10
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
@@ -12514,7 +12529,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!95 &373541547
 Animator:
@@ -12679,6 +12694,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 376017481}
+  - component: {fileID: 376017482}
   m_Layer: 0
   m_Name: Level1
   m_TagString: Untagged
@@ -12705,6 +12721,20 @@ Transform:
   - {fileID: 5750737120634992482}
   m_Father: {fileID: 914955922}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &376017482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376017480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27d1198bb8ba6c44fabf12b6e58f9f47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obstacleMap: {fileID: 2113861149}
+  boundaryMap: {fileID: 2120138557}
 --- !u!1 &414075378
 GameObject:
   m_ObjectHideFlags: 0
@@ -13384,7 +13414,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 12
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -13451,6 +13481,7 @@ MonoBehaviour:
   ShakeAnimation: {fileID: 519420033}
   target: {fileID: 373541533}
   offset: {x: 0, y: 0, z: -1}
+  fix: 0
 --- !u!114 &519420035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14172,7 +14203,7 @@ GameObject:
   - component: {fileID: 668480469}
   - component: {fileID: 668480468}
   m_Layer: 12
-  m_Name: Collidertiles
+  m_Name: ObstacleTiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15119,7 +15150,7 @@ GameObject:
   - component: {fileID: 833482964}
   - component: {fileID: 833482963}
   m_Layer: 12
-  m_Name: Collidertiles
+  m_Name: ObstacleTIles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17236,7 +17267,7 @@ GameObject:
   m_Component:
   - component: {fileID: 914955922}
   m_Layer: 0
-  m_Name: LevelMaps
+  m_Name: Dungeon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17273,7 +17304,7 @@ GameObject:
   - component: {fileID: 918518636}
   - component: {fileID: 918518635}
   m_Layer: 0
-  m_Name: Groundtiles
+  m_Name: GroundTIles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20181,6 +20212,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1187081847}
+  - component: {fileID: 1187081848}
   m_Layer: 0
   m_Name: Level3
   m_TagString: Untagged
@@ -20207,6 +20239,20 @@ Transform:
   - {fileID: 1609898618}
   m_Father: {fileID: 914955922}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1187081848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1187081846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27d1198bb8ba6c44fabf12b6e58f9f47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obstacleMap: {fileID: 833482967}
+  boundaryMap: {fileID: 1631293284}
 --- !u!1001 &1203259560
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27105,7 +27151,7 @@ GameObject:
   - component: {fileID: 1605234584}
   - component: {fileID: 1605234583}
   m_Layer: 11
-  m_Name: Boundarytiles
+  m_Name: BoundaryTiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52952,7 +52998,7 @@ GameObject:
   - component: {fileID: 1631293281}
   - component: {fileID: 1631293280}
   m_Layer: 11
-  m_Name: Boundarytiles
+  m_Name: BoundaryTiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -59485,6 +59531,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1670015609}
+  - component: {fileID: 1670015610}
   m_Layer: 0
   m_Name: Level0
   m_TagString: Untagged
@@ -59511,6 +59558,20 @@ Transform:
   - {fileID: 89051487}
   m_Father: {fileID: 914955922}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1670015610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670015608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27d1198bb8ba6c44fabf12b6e58f9f47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obstacleMap: {fileID: 668480472}
+  boundaryMap: {fileID: 11936861}
 --- !u!4 &1680759325 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7480321473359576386, guid: 56165a4eb9758584583943564ffea420,
@@ -59604,7 +59665,7 @@ GameObject:
   - component: {fileID: 1699401747}
   - component: {fileID: 1699401746}
   m_Layer: 0
-  m_Name: Groundtiles
+  m_Name: GroundTiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61348,7 +61409,7 @@ GameObject:
   - component: {fileID: 2019367279}
   - component: {fileID: 2019367278}
   m_Layer: 12
-  m_Name: Collidertiles
+  m_Name: ObstacleTiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -63262,7 +63323,7 @@ GameObject:
   - component: {fileID: 2113861151}
   - component: {fileID: 2113861150}
   m_Layer: 12
-  m_Name: Obstacletiles
+  m_Name: ObstacleTiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -65397,7 +65458,7 @@ GameObject:
   - component: {fileID: 2120138554}
   - component: {fileID: 2120138553}
   m_Layer: 11
-  m_Name: Boundarytiles
+  m_Name: BoundaryTiles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

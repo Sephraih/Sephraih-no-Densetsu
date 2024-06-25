@@ -31,11 +31,11 @@ public class StatusController : MonoBehaviour
 
     public void Start()
     {
-        Int = 1;
-        Str = 1;
-        Agi = 1;
-        Vit = 1;
-        lvl = 1;
+        //Int = 1;
+        //Str = 1;
+        //Agi = 1;
+        //Vit = 1;
+        //lvl = 1;
         mvspd = dmvspd; // setting the current speed to the default
     }
     public void Update()

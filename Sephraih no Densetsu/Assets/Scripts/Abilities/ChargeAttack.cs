@@ -11,7 +11,11 @@ public class ChargeAttack : Ability
     private Vector2 chargeDirection;
     private float distanceToTarget;
     private Transform target;
-   
+
+    public void Start()
+    {
+        range = 6;
+    }
 
     //run at a target, damage based on character attack*3 and stun it for a short time
     public override void UseTarget(Transform target)

@@ -21,6 +21,7 @@ public class ShadowImpact : Ability
         attackPos = transform.GetChild(0); //loaded automatically instead of assignment through editor
         slashEffect = Resources.Load("Prefabs/Effects/ParticleSlashPrefab") as GameObject;
         tpEffect = Resources.Load("Prefabs/Effects/TeleportEffect") as GameObject;
+        range = 4;
     }
 
 
@@ -54,10 +55,13 @@ public class ShadowImpact : Ability
 
     IEnumerator SlashCoroutine()
     {
-        float time = 1f;
-        float count = 0.0f;
+
+        float times = 8;
+        float count = 0;
+        float intervall = 0.12f;
         float random = 1f;
-        while (count < time && target != null)
+        float hit = 1;
+        while (count < times && target != null)
         {
             //transform.GetComponent<Rigidbody2D>().velocity = new Vector2(0,0);
             //target.GetComponent<Rigidbody2D>().velocity    = new Vector2(0, 0);
@@ -68,19 +72,22 @@ public class ShadowImpact : Ability
             //direction.Normalize(); // ignore distance
             Vector2 trpos = transform.position;
             //transform.position = trpos + direction * range;
-            transform.position = target.position + offset(count);
+            transform.position = target.position + offset(hit);
             //GameObject tef = Instantiate(tpEffect, transform.position + new Vector3(0, -0.7f, 0), Quaternion.Euler(0f, 0f, 0)); //instantiate effect prefab at position and rotation
             //Destroy(tef, 0.5f); //free up memory
 
 
-            Slash(30*random, Color.red);
+         
 
             GetComponent<MovementController>().stuck = true; //disalow any other movement of the charging character
             GetComponent<MovementController>().LookAt(target.position);
+            Slash(30 * random, Color.red);
+
             target.GetComponent<HealthController>().TakeDamage(dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str), transform);
-            count += 0.125f;
-            random *= -1;
-            yield return new WaitForSeconds(0.125f);
+            count ++;
+            random *= -1f;
+            hit++;
+            yield return new WaitForSeconds(intervall);
         }
         //after coroutine
         GetComponent<MovementController>().stuck = false;
@@ -90,17 +97,17 @@ public class ShadowImpact : Ability
 
          Vector3 v = new Vector3(0, 1, 0);
         
-        if (count >= 0.25f)
+        if (count > 2)
         {
             v = new Vector3(1, 0, 0);
         }
-        if (count >= 0.5f)
-        {
-            v = new Vector3(-1, 0, 0);
-        }
-        if (count >= 0.75f)
+        if (count > 4)
         {
             v = new Vector3(0, -1, 0);
+        }
+        if (count > 6)
+        {
+            v = new Vector3(-1, 0, 0);
         }
 
         return v;
