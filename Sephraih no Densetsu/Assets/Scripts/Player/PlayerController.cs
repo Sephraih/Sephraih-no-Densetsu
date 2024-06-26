@@ -10,7 +10,6 @@ public class PlayerController : UnitController
 
 
     protected Transform enemy;
-     
 
     // called once
     public void Start()
@@ -20,6 +19,8 @@ public class PlayerController : UnitController
         Camera.main.GetComponent<GameBehaviour>().Register(transform);
         GetComponent<StatusController>().teamID = teamID;
         saveSpot = Vector3.zero;
+       
+
     }
 
     // called each frame

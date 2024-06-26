@@ -27,7 +27,12 @@ public class MultiSlash : Ability
         attackPos = transform.GetChild(0); //loaded automatically instead of assignment through editor
         slashEffect = Resources.Load("Prefabs/Effects/ParticleSlashPrefab") as GameObject;
     }
-  
+
+    public override void UseMouse()
+    {
+        Use();
+    }
+
     public override void Use()
     {
         if (cd <= 0) //can't attack if the attack isnt ready to be used again

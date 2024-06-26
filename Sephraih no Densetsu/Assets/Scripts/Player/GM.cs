@@ -35,8 +35,14 @@ public class GM : PlayerController
         }
         if (Input.GetButtonUp("mouse1"))
         {
-//            GetComponent<FireBolt>().UseMouse();
-            GetComponent<ShadowImpact>().UseMouse();
+            //            GetComponent<FireBolt>().UseMouse();
+            //GetComponent<ShadowImpact>().UseMouse();
+            
+            //Ability a = GetComponent<ShadowImpact>();
+            //a.UseMouse();
+
+            GetComponent<AbilityController>().UseAbility(7);
         }
     }
+
 }

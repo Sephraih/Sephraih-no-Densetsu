@@ -25,4 +25,10 @@ public class SelfHeal : Ability
 
     }
 
+    public override void UseMouse()
+    {
+        Use();
+    }
+
+
 }
