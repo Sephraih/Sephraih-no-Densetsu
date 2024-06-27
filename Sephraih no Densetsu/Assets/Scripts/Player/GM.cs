@@ -15,23 +15,25 @@ public class GM : PlayerController
         enemy = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); //get closest enemy inside arena
         if (Input.GetButtonUp("r"))
         {
-            GetComponent<FireStorm>().UseMouse();
+            GetComponent<AbilityController>().UseAbility(3);
         }
         if (Input.GetButtonUp("e"))
         {
-            GetComponent<Teleport>().UseMouse();
+            GetComponent<AbilityController>().UseAbility(6);
         }
         if (Input.GetButtonUp("q"))
         {
-            GetComponent<ChargeAttack>().UseMouse();
+            GetComponent<AbilityController>().UseAbility(2);
         }
         if (Input.GetButtonUp("f"))
         {
-            GetComponent<SelfHeal>().Use();
+
+            GetComponent<AbilityController>().UseAbility(7);
         }
         if (Input.GetButtonUp("mouse0"))
         {
-            GetComponent<MultiSlash>().Use();
+            //GetComponent<MultiSlash>().Use();
+            GetComponent<AbilityController>().UseAbility(1);
         }
         if (Input.GetButtonUp("mouse1"))
         {
@@ -41,7 +43,7 @@ public class GM : PlayerController
             //Ability a = GetComponent<ShadowImpact>();
             //a.UseMouse();
 
-            GetComponent<AbilityController>().UseAbility(7);
+            GetComponent<AbilityController>().UseAbility(4);
         }
     }
 

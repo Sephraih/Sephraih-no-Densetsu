@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //simple basic attack, see multislash for explanation of functionality
-public class BasicAttack : MonoBehaviour
+public class BasicAttack : Ability
 {
     public int dmg;
     public float startDelay;
@@ -35,8 +35,16 @@ public class BasicAttack : MonoBehaviour
             delay -= Time.deltaTime;
         }
     }
-
     public void Attack()
+    {
+        Use();
+    }
+    public override void UseMouse()
+    {
+        Use();
+    }
+
+    public override void Use()
     {
         if (delay <= 0)
         {
