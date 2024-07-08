@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 // bot behaviour attached to the wizard enemy character and prefab
@@ -15,8 +16,8 @@ public class WizardBehaviour : EnemyController
 
         Camera.main.GetComponent<GameBehaviour>().Register(transform); //upon creation add to list of enemies
         teamID = GetComponent<StatusController>().teamID;
-        GetComponent<FireBolt>().acd = 1.0f; // initial cooldown of firebolt ability
-        GetComponent<StatusController>().Int = 10; // set the wizard's default magical attack strenght value to 100
+        //GetComponent<FireBolt>().acd = 1.0f; // initial cooldown of firebolt ability
+        GetComponent<StatusController>().Int = 10; // set the wizard's default magical attack strenght value to 10
 
 
     }
@@ -45,7 +46,7 @@ public class WizardBehaviour : EnemyController
         if (distanceToTarget <= 10.0f && distanceToTarget > 5.0f || distanceToTarget > 20.0f) movementDirection = Vector2.zero; // don't move
         if (distanceToTarget <= 5.0f)
         {
-            GetComponent<Teleport>().Use();
+            Camera.main.GetComponent<AbilityController>().Invoke(6, transform);
             movementDirection = transform.position - target.transform.position; //walk away from target
         }
 
@@ -63,7 +64,7 @@ public class WizardBehaviour : EnemyController
     {
         if (distanceToTarget >= 3.0f && distanceToTarget <= 15.0f)
         {
-            GetComponent<FireBolt>().Use();
+            Camera.main.GetComponent<AbilityController>().Invoke(4, transform);
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 //bot behaviour attached to the "guard" type enemy character and its prefab
@@ -89,16 +90,16 @@ public class GuardBehaviour : EnemyController
     {
         if (distanceToTarget < 1.0f)
         {
-            this.GetComponent<BasicAttack>().Attack();
+            Camera.main.GetComponent<AbilityController>().Invoke(0, transform);
         }
         else if (distanceToTarget < guardRadius && distanceToGuardSpot <= guardMaxChaseRadius)
         {
-            this.GetComponent<ChargeAttack>().UseTarget(player);
+            Camera.main.GetComponent<AbilityController>().Invoke(2, transform);
         }
 
         if (distanceToTarget > 5.0f && distanceToTarget < 10.0f)
         {
-            GetComponent<FireBolt>().Use();
+            Camera.main.GetComponent<AbilityController>().Invoke(5, transform);
         }
     }
 

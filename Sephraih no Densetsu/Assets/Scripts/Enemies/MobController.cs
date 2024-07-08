@@ -42,7 +42,8 @@ public class MobController : EnemyController
     {
         if (Vector2.Distance(transform.position, target.position) < 1.0f)
         {
-            this.GetComponent<BasicAttack>().Attack();
+
+            Camera.main.GetComponent<AbilityController>().Invoke(0, transform);
         }
     }
 

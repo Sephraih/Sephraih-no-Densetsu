@@ -6,30 +6,37 @@ using UnityEngine;
 public class AbilityController : MonoBehaviour
 {
 
-
-    public List<Ability> A1;
+    public List<Ability> Abilities;
 
     public void Start()
     {
-        A1.Add(GetComponent<BasicAttack>()); //0
-        A1.Add(GetComponent<MultiSlash>()); //1
-        A1.Add(GetComponent<ChargeAttack>()); //2
-        A1.Add(GetComponent<ShadowImpact>()); //3
-        A1.Add(GetComponent<FireBolt>()); //4
-        A1.Add(GetComponent<FireStorm>()); //5
-        A1.Add(GetComponent<Teleport>());  //6
-        A1.Add(GetComponent<SelfHeal>()); //7
-        A1.Add(GetComponent<HealBolt>()); //8
-        A1.Add(GetComponent<HealWave>()); //9
-
+       Abilities.Add(Camera.main.GetComponentInChildren<BasicAttack>()); //0
+       Abilities.Add(Camera.main.GetComponentInChildren<MultiSlash>()); //1
+       Abilities.Add(Camera.main.GetComponentInChildren<ChargeAttack>()); //2
+       Abilities.Add(Camera.main.GetComponentInChildren<ShadowImpact>()); //3
+       Abilities.Add(Camera.main.GetComponentInChildren<FireBolt>()); //4
+       Abilities.Add(Camera.main.GetComponentInChildren<FireStorm>()); //5
+       Abilities.Add(Camera.main.GetComponentInChildren<Teleport>());  //6
+       Abilities.Add(Camera.main.GetComponentInChildren<SelfHeal>()); //7
+       Abilities.Add(Camera.main.GetComponentInChildren<HealBolt>()); //8
+       Abilities.Add(Camera.main.GetComponentInChildren<HealWave>()); //9
     }
 
     public void UseAbility(int spellid) {
-        A1[spellid].UseMouse();
+        Abilities[spellid].UseMouse();
 
         
     }
 
+    public void Invoke(int spellid, Transform user)
+    {
+        Abilities[spellid].Invoke(user);
+    }
+
+    public void InvokeMouse(int spellid, Transform user)
+    {
+        Abilities[spellid].InvokeMouse(user);
+    }
 
 
 

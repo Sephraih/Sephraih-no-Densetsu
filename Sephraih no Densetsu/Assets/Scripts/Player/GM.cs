@@ -12,39 +12,55 @@ public class GM : PlayerController
     // using the skills assigned to the keys depending on input
     public override void Attack()
     {
+        int skill = 1000;
         enemy = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); //get closest enemy inside arena
         if (Input.GetButtonUp("r"))
         {
-            GetComponent<AbilityController>().UseAbility(3);
+            skill = 3;
         }
         if (Input.GetButtonUp("e"))
         {
-            GetComponent<AbilityController>().UseAbility(6);
+            skill = 6;
         }
         if (Input.GetButtonUp("q"))
         {
-            GetComponent<AbilityController>().UseAbility(2);
+            skill = 2;
         }
         if (Input.GetButtonUp("f"))
         {
-
-            GetComponent<AbilityController>().UseAbility(7);
+            skill = 7;
         }
         if (Input.GetButtonUp("mouse0"))
         {
-            //GetComponent<MultiSlash>().Use();
-            GetComponent<AbilityController>().UseAbility(1);
+            skill = 1;
         }
         if (Input.GetButtonUp("mouse1"))
         {
-            //            GetComponent<FireBolt>().UseMouse();
+            skill = 4;
+        }
+        if (Input.GetButtonUp("x"))
+        {
+            skill = 5;
+        }
+
+
+        if (skill < 1000)
+        {
+        Camera.main.GetComponent<AbilityController>().InvokeMouse(skill, transform);
+        }
+
+    }
+
+}
+
+
+/*
+      //            GetComponent<FireBolt>().UseMouse();
             //GetComponent<ShadowImpact>().UseMouse();
             
             //Ability a = GetComponent<ShadowImpact>();
             //a.UseMouse();
 
-            GetComponent<AbilityController>().UseAbility(4);
-        }
-    }
-
-}
+            Camera.main.GetComponent<AbilityController>().InvokeMouse(4,transform);
+ 
+ */

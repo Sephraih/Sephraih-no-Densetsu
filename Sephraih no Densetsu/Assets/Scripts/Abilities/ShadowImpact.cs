@@ -12,13 +12,11 @@ public class ShadowImpact : Ability
     private Vector2 chargeDirection;
     private float distanceToTarget;
     private Transform target;
-    private Transform attackPos; //direction of attack
     private GameObject slashEffect; //particle slash
     private GameObject tpEffect; //particle slash
 
     private void Start()
     {
-        attackPos = transform.GetChild(0); //loaded automatically instead of assignment through editor
         slashEffect = Resources.Load("Prefabs/Effects/ParticleSlashPrefab") as GameObject;
         tpEffect = Resources.Load("Prefabs/Effects/TeleportEffect") as GameObject;
         range = 4;
@@ -27,12 +25,14 @@ public class ShadowImpact : Ability
 
     public override void UseTarget(Transform target)
     {
-        if (transform.GetComponent<StatusController>().teamID != target.GetComponent<StatusController>().teamID)
+        attackPos = user.GetChild(0); //loaded automatically instead of assignment through editor
+
+        if (user.GetComponent<StatusController>().teamID != target.GetComponent<StatusController>().teamID)
         {
             if (cd <= 0f) // if ability ready to use
             {
                 //determine direction
-                distanceToTarget = Vector2.Distance(transform.position, target.position);
+                distanceToTarget = Vector2.Distance(user.position, target.position);
                 if (distanceToTarget <= range) // && distanceToTarget >= 2.0f at point blank atm
                 {
                     this.target = target; //classwide access
@@ -47,8 +47,9 @@ public class ShadowImpact : Ability
 
     public override void UseMouse()
     {
-        transform.GetComponent<UnitController>().SetSaveSpot(transform.position);//reset if stuck in a wall
-        Transform t = Camera.main.GetComponent<GameBehaviour>().ClosestEnemyToLocation(MousePosition(), transform);
+
+        user.GetComponent<UnitController>().SetSaveSpot(user.position);//reset if stuck in a wall
+        Transform t = Camera.main.GetComponent<GameBehaviour>().ClosestEnemyToLocation(MousePosition(), user);
         UseTarget(t);
 
     }
@@ -70,27 +71,27 @@ public class ShadowImpact : Ability
             //Vector2 direction = tp - new Vector2(transform.position.x, transform.position.y); // get the direction the caster is facing
             //float distance = direction.magnitude;
             //direction.Normalize(); // ignore distance
-            Vector2 trpos = transform.position;
+            Vector2 trpos = user.position;
             //transform.position = trpos + direction * range;
-            transform.position = target.position + offset(hit);
+            user.position = target.position + offset(hit);
             //GameObject tef = Instantiate(tpEffect, transform.position + new Vector3(0, -0.7f, 0), Quaternion.Euler(0f, 0f, 0)); //instantiate effect prefab at position and rotation
             //Destroy(tef, 0.5f); //free up memory
 
 
          
 
-            GetComponent<MovementController>().stuck = true; //disalow any other movement of the charging character
-            GetComponent<MovementController>().LookAt(target.position);
+            user.GetComponent<MovementController>().stuck = true; //disalow any other movement of the charging character
+            user.GetComponent<MovementController>().LookAt(target.position);
             Slash(30 * random, Color.red);
 
-            target.GetComponent<HealthController>().TakeDamage(dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str), transform);
+            target.GetComponent<HealthController>().TakeDamage(dmg * (user.GetComponent<StatusController>().lvl + user.GetComponent<StatusController>().Str), user);
             count ++;
             random *= -1f;
             hit++;
             yield return new WaitForSeconds(intervall);
         }
         //after coroutine
-        GetComponent<MovementController>().stuck = false;
+       user.GetComponent<MovementController>().stuck = false;
     }
 
     private Vector3 offset(float count) {
@@ -118,7 +119,7 @@ public class ShadowImpact : Ability
     {
 
         //instantiate slash prefab
-        GameObject slash = Instantiate(slashEffect, transform.position + attackPos.localPosition, Quaternion.identity);
+        GameObject slash = Instantiate(slashEffect, user.position + attackPos.localPosition, Quaternion.identity);
 
 
         //get particle system to set it's color
@@ -126,7 +127,7 @@ public class ShadowImpact : Ability
         slashParticleMain.startColor = color;
 
         //effect
-        slash.transform.parent = transform; //to set the simulation space (follow the character)
+        slash.transform.parent = user; //to set the simulation space (follow the character)
         slash.transform.Rotate(Mathf.Atan2(attackPos.localPosition.x, attackPos.localPosition.y) * Mathf.Rad2Deg, +90, 0); // direction user is facing
         slash.transform.Rotate(angle, 0, 0); //rotate the slash
 

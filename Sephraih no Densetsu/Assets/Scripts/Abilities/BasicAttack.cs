@@ -10,9 +10,8 @@ public class BasicAttack : Ability
     private float delay;
 
 
-    public LayerMask whatIsEnemy;
+    public LayerMask units;
 
-    private Transform attackPos;
     private float attackRangeX = 2.5f;
     private float attackRangeY = 1.5f;
 
@@ -24,9 +23,8 @@ public class BasicAttack : Ability
 
     private void Start()
     {
-        attackPos = transform.GetChild(0);
         slashEffect = Resources.Load("prefabs/Effects/ParticleSlashPrefab") as GameObject;
-
+       
     }
     void Update()
     {
@@ -44,25 +42,30 @@ public class BasicAttack : Ability
         Use();
     }
 
+
+
+
     public override void Use()
     {
+
         if (delay <= 0)
+        attackPos = user.transform.GetChild(0);
         {
             // instantiate slash prefab
-            GameObject slash = Instantiate(slashEffect, transform.position + attackPos.localPosition, Quaternion.identity);
+            GameObject slash = Instantiate(slashEffect, user.transform.position + attackPos.localPosition, Quaternion.identity);
 
 
             //effect
-            slash.transform.parent = transform;
+            slash.transform.parent = user.transform;
             slash.transform.Rotate(Mathf.Atan2(attackPos.localPosition.x, attackPos.localPosition.y) * Mathf.Rad2Deg, +90, 0);
             Destroy(slash, 0.2f);
 
             //determine damaged enemies, apply damage
-            Collider2D[] enemiesToDamage = Physics2D.OverlapBoxAll(attackPos.position, new Vector2(attackRangeX, attackRangeY), attackPos.localPosition.x * 90, whatIsEnemy);
+            Collider2D[] enemiesToDamage = Physics2D.OverlapBoxAll(attackPos.position, new Vector2(attackRangeX, attackRangeY), attackPos.localPosition.x * 90, units);
             for (int i = 0; i < enemiesToDamage.Length; i++)
             {
-                if (enemiesToDamage[i].isTrigger && enemiesToDamage[i].GetComponent<StatusController>().teamID != transform.GetComponent<StatusController>().teamID)
-                    enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(dmg, transform);
+                if (enemiesToDamage[i].isTrigger && enemiesToDamage[i].GetComponent<StatusController>().teamID != user.transform.GetComponent<StatusController>().teamID)
+                    enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(dmg, user.transform);
 
             }
             delay = startDelay;

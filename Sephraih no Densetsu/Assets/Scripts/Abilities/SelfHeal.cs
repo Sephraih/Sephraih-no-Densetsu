@@ -16,10 +16,10 @@ public class SelfHeal : Ability
     {
         if (cd <= 0)
         {
-            GetComponent<HealthController>().Heal(healAmount *(GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Int), transform); // magical attack from status
+            user.GetComponent<HealthController>().Heal(healAmount *(user.GetComponent<StatusController>().lvl + user.transform.GetComponent<StatusController>().Int), user.transform); // magical attack from status
             cd = acd;
-            GameObject a = Instantiate(effect, transform.position, Quaternion.identity); // instantiate a heal effect
-            a.transform.parent = transform; //so the particle system follows the character
+            GameObject a = Instantiate(effect, user.transform.position, Quaternion.identity); // instantiate a heal effect
+            a.transform.parent = user.transform; //so the particle system follows the character
             Destroy(a, 0.5f); // destroy the heal effect to safe memory
         }
 

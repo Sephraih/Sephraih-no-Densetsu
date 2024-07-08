@@ -8,17 +8,22 @@ public class HealWave : Ability
     private readonly float offset = -90.0f; //make the sprite and particle system face upwards
     
     public GameObject projectile; // the healwave projectile prefab is attached to the editor in this public field
-    public Transform shotPoint;
-
+    
     private int healAmount = 40;
+
+    private void Start()
+    {
+    }
 
     //used to fire the projectile in the way the character is facing
     public override void Use()
     {
-        Vector2 difference = transform.position - shotPoint.transform.position;
+
+        attackPos = user.transform.GetChild(0);
+        Vector2 difference = user.transform.position - attackPos.transform.position;
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
-        shotPoint.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
+        attackPos.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
         Wave();
 
     }
@@ -29,10 +34,11 @@ public class HealWave : Ability
     {
 
 
-        Vector2 difference = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+        attackPos = user.transform.GetChild(0);
+        Vector2 difference = Camera.main.ScreenToWorldPoint(Input.mousePosition) - user.transform.position;
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 180;
-        shotPoint.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
+        attackPos.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
         Wave();
     }
 
@@ -41,10 +47,10 @@ public class HealWave : Ability
     {
 
         Vector2 dir = new Vector2(target.localPosition.x, target.localPosition.y);
-        Vector2 difference = new Vector2(dir.x - transform.localPosition.x, dir.y - transform.localPosition.y); // vector from transform dir
+        Vector2 difference = new Vector2(dir.x - user.localPosition.x, dir.y - user.localPosition.y); // vector from transform dir
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 180; //rotate projectile onto vector
-        shotPoint.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
+        attackPos.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
         Wave();
 
     }
@@ -56,9 +62,9 @@ public class HealWave : Ability
         if (cd <= 0)
         {
 
-            var bolt = Instantiate(projectile, transform.position, shotPoint.transform.rotation);
-            bolt.GetComponent<HealWaveProjectile>().healAmount = healAmount * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Int); //this.GetComponent<StatusController>().matk;
-            bolt.GetComponent<HealWaveProjectile>().user = transform;
+            var bolt = Instantiate(projectile, user.position, attackPos.transform.rotation);
+            bolt.GetComponent<HealWaveProjectile>().healAmount = healAmount * (user.GetComponent<StatusController>().lvl + user.GetComponent<StatusController>().Int); //this.GetComponent<StatusController>().matk;
+            bolt.GetComponent<HealWaveProjectile>().user = user;
 
             cd = acd;
 

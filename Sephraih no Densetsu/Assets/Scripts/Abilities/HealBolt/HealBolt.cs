@@ -9,17 +9,18 @@ public class HealBolt : Ability
     
 
     public GameObject projectile;
-    public Transform shotPoint;
 
     private int healAmount =70;
 
 
     public override void Use()
     {
-        Vector2 difference = transform.position - shotPoint.transform.position;
+
+        attackPos = user.transform.GetChild(0);
+        Vector2 difference = user.transform.position - attackPos.transform.position;
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
-        shotPoint.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
+        attackPos.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
         Bolt();
 
     }
@@ -29,10 +30,12 @@ public class HealBolt : Ability
     //same use as blast but shooting towards mouse position, delay zero for testing
     public override void UseMouse()
     {
-        Vector2 difference = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+
+        attackPos = user.transform.GetChild(0);
+        Vector2 difference = Camera.main.ScreenToWorldPoint(Input.mousePosition) - user.transform.position;
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 180;
-        shotPoint.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
+        attackPos.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
         Bolt();
 
     }
@@ -41,10 +44,10 @@ public class HealBolt : Ability
     {
 
         Vector2 dir = new Vector2(target.localPosition.x, target.localPosition.y);
-        Vector2 difference = new Vector2(dir.x - transform.localPosition.x, dir.y - transform.localPosition.y); // vector from transform dir
+        Vector2 difference = new Vector2(dir.x - user.localPosition.x, dir.y - user.localPosition.y); // vector from transform dir
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 180; //rotate projectile onto vector
-        shotPoint.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
+        attackPos.transform.rotation = Quaternion.Euler(0f, 0f, rotZ - offset);
         Bolt();
 
     }
@@ -55,9 +58,9 @@ public class HealBolt : Ability
         if (cd <= 0)
         {
             //instantiate projectile and assign values
-            var bolt = Instantiate(projectile, transform.position, shotPoint.transform.rotation);
+            var bolt = Instantiate(projectile, user.position, attackPos.transform.rotation);
             bolt.GetComponent<HealBoltProjectile>().heal = healAmount; //this.GetComponent<StatusController>().matk;
-            bolt.GetComponent<HealBoltProjectile>().user = transform;
+            bolt.GetComponent<HealBoltProjectile>().user = user;
 
             cd = acd;
 

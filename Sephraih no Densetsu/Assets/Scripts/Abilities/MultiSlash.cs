@@ -11,10 +11,9 @@ public class MultiSlash : Ability
     private float comboDelay = 0.1f;
 
 
-    public LayerMask whatIsEnemy; //Layer specified in editor "player" then matched against tags of objects to be determined player or not
+    public LayerMask units; //Layer specified in editor "player" then matched against tags of objects to be determined player or not
 
-    private Transform attackPos; //direction of attack
-
+   
     //damage area of slash
     private float attackRangeX = 2.5f;
     private float attackRangeY = 1.5f;
@@ -24,7 +23,6 @@ public class MultiSlash : Ability
 
     private void Start()
     {
-        attackPos = transform.GetChild(0); //loaded automatically instead of assignment through editor
         slashEffect = Resources.Load("Prefabs/Effects/ParticleSlashPrefab") as GameObject;
     }
 
@@ -35,6 +33,7 @@ public class MultiSlash : Ability
 
     public override void Use()
     {
+         attackPos = user.GetChild(0); //loaded automatically instead of assignment through editor
         if (cd <= 0) //can't attack if the attack isnt ready to be used again
         {
 
@@ -51,14 +50,14 @@ public class MultiSlash : Ability
             //var atk = transform.GetComponent<StatusController>().atk;
 
             //determine damaged enemies, apply damage
-            Collider2D[] enemiesToDamage = Physics2D.OverlapBoxAll(attackPos.position, new Vector2(attackRangeX, attackRangeY), attackPos.localPosition.x * 90, whatIsEnemy);
+            Collider2D[] enemiesToDamage = Physics2D.OverlapBoxAll(attackPos.position, new Vector2(attackRangeX, attackRangeY), attackPos.localPosition.x * 90, units);
             for (int i = 0; i < enemiesToDamage.Length; i++)
             {
                 if (enemiesToDamage[i].isTrigger && enemiesToDamage[i].transform != transform)
                 {
-                    if (enemiesToDamage[i].GetComponent<StatusController>().teamID != transform.GetComponent<StatusController>().teamID)
+                    if (enemiesToDamage[i].GetComponent<StatusController>().teamID != user.transform.GetComponent<StatusController>().teamID)
                     {
-                        enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(dmg * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Str), transform);
+                        enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(dmg * (GetComponent<StatusController>().lvl + user.transform.GetComponent<StatusController>().Str), user.transform);
                     }
                 }
             }
@@ -98,7 +97,7 @@ public class MultiSlash : Ability
     {
 
         //instantiate slash prefab
-        GameObject slash = Instantiate(slashEffect, transform.position + attackPos.localPosition, Quaternion.identity);
+        GameObject slash = Instantiate(slashEffect, user.transform.position + attackPos.localPosition, Quaternion.identity);
 
 
         //get particle system to set it's color
@@ -106,7 +105,7 @@ public class MultiSlash : Ability
         slashParticleMain.startColor = color;
 
         //effect
-        slash.transform.parent = transform; //to set the simulation space (follow the character)
+        slash.transform.parent = user.transform; //to set the simulation space (follow the character)
         slash.transform.Rotate(Mathf.Atan2(attackPos.localPosition.x, attackPos.localPosition.y) * Mathf.Rad2Deg, +90, 0); // direction user is facing
         slash.transform.Rotate(angle, 0, 0); //rotate the slash
 
