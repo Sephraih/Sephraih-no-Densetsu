@@ -53,11 +53,11 @@ public class MultiSlash : Ability
             Collider2D[] enemiesToDamage = Physics2D.OverlapBoxAll(attackPos.position, new Vector2(attackRangeX, attackRangeY), attackPos.localPosition.x * 90, units);
             for (int i = 0; i < enemiesToDamage.Length; i++)
             {
-                if (enemiesToDamage[i].isTrigger && enemiesToDamage[i].transform != transform)
+                if (enemiesToDamage[i].isTrigger && enemiesToDamage[i].transform != user.transform)
                 {
                     if (enemiesToDamage[i].GetComponent<StatusController>().teamID != user.transform.GetComponent<StatusController>().teamID)
                     {
-                        enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(dmg * (GetComponent<StatusController>().lvl + user.transform.GetComponent<StatusController>().Str), user.transform);
+                        enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(dmg * (user.GetComponent<StatusController>().lvl + user.transform.GetComponent<StatusController>().Str), user.transform);
                     }
                 }
             }

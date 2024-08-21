@@ -99,7 +99,7 @@ public class GuardBehaviour : EnemyController
 
         if (distanceToTarget > 5.0f && distanceToTarget < 10.0f)
         {
-            Camera.main.GetComponent<AbilityController>().Invoke(5, transform);
+            Camera.main.GetComponent<AbilityController>().Invoke(4, transform);
         }
     }
 
