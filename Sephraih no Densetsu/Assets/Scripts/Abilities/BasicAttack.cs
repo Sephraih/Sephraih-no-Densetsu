@@ -5,9 +5,7 @@ using UnityEngine;
 //simple basic attack, see multislash for explanation of functionality
 public class BasicAttack : Ability
 {
-    public int dmg;
-    public float startDelay;
-    private float delay;
+    private int dmg = 100;
 
 
     public LayerMask units;
@@ -24,13 +22,13 @@ public class BasicAttack : Ability
     private void Start()
     {
         slashEffect = Resources.Load("prefabs/Effects/ParticleSlashPrefab") as GameObject;
-       
+        acd = 1;
     }
     void Update()
     {
-        if (delay >= 0)
+        if (cd >= 0)
         {
-            delay -= Time.deltaTime;
+            cd -= Time.deltaTime;
         }
     }
     public void Attack()
@@ -48,9 +46,9 @@ public class BasicAttack : Ability
     public override void Use()
     {
 
-        if (delay <= 0)
-        attackPos = user.transform.GetChild(0);
+        if (cd <= 0)
         {
+        attackPos = user.transform.GetChild(0);
             // instantiate slash prefab
             GameObject slash = Instantiate(slashEffect, user.transform.position + attackPos.localPosition, Quaternion.identity);
 
@@ -68,7 +66,7 @@ public class BasicAttack : Ability
                     enemiesToDamage[i].GetComponent<HealthController>().TakeDamage(dmg, user.transform);
 
             }
-            delay = startDelay;
+            cd = acd;
 
         }
     }

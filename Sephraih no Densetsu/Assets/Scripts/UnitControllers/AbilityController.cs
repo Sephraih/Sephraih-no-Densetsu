@@ -8,19 +8,23 @@ public class AbilityController : MonoBehaviour
 
     public List<Ability> Abilities;
 
+
     public void Start()
     {
-       Abilities.Add(Camera.main.GetComponentInChildren<BasicAttack>()); //0
-       Abilities.Add(Camera.main.GetComponentInChildren<MultiSlash>()); //1
-       Abilities.Add(Camera.main.GetComponentInChildren<ChargeAttack>()); //2
-       Abilities.Add(Camera.main.GetComponentInChildren<ShadowImpact>()); //3
-       Abilities.Add(Camera.main.GetComponentInChildren<FireBolt>()); //4
-       Abilities.Add(Camera.main.GetComponentInChildren<FireStorm>()); //5
-       Abilities.Add(Camera.main.GetComponentInChildren<Teleport>());  //6
-       Abilities.Add(Camera.main.GetComponentInChildren<SelfHeal>()); //7
-       Abilities.Add(Camera.main.GetComponentInChildren<HealBolt>()); //8
-       Abilities.Add(Camera.main.GetComponentInChildren<HealWave>()); //9
+
+
+       Abilities.Add(transform.GetComponent<BasicAttack>()); //0
+       Abilities.Add(transform.GetComponent<MultiSlash>()); //1
+       Abilities.Add(transform.GetComponent<ChargeAttack>()); //2
+       Abilities.Add(transform.GetComponent<ShadowImpact>()); //3
+       Abilities.Add(transform.GetComponent<FireBolt>()); //4
+       Abilities.Add(transform.GetComponent<FireStorm>()); //5
+       Abilities.Add(transform.GetComponent<Teleport>());  //6
+       Abilities.Add(transform.GetComponent<SelfHeal>()); //7fir
+       Abilities.Add(transform.GetComponent<HealBolt>()); //8
+       Abilities.Add(transform.GetComponent<HealWave>()); //9
     }
+
 
     public void UseAbility(int spellid) {
         Abilities[spellid].UseMouse();

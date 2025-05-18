@@ -46,7 +46,7 @@ public class WizardBehaviour : EnemyController
         if (distanceToTarget <= 10.0f && distanceToTarget > 5.0f || distanceToTarget > 20.0f) movementDirection = Vector2.zero; // don't move
         if (distanceToTarget <= 5.0f)
         {
-            Camera.main.GetComponent<AbilityController>().Invoke(6, transform);
+            transform.GetComponentInChildren<AbilityController>().Invoke(6, transform);
             movementDirection = transform.position - target.transform.position; //walk away from target
         }
 
@@ -64,7 +64,7 @@ public class WizardBehaviour : EnemyController
     {
         if (distanceToTarget >= 3.0f && distanceToTarget <= 15.0f)
         {
-            Camera.main.GetComponent<AbilityController>().Invoke(4, transform);
+            transform.GetComponentInChildren<AbilityController>().Invoke(4, transform);
         }
     }
 

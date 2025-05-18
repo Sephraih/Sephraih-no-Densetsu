@@ -64,7 +64,7 @@ public class ChargeAttack : Ability
             yield return new WaitForSeconds(time);
         }
         //after charging
-        if (target != null)
+        if (target != null && user != null)
         {
             user.GetComponent<MovementController>().LookAt(target.position);
             if (target.GetComponent<HealthController>().health > dmg * (user.GetComponent<StatusController>().lvl + user.GetComponent<StatusController>().Str))

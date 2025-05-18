@@ -6,9 +6,7 @@ using UnityEngine;
 public class GM : PlayerController
 {
     // used in the process of determining whether the player wants to use a skill
-    
-
-
+  
     // using the skills assigned to the keys depending on input
     public override void Attack()
     {
@@ -45,8 +43,10 @@ public class GM : PlayerController
 
 
         if (skill < 1000)
-        {
-        Camera.main.GetComponent<AbilityController>().InvokeMouse(skill, transform);
+        {          
+         transform.GetComponentInChildren<AbilityController>().InvokeMouse(skill, transform);
+
+
         }
 
     }

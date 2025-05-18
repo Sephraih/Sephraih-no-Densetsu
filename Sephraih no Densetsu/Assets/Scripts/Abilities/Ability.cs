@@ -7,7 +7,6 @@ public class Ability : MonoBehaviour
 
     public float acd; // ability cd
     protected float cd = 0; //remaining cd
-    protected float dmg;
     public float range;
     
 
@@ -19,6 +18,7 @@ public class Ability : MonoBehaviour
     public virtual void Use() {
         UseMouse();
     }
+
     public virtual void UseTarget(Transform target) { }
     public virtual void UseMouse() { }
 

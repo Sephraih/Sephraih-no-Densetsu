@@ -27,7 +27,7 @@ public class GuardBehaviour : EnemyController
         guardSpot = transform.position;
         Camera.main.GetComponent<GameBehaviour>().Register(transform); //upon creation add to list of enemies
         teamID = GetComponent<StatusController>().teamID;
-        GetComponent<FireBolt>().acd = 5.0f; // define frequency of firebolt ability usage
+        GetComponentInChildren<FireBolt>().acd = 5.0f; // define frequency of firebolt ability usage
     }
 
     void Update()
@@ -90,16 +90,17 @@ public class GuardBehaviour : EnemyController
     {
         if (distanceToTarget < 1.0f)
         {
-            Camera.main.GetComponent<AbilityController>().Invoke(0, transform);
+            transform.GetComponentInChildren<AbilityController>().Invoke(0, transform);
+
         }
         else if (distanceToTarget < guardRadius && distanceToGuardSpot <= guardMaxChaseRadius)
         {
-            Camera.main.GetComponent<AbilityController>().Invoke(2, transform);
+            transform.GetComponentInChildren<AbilityController>().Invoke(2, transform);
         }
 
         if (distanceToTarget > 5.0f && distanceToTarget < 10.0f)
         {
-            Camera.main.GetComponent<AbilityController>().Invoke(4, transform);
+            transform.GetComponentInChildren<AbilityController>().Invoke(4, transform);
         }
     }
 

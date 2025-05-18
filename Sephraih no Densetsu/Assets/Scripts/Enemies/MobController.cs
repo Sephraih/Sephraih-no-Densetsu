@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
@@ -42,8 +43,7 @@ public class MobController : EnemyController
     {
         if (Vector2.Distance(transform.position, target.position) < 1.0f)
         {
-
-            Camera.main.GetComponent<AbilityController>().Invoke(0, transform);
+            transform.GetComponentInChildren<AbilityController>().InvokeMouse(0, transform);
         }
     }
 
