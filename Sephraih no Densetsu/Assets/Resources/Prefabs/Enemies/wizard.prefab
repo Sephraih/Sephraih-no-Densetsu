@@ -209,8 +209,6 @@ GameObject:
   - component: {fileID: 7716261698932046088}
   - component: {fileID: 8917679878055481547}
   - component: {fileID: 164409420961742819}
-  - component: {fileID: 164409421068278936}
-  - component: {fileID: 1610220893}
   m_Layer: 7
   m_Name: wizard
   m_TagString: Player
@@ -498,45 +496,6 @@ MonoBehaviour:
   attackPos: {fileID: 7716261698477887790}
   stuck: 0
   stunned: 0
---- !u!114 &164409421068278936
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7716261697097872516}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16e82ab83fa701c498069fa7b8e974a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  acd: 0
-  range: 0
-  projectile: {fileID: 1150724258750520066, guid: 818c5605413b00641b517b1f127b8ce0,
-    type: 3}
-  slow: 0.8
---- !u!114 &1610220893
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7716261697097872516}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de72c2b4dcd34874fab40f6fce370659, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  acd: 5
-  range: 10
-  teleportEffect: {fileID: 3838902983540275944, guid: 822a85a45243e5f45adbd7dc67b9be4f,
-    type: 3}
-  boundaries:
-    serializedVersion: 2
-    m_Bits: 2048
-  colliders:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!1 &7716261698477887790
 GameObject:
   m_ObjectHideFlags: 0
