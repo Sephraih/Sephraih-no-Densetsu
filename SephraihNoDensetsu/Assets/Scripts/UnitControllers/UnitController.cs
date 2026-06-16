@@ -5,12 +5,16 @@ using UnityEngine;
 public class UnitController : MonoBehaviour
 {
 
-    public Vector2 movementDirection; // direction of movement
-    protected float msi; // movement speed input, in the case of a bot this is either zero or one
-    public GameObject attackingDirection; // object used to calculate a vector of attack
+    public Vector2 movementDirection;
+    protected float msi;
+    public GameObject attackingDirection;
     public int teamID;
     public Vector3 saveSpot;
-     
+
+    protected virtual void Awake()
+    {
+        attackingDirection = transform.Find("AttackPos")?.gameObject;
+    }
 
     public virtual void Move(){}
 

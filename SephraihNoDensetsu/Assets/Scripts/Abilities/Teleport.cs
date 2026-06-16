@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.PackageManager;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Teleport : Ability
 {
@@ -12,8 +9,6 @@ public class Teleport : Ability
 
     public override void Use()
     {
-
-        attackPos = user.GetChild(0);
         Vector3 direction = user.transform.position - attackPos.position; // get the direction the caster is facing
         direction.Normalize(); // ignore distance
         user.GetComponent<UnitController>().SetSaveSpot(user.transform.position);

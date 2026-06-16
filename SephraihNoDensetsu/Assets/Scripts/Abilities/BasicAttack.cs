@@ -48,7 +48,6 @@ public class BasicAttack : Ability
 
         if (cd <= 0)
         {
-        attackPos = user.transform.GetChild(0);
             // instantiate slash prefab
             GameObject slash = Instantiate(slashEffect, user.transform.position + attackPos.localPosition, Quaternion.identity);
 

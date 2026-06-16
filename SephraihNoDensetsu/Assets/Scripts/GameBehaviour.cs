@@ -93,21 +93,13 @@ public class GameBehaviour : MonoBehaviour
     {
 
         if (Input.GetButtonDown("enemy1"))
-        {
-            // load an enemy at current mouse position, transformed to game world position
-            Instantiate((Resources.Load("Prefabs/Enemy") as GameObject), Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1), Quaternion.identity);
-        }
+            Instantiate((Resources.Load("Prefabs/Enemies/mob") as GameObject), Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1), Quaternion.identity);
+
         if (Input.GetButtonDown("enemy2"))
-        {
-            // load an enemy at current mouse position, transformed to game world position
-            GameObject a = Instantiate((Resources.Load("Prefabs/Guard") as GameObject), Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1), Quaternion.identity);
-           // a.GetComponent<GuardBehaviour>().guardSpot = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1);
-        }
+            Instantiate((Resources.Load("Prefabs/Enemies/guard") as GameObject), Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1), Quaternion.identity);
+
         if (Input.GetButtonDown("enemy3"))
-        {
-            // load an enemy at current mouse position, transformed to game world position
-            Instantiate((Resources.Load("Prefabs/Wizard") as GameObject), Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1), Quaternion.identity);
-        }
+            Instantiate((Resources.Load("Prefabs/Enemies/wizard") as GameObject), Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 1), Quaternion.identity);
     }
 
 

@@ -23,8 +23,6 @@ public class ShadowImpact : Ability
 
     public override void UseTarget(Transform target)
     {
-        attackPos = user.GetChild(0); //loaded automatically instead of assignment through editor
-
         if (user.GetComponent<StatusController>().teamID != target.GetComponent<StatusController>().teamID)
         {
             if (cd <= 0f) // if ability ready to use

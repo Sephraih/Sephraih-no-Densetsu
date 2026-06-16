@@ -33,7 +33,6 @@ public class MultiSlash : Ability
 
     public override void Use()
     {
-         attackPos = user.GetChild(0); //loaded automatically instead of assignment through editor
         if (cd <= 0) //can't attack if the attack isnt ready to be used again
         {
 

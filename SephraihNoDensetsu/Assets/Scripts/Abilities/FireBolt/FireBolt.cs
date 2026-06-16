@@ -18,8 +18,6 @@ public class FireBolt : Ability
     // blast towards casters attacking point
     public override void Use()
     {
-
-        attackPos = user.transform.GetChild(0);
         Vector2 difference = user.transform.position - attackPos.transform.position; //attack vector from transform to shotpoint
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg; //rotate projectile onto attack vector
@@ -30,10 +28,7 @@ public class FireBolt : Ability
     //same use as blast but shooting towards mouse position, delay zero for testing
     public override void UseMouse()
     {
-
         Vector2 trpos = user.position;
-        attackPos = user.transform.GetChild(0);
-
         Vector2 difference = MousePosition() - trpos; // vector from transform to mouse
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 180; //rotate projectile onto vector

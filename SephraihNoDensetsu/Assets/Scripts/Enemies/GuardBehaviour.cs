@@ -1,108 +1,93 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-//bot behaviour attached to the "guard" type enemy character and its prefab
 public class GuardBehaviour : EnemyController
 {
-
-    // definition of the guard spot and chase radius
-    private Vector3 guardSpot = new Vector3(5.0f, 5.0f, 0f);
+    private Vector3 guardSpot;
     public float guardMaxChaseRadius = 25.0f;
     public float guardRadius = 5.0f;
 
-
-    // required for attacking, following and guard logic
     private float distanceToTarget;
     private float distanceToGuardSpot;
-    private bool returning = false;
 
-
-    private Transform player; // target player
-
-    //initialization
     void Start()
     {
         guardSpot = transform.position;
-        Camera.main.GetComponent<GameBehaviour>().Register(transform); //upon creation add to list of enemies
+        game.Register(transform);
         teamID = GetComponent<StatusController>().teamID;
-        GetComponentInChildren<FireBolt>().acd = 5.0f; // define frequency of firebolt ability usage
+        GetComponentInChildren<FireBolt>().acd = 5.0f;
+        detectionRange = guardRadius;
     }
 
     void Update()
     {
+        target = game.ClosestEnemy(transform);
+        distanceToTarget = (target != null && target != transform)
+            ? Vector2.Distance(transform.position, target.position)
+            : float.MaxValue;
+        distanceToGuardSpot = Vector2.Distance(transform.position, guardSpot);
+
+        UpdateState();
+
+        // Force return if the chase has led too far from the guard spot
+        if (state == BotState.Chase && distanceToGuardSpot >= guardMaxChaseRadius)
+            state = BotState.Return;
+
         Move();
-        Aim();
+        GuardAim();
         Attack();
         Die();
     }
 
     public override void Move()
     {
-
-        player = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); // interact with closest player determined each frame
-
-        distanceToTarget = Vector2.Distance(transform.position, player.position);
-        distanceToGuardSpot = Vector2.Distance(transform.position, guardSpot);
-
-        // chase the player within guard radius and not outside of the maximal chase radius, follow it
-        if (distanceToTarget <= guardRadius && distanceToGuardSpot < guardMaxChaseRadius && !returning)
+        switch (state)
         {
-            movementDirection = player.transform.position - transform.position;
-            if (distanceToTarget < 1.0f) { movementDirection = Vector2.zero; }
-        }
-        else // return to the spot if not there
-        {
-            returning = true;
-            movementDirection = guardSpot - transform.position;
+            case BotState.Chase:
+                movementDirection = (Vector2)(target.position - transform.position);
+                if (distanceToTarget < 1.0f) movementDirection = Vector2.zero;
+                break;
 
-            if (distanceToGuardSpot < 0.5f) { movementDirection = Vector2.zero; }
-            if (distanceToGuardSpot < guardRadius) { returning = false; }
+            case BotState.Idle:
+            case BotState.Return:
+                movementDirection = (Vector2)(guardSpot - transform.position);
+                if (distanceToGuardSpot < 0.5f)
+                {
+                    movementDirection = Vector2.zero;
+                    state = BotState.Idle;
+                }
+                break;
         }
 
-        // tell the movement controller where to move to
-        movementDirection.Normalize(); //distance not to affect speed of movement
-        msi = Mathf.Clamp(movementDirection.magnitude, 0.0f, 1.0f);
+        movementDirection.Normalize();
+        msi = Mathf.Clamp(movementDirection.magnitude, 0f, 1f);
         GetComponent<MovementController>().Move(movementDirection, msi);
-
     }
 
-    // aim towards movement direction if moving, else, if within sight aim at the closest player
-    public new void Aim()
+    // Guards face their movement direction while moving, otherwise face the player if nearby.
+    private void GuardAim()
     {
         if (movementDirection != Vector2.zero)
         {
             attackingDirection.transform.localPosition = movementDirection;
         }
-        else if (distanceToTarget < 20.0f)
+        else if (target != null && target != transform && distanceToTarget < 20.0f)
         {
-
-            var x = player.position - transform.position;
-            x.Normalize();
-            attackingDirection.transform.localPosition = x;
-            GetComponent<MovementController>().LookAt(player.position);
+            Vector2 dir = (target.position - transform.position).normalized;
+            attackingDirection.transform.localPosition = (Vector3)dir;
+            GetComponent<MovementController>().LookAt(target.position);
         }
     }
 
-    // basic attack if next to enemy, charge if within charge range, firebolt if within sight and out of chase radius
     public override void Attack()
     {
-        if (distanceToTarget < 1.0f)
-        {
-            transform.GetComponentInChildren<AbilityController>().Invoke(0, transform);
+        if (state != BotState.Chase || target == null || target == transform) return;
 
-        }
+        if (distanceToTarget < 1.0f)
+            GetComponentInChildren<AbilityController>().Invoke(0, transform);
         else if (distanceToTarget < guardRadius && distanceToGuardSpot <= guardMaxChaseRadius)
-        {
-            transform.GetComponentInChildren<AbilityController>().Invoke(2, transform);
-        }
+            GetComponentInChildren<AbilityController>().Invoke(2, transform);
 
         if (distanceToTarget > 5.0f && distanceToTarget < 10.0f)
-        {
-            transform.GetComponentInChildren<AbilityController>().Invoke(4, transform);
-        }
+            GetComponentInChildren<AbilityController>().Invoke(4, transform);
     }
-
-
 }

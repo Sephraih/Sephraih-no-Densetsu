@@ -25,14 +25,14 @@ public class Ability : MonoBehaviour
     public void InvokeMouse(Transform user)
     {
         this.user = user;
-        this.attackPos = user.GetChild(0);
+        this.attackPos = user.GetComponent<UnitController>().attackingDirection.transform;
         UseMouse();
     }
 
     public void Invoke(Transform user)
     {
         this.user = user;
-        this.attackPos = user.GetChild(0);
+        this.attackPos = user.GetComponent<UnitController>().attackingDirection.transform;
         Use();
     }
 

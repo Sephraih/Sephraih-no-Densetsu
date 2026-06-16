@@ -15,8 +15,6 @@ public class HealBolt : Ability
 
     public override void Use()
     {
-
-        attackPos = user.transform.GetChild(0);
         Vector2 difference = user.transform.position - attackPos.transform.position;
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
@@ -30,8 +28,6 @@ public class HealBolt : Ability
     //same use as blast but shooting towards mouse position, delay zero for testing
     public override void UseMouse()
     {
-
-        attackPos = user.transform.GetChild(0);
         Vector2 difference = Camera.main.ScreenToWorldPoint(Input.mousePosition) - user.transform.position;
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg - 180;
