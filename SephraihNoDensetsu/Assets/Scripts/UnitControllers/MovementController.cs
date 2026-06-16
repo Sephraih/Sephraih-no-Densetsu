@@ -28,10 +28,10 @@ public class MovementController : MonoBehaviour
         {
             this.md = md;
             this.msi = msi;
-            rb.velocity = md * msi * this.GetComponent<StatusController>().mvspd; //direction, input strength, character movement speed
+            rb.linearVelocity = md * msi * this.GetComponent<StatusController>().mvspd; //direction, input strength, character movement speed
             MovementAnimation();
         }
-        if (stunned) { rb.velocity = Vector3.zero; }
+        if (stunned) { rb.linearVelocity = Vector3.zero; }
     }
 
     public void Idle() {

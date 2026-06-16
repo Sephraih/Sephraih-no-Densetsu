@@ -59,7 +59,7 @@ public class ChargeAttack : Ability
             
             user.GetComponent<MovementController>().stuck = true; //disalow any other movement of the charging character
             user.GetComponent<MovementController>().WalkTowards(chargeDirection); // set movement animation, as default is disabled due to being stuck
-            user.GetComponent<Rigidbody2D>().velocity = chargeDirection * 70;
+            user.GetComponent<Rigidbody2D>().linearVelocity = chargeDirection * 70;
             count += time;
             yield return new WaitForSeconds(time);
         }

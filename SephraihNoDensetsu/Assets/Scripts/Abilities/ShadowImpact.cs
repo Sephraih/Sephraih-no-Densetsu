@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
-using Unity.Services.Analytics.Platform;
 using UnityEngine;
 
 public class ShadowImpact : Ability
