@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class HealWaveProjectile : MonoBehaviour
@@ -35,6 +35,12 @@ public class HealWaveProjectile : MonoBehaviour
         //heal or damage colliders found, only apply to trigger type colliders that don't belong to an unseen character
         foreach (Collider2D collider in overlapColliders)
         {
+            if (ObstacleRegistry.TryGet(collider, out var obs) && obs.BlocksProjectiles)
+            {
+                DestroyProjectile();
+                return;
+            }
+
             if (collider.CompareTag("Player") && collider.transform != user && collider.isTrigger && collider.transform.GetComponent<StatusController>().teamID == teamID)
             {
                 if (!healedTargets.Contains(collider))

@@ -41,12 +41,21 @@ public class ShadowImpact : Ability
 
     }
 
+    // Invoked by AI callers via AbilityController.Invoke() - resolve via the caller's own AI
+    // target instead of falling through to UseMouse()'s player-only mouse-cursor lookup. Not
+    // currently invoked by any enemy, but ChargeAttack had the identical bug (see there), so
+    // fixed here too for consistency/future use.
+    public override void Use()
+    {
+        UseAITargetOrMouse();
+    }
+
     public override void UseMouse()
     {
 
         user.GetComponent<UnitController>().SetSaveSpot(user.position);//reset if stuck in a wall
-        Transform t = Camera.main.GetComponent<GameBehaviour>().ClosestEnemyToLocation(MousePosition(), user);
-        UseTarget(t);
+        Transform t = PreciseMouseTarget();
+        if (t != null) UseTarget(t);
 
     }
 
@@ -69,7 +78,16 @@ public class ShadowImpact : Ability
             //direction.Normalize(); // ignore distance
             Vector2 trpos = user.position;
             //transform.position = trpos + direction * range;
-            user.position = target.position + offset(hit);
+            // Only actually teleport if the destination is clear - one of the 4 offset positions
+            // around the target can land inside or past a wall/boundary if the target happens to
+            // be standing close to one, which would otherwise put the user out of bounds. Skip the
+            // repositioning for this hit (stay put, still slash/damage from the current spot)
+            // rather than blindly teleporting into whatever is there.
+            Vector2 candidate = target.position + offset(hit);
+            if (!ObstacleQuery.BlocksTeleport(user.position, candidate))
+            {
+                user.position = candidate;
+            }
             //GameObject tef = Instantiate(tpEffect, transform.position + new Vector3(0, -0.7f, 0), Quaternion.Euler(0f, 0f, 0)); //instantiate effect prefab at position and rotation
             //Destroy(tef, 0.5f); //free up memory
 

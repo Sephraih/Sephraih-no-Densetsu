@@ -15,8 +15,16 @@ public class MovementController : MonoBehaviour
     public bool stuck; // whether the character may not move aside from a fixed logic defined in the function causing the character to be stuck
     public bool stunned; // whether the character is stunned, meaning it cannot move at all.
   
-    // Start is called before the first frame update
-    void Start()
+    // Assigned in Awake, not Start: Start() only guarantees ordering relative to this script's own
+    // Update() - it does NOT guarantee running before a DIFFERENT script's Update() on the same
+    // object. When a whole level's enemies activate together (SetActive(true) cascading through a
+    // level's hierarchy), MobBehaviour.Update() could run before MovementController.Start() had a
+    // chance to set rb, throwing a NullReferenceException in Move() (confirmed live - all of a
+    // level's mobs hit this in the same frame right as the level activated). Awake() has the
+    // stronger guarantee (every Awake() in the scene completes before any Start()/Update()), and
+    // GetComponent<Rigidbody2D>() has no dependency on any other script's own initialization, so
+    // there's no reason this needs to wait until Start().
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
     }

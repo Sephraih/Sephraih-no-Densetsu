@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2006246590, guid: b693122c99ecd174bac378e802c54425, type: 3}
+      propertyPath: attackPos
+      value: 
+      objectReference: {fileID: 5108183225608951107}
     - target: {fileID: 5765252530442742022, guid: b693122c99ecd174bac378e802c54425,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -71,6 +75,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1505575715949514556}
+    - targetCorrespondingSourceObject: {fileID: 5765252530442742076, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7069808382162746097}
   m_SourcePrefab: {fileID: 100100000, guid: b693122c99ecd174bac378e802c54425, type: 3}
 --- !u!1 &5108183224245645545 stripped
 GameObject:
@@ -95,9 +103,32 @@ MonoBehaviour:
   teamID: 0
   saveSpot: {x: 0, y: 0, z: 0}
   detectionRange: 8
-  wallMask:
+  repathInterval: 0.35
+  targetLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 640
+--- !u!195 &7069808382162746097
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5108183224245645545}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.2
+  m_Speed: 3.5
+  m_Acceleration: 999
+  avoidancePriority: 50
+  m_AngularSpeed: 0
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 0
+  m_AutoRepath: 1
+  m_Height: 1
+  m_BaseOffset: 0.5416667
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &5108183225608951107 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5765252529138207894, guid: b693122c99ecd174bac378e802c54425,

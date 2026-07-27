@@ -16,6 +16,11 @@ public class HealthController : MonoBehaviour
 
     public GameObject ht; // health text variable, this can be a heal or dmg text
 
+    // Fires exactly once when health crosses from >0 to <=0 - subscribers (e.g. EnemyController)
+    // react to this instead of polling health every frame. dmger is passed through so a death
+    // handler can know who landed the killing blow.
+    public event System.Action<Transform> OnDeath;
+    public bool isDead { get; private set; }
 
     void Start()
     {
@@ -38,16 +43,26 @@ public class HealthController : MonoBehaviour
     // take damage, display number and blood effect
     public void TakeDamage(int damage, Transform dmger)
     {
+        if (isDead) return; // already dead - ignore further hits (e.g. two hits landing the same frame)
+
         GameObject blood = Instantiate(bloodEffect, transform.position, Quaternion.identity); // at character's position without any rotation
         blood.transform.parent = transform; // make the effect child of the character to let the effect follow it
         Destroy(blood, 0.7f);
 
         ShowDamageText(damage);
+        bool wasAlive = health > 0;
         health -= damage;
         if (health < 0) { health = 0; }
 
         //Debug.Log("took dmg" + damage);
 
+        // Detected BEFORE the clamp above so an overkill hit (damage far exceeding remaining
+        // health) still fires this exactly once, not skipped because health "landed" past 0.
+        if (wasAlive && health <= 0)
+        {
+            isDead = true;
+            OnDeath?.Invoke(dmger);
+        }
     }
 
     // recover damage, display number and recovery effect
@@ -61,6 +76,7 @@ public class HealthController : MonoBehaviour
 
         if (health < maxHealth) { health += heal; }
         if (health > maxHealth) { health = maxHealth; }
+        if (health > 0) isDead = false;
         ShowHealText(heal);
     }
 
@@ -96,6 +112,7 @@ public class HealthController : MonoBehaviour
     public void Max()
     {
         health = maxHealth;
+        isDead = false;
         ShowHealText(maxHealth);
     }
 

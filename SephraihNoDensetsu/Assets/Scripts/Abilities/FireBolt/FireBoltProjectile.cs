@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -52,7 +52,11 @@ public class FireBoltProjectile : MonoBehaviour
                         }
                     }
                 }
-                else DestroyProjectile(); // destroy on any collider
+                else if (ObstacleRegistry.TryGet(collider, out var obs))
+                {
+                    if (obs.BlocksProjectiles) DestroyProjectile();
+                }
+                else DestroyProjectile(); // solid collider with no Obstacle component yet: fail-safe, keep prior behavior
             }
 
         }

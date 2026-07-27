@@ -11,7 +11,6 @@ public class GM : PlayerController
     public override void Attack()
     {
         int skill = 1000;
-        enemy = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); //get closest enemy inside arena
         if (Input.GetButtonUp("r"))
         {
             skill = 3;

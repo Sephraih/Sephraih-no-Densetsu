@@ -7,7 +7,6 @@ public class DummyBehaviour : EnemyController
     // Start is called before the first frame update
     public void Start()
     {
-        Camera.main.GetComponent<GameBehaviour>().Register(transform); //upon creation add to list of enemies
         teamID = GetComponent<StatusController>().teamID;
 
         GetComponent<StatusController>().lvl = 10;
@@ -20,7 +19,6 @@ public class DummyBehaviour : EnemyController
         {
             GetComponent<HealthController>().health = GetComponent<HealthController>().maxHealth;
         }
-        Die();
     }
 
 

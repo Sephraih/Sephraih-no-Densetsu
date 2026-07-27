@@ -1,10 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class Teleport : Ability
 {
     public GameObject teleportEffect; //effect to be displayed on teleport
-    public LayerMask boundaries; // all objects that act as game world boundaries belong to this layermask
-    public LayerMask colliders;
 
 
     public override void Use()
@@ -14,8 +12,8 @@ public class Teleport : Ability
         user.GetComponent<UnitController>().SetSaveSpot(user.transform.position);
         for (float range = this.range; range > 0; range--) //shorter jump distance if location jumped at was out of boundary
         {
-            RaycastHit2D hitInfo = Physics2D.Raycast(user.transform.position, direction, range+0.2f, boundaries); //check for boundary colliders
-            if (hitInfo.collider == null)
+            Vector2 candidate = (Vector2)user.transform.position + (Vector2)direction * range;
+            if (!ObstacleQuery.BlocksTeleport(user.transform.position, candidate)) //check for obstacle/boundary colliders along the way
             {
                 if (cd <= 0f) // if ability ready to use
                 {
@@ -47,9 +45,8 @@ public class Teleport : Ability
         if (distance > range) distance = range; //set to max tp range if mouse further away
         for (float range = distance; range > 0; range--) //shorter jump distance if location jumped at was out of boundary
         {
-            RaycastHit2D hitInfo = Physics2D.Raycast(user.transform.position, direction, range+0.2f, boundaries); //check for boundary colliders
-         
-            if (hitInfo.collider == null)
+            Vector2 candidate = (Vector2)user.transform.position + direction * range;
+            if (!ObstacleQuery.BlocksTeleport(user.transform.position, candidate)) //check for obstacle/boundary colliders along the way
             {
                 if (cd <= 0f) // if ability ready to use
                 {

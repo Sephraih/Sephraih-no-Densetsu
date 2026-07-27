@@ -9,17 +9,13 @@ public class PlayerController : UnitController
 {
 
 
-    protected Transform enemy;
-
     // called once
     public void Start()
     {
         attackingDirection.transform.localPosition = new Vector2(0, -0.5f); // set an attacking direction before the player moves for the first time
-        enemy = Camera.main.GetComponent<GameBehaviour>().ClosestEnemy(transform); //get closest enemy inside arena
-        Camera.main.GetComponent<GameBehaviour>().Register(transform);
         GetComponent<StatusController>().teamID = teamID;
         saveSpot = Vector3.zero;
-       
+
 
     }
 

@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2006246590, guid: b693122c99ecd174bac378e802c54425, type: 3}
+      propertyPath: attackPos
+      value: 
+      objectReference: {fileID: 1678532175718306922}
     - target: {fileID: 5765252530442742022, guid: b693122c99ecd174bac378e802c54425,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -95,9 +99,10 @@ MonoBehaviour:
   teamID: 0
   saveSpot: {x: 0, y: 0, z: 0}
   detectionRange: 8
-  wallMask:
+  repathInterval: 0.35
+  targetLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 640
 --- !u!1 &1678532175718306922 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5765252529138207894, guid: b693122c99ecd174bac378e802c54425,

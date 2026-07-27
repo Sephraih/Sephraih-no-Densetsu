@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,8 +12,6 @@ public class HealBoltProjectile : MonoBehaviour
     public float lifetime;
     public float rayDistance;
     public int heal;
-
-    public LayerMask whatIsEnemy;
 
     public GameObject destroyEffect;
 
@@ -32,6 +30,10 @@ public class HealBoltProjectile : MonoBehaviour
             {
                 Debug.Log(hitInfo.collider);
                 hitInfo.collider.GetComponent<HealthController>().Heal(heal * (GetComponent<StatusController>().lvl + transform.GetComponent<StatusController>().Int), user);
+                DestroyProjectile();
+            }
+            else if (ObstacleRegistry.TryGet(hitInfo.collider, out var obs) && obs.BlocksProjectiles)
+            {
                 DestroyProjectile();
             }
 

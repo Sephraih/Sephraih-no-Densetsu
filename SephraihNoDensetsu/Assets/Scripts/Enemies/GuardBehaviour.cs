@@ -12,7 +12,6 @@ public class GuardBehaviour : EnemyController
     void Start()
     {
         guardSpot = transform.position;
-        game.Register(transform);
         teamID = GetComponent<StatusController>().teamID;
         GetComponentInChildren<FireBolt>().acd = 5.0f;
         detectionRange = guardRadius;
@@ -20,7 +19,7 @@ public class GuardBehaviour : EnemyController
 
     void Update()
     {
-        target = game.ClosestEnemy(transform);
+        target = FindNearestEnemy(detectionRange, requireLineOfSight: state != BotState.Chase);
         distanceToTarget = (target != null && target != transform)
             ? Vector2.Distance(transform.position, target.position)
             : float.MaxValue;
@@ -35,7 +34,6 @@ public class GuardBehaviour : EnemyController
         Move();
         GuardAim();
         Attack();
-        Die();
     }
 
     public override void Move()
@@ -43,23 +41,34 @@ public class GuardBehaviour : EnemyController
         switch (state)
         {
             case BotState.Chase:
-                movementDirection = (Vector2)(target.position - transform.position);
-                if (distanceToTarget < 1.0f) movementDirection = Vector2.zero;
+                // 1.2f, not the 1.0f melee-attack threshold used in Attack() below: ChargeAttack
+                // lands the guard ~1.1 units from its target (deliberately outside true melee
+                // range, to keep the colliders clear of each other once solid again - see
+                // ChargeAttack.meleeRange). If this used the same 1.0f cutoff, the guard would
+                // keep trying to walk the last sliver of distance closed every single frame via
+                // normal solid-body movement, physically shoving the target the entire time it's
+                // stuck in that gap - a sustained push, not a one-off nudge. Stopping the walk a
+                // bit earlier than the melee threshold means a charge can occasionally leave the
+                // guard just outside strict melee range until its next attack roll, rather than
+                // ever needing to close real physical distance against the target's collider.
+                movementDirection = distanceToTarget < 1.2f ? Vector2.zero : GetPathDirection(target.position);
                 break;
 
             case BotState.Idle:
             case BotState.Return:
-                movementDirection = (Vector2)(guardSpot - transform.position);
                 if (distanceToGuardSpot < 0.5f)
                 {
                     movementDirection = Vector2.zero;
                     state = BotState.Idle;
                 }
+                else
+                {
+                    movementDirection = GetPathDirection(guardSpot);
+                }
                 break;
         }
 
-        movementDirection.Normalize();
-        msi = Mathf.Clamp(movementDirection.magnitude, 0f, 1f);
+        msi = movementDirection.sqrMagnitude > 0.0001f ? 1f : 0f;
         GetComponent<MovementController>().Move(movementDirection, msi);
     }
 

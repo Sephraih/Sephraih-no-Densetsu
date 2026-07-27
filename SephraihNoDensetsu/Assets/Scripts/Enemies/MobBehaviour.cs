@@ -2,22 +2,23 @@ using UnityEngine;
 
 public class MobBehaviour : EnemyController
 {
+    private Vector3 spawnSpot;
+
     void Start()
     {
-        game.Register(transform);
+        spawnSpot = transform.position;
         teamID = GetComponent<StatusController>().teamID;
     }
 
     void Update()
     {
-        if (GetComponent<MovementController>().stunned) { Die(); return; }
+        if (GetComponent<MovementController>().stunned) { return; }
 
-        target = game.ClosestEnemy(transform);
+        target = FindNearestEnemy(detectionRange, requireLineOfSight: state != BotState.Chase);
         UpdateState();
         Move();
         if (state == BotState.Chase) Aim();
         Attack();
-        Die();
     }
 
     public override void Move()
@@ -26,13 +27,23 @@ public class MobBehaviour : EnemyController
         {
             case BotState.Chase:
                 float dist = Vector2.Distance(transform.position, target.position);
-                movementDirection = (target.position - transform.position).normalized;
+                movementDirection = GetPathDirection(target.position);
                 msi = dist > 1.0f ? 1f : 0f;
                 break;
-            default:
-                movementDirection = Vector2.zero;
-                msi = 0f;
-                state = BotState.Idle;
+
+            case BotState.Idle:
+            case BotState.Return:
+                if (Vector2.Distance(transform.position, spawnSpot) < 0.5f)
+                {
+                    movementDirection = Vector2.zero;
+                    msi = 0f;
+                    state = BotState.Idle;
+                }
+                else
+                {
+                    movementDirection = GetPathDirection(spawnSpot);
+                    msi = movementDirection.sqrMagnitude > 0.0001f ? 1f : 0f;
+                }
                 break;
         }
         GetComponent<MovementController>().Move(movementDirection, msi);
