@@ -32,6 +32,13 @@ public class DungeonMap : MapBehaviour
 
     [SerializeField] private NavMeshSurface navMeshSurface;
 
+    // Where a fresh City -> Dungeon arrival lands, and the level that PortalExit belongs to
+    // determines which level gets activated. Replaces the old GetSpawnPoint("Entry") lookup for
+    // this same purpose - that resolved to a single scene-wide SpawnPoint that, since nothing kept
+    // its typed string ID and its actual position in sync, had drifted to sitting at (0,0,0),
+    // unrelated to any level's real layout.
+    [SerializeField] private PortalExit level1Entry;
+
     private Vector2 worldPoint;
     [SerializeField] private Tilemap obstacleMap;
     [SerializeField] private Tilemap boundaryMap;
@@ -184,10 +191,22 @@ public class DungeonMap : MapBehaviour
         var obstacle = obstacleMap.GetTile(obstacleMap.WorldToCell(Player.transform.position));
         var boundary = boundaryMap.GetTile(boundaryMap.WorldToCell(Player.transform.position));
 
+        var unitController = Player.GetComponent<UnitController>();
 
         if (obstacle || boundary) // if a tile (obstacle or boundary) was found -> move player
         {
-            Player.transform.position = Player.GetComponent<UnitController>().saveSpot; // unstuck to last savespot triggered by critical abilities.
+            // saveSpot used to only be refreshed by ChargeAttack/ShadowImpact's own "reset if stuck
+            // in a wall" calls - meaning a false-positive tile detection anywhere else (e.g. a spawn
+            // point sitting close to a tile edge right at a level entrance) would snap the player
+            // back to wherever they last cast one of those two abilities, or to (0,0,0) if they
+            // never had - a genuinely random-looking teleport. Now saveSpot is kept up to date every
+            // frame the player is confirmed NOT stuck (below), so any rescue snaps back to wherever
+            // they actually just were instead of an unrelated stale position.
+            Player.transform.position = unitController.saveSpot;
+        }
+        else
+        {
+            unitController.SetSaveSpot(Player.transform.position);
         }
 
 
@@ -195,6 +214,12 @@ public class DungeonMap : MapBehaviour
 
     public override void OnMapEntered(string spawnPointId)
     {
+        if (level1Entry != null)
+        {
+            Player.transform.position = level1Entry.transform.position;
+            return;
+        }
+        // Fallback only - level1Entry should always be assigned in the Editor.
         var spawn = GetSpawnPoint(spawnPointId) ?? GetSpawnPoint("Entry");
         if (spawn != null) Player.transform.position = spawn.transform.position;
     }
@@ -206,7 +231,32 @@ public class DungeonMap : MapBehaviour
 
     public override void OnPortalUsed(PortalBehaviour portalUsed)
     {
-        LoadNextLevel();
+        if (portalUsed.exit != null)
+            GoToExit(portalUsed.exit);
+        else
+            LoadNextLevel(); // legacy fallback for a portal that hasn't been given an explicit exit yet
+    }
+
+    // Activates whichever level the given exit belongs to (found by walking up its hierarchy to
+    // the owning LevelBehaviour, so a level's own sibling index IS its level number - no separate
+    // bookkeeping needed) and places the player exactly at the exit's position. Replaces the old
+    // "OnPortalUsed always means advance exactly one level" assumption, so the same mechanism now
+    // works for both advancing and going back to a previous level.
+    private void GoToExit(PortalExit exit)
+    {
+        var targetLevel = exit.GetComponentInParent<LevelBehaviour>(true);
+        if (targetLevel == null)
+        {
+            Debug.LogError($"[DungeonMap] PortalExit '{exit.name}' isn't nested under a Level - can't tell which level to activate.");
+            return;
+        }
+
+        int targetIndex = targetLevel.transform.GetSiblingIndex() + 1; // 1-based, matches ActivateLevel's convention
+        LevelMaps.transform.GetChild(Level - 1).gameObject.SetActive(false);
+        Level = targetIndex;
+        ActivateLevel(Level);
+        RebuildNavMesh();
+        Player.transform.position = exit.transform.position;
     }
 
     [Serializable]

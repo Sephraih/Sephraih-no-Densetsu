@@ -8,10 +8,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1539615721, guid: b693122c99ecd174bac378e802c54425, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2006246590, guid: b693122c99ecd174bac378e802c54425, type: 3}
       propertyPath: attackPos
       value: 
       objectReference: {fileID: 4497875012699089440}
+    - target: {fileID: 3699976396759297765, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: acd
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3699976396759297765, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: range
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3699976396759297765, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: stunTime
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 5765252530442742022, guid: b693122c99ecd174bac378e802c54425,
         type: 3}
       propertyPath: m_LocalPosition.x

@@ -41,16 +41,14 @@ public class GuardBehaviour : EnemyController
         switch (state)
         {
             case BotState.Chase:
-                // 1.2f, not the 1.0f melee-attack threshold used in Attack() below: ChargeAttack
-                // lands the guard ~1.1 units from its target (deliberately outside true melee
-                // range, to keep the colliders clear of each other once solid again - see
-                // ChargeAttack.meleeRange). If this used the same 1.0f cutoff, the guard would
-                // keep trying to walk the last sliver of distance closed every single frame via
-                // normal solid-body movement, physically shoving the target the entire time it's
-                // stuck in that gap - a sustained push, not a one-off nudge. Stopping the walk a
-                // bit earlier than the melee threshold means a charge can occasionally leave the
-                // guard just outside strict melee range until its next attack roll, rather than
-                // ever needing to close real physical distance against the target's collider.
+                // 1.2f, matching Attack()'s own melee-range check below (kept in sync
+                // deliberately - see the note there). ChargeAttack lands the guard ~1.1 units from
+                // its target (deliberately outside true melee range, to keep the colliders clear
+                // of each other once solid again - see ChargeAttack.meleeRange). If this used a
+                // tighter cutoff than Attack()'s own, the guard would keep trying to walk the last
+                // sliver of distance closed every single frame via normal solid-body movement,
+                // physically shoving the target the entire time it's stuck in that gap - a
+                // sustained push, not a one-off nudge.
                 movementDirection = distanceToTarget < 1.2f ? Vector2.zero : GetPathDirection(target.position);
                 break;
 
@@ -91,7 +89,12 @@ public class GuardBehaviour : EnemyController
     {
         if (state != BotState.Chase || target == null || target == transform) return;
 
-        if (distanceToTarget < 1.0f)
+        // Matches Move()'s own chase-stop threshold above (also 1.2f) - they used to disagree
+        // (this was 1.0f while Move() stopped walking at 1.2f), leaving a dead zone right where
+        // ChargeAttack lands the guard (~1.1 units away): close enough to stop walking, not close
+        // enough to satisfy this check, so the guard would just stand there unable to melee until
+        // something else changed the distance.
+        if (distanceToTarget < 1.2f)
             GetComponentInChildren<AbilityController>().Invoke(0, transform);
         else if (distanceToTarget < guardRadius && distanceToGuardSpot <= guardMaxChaseRadius)
             GetComponentInChildren<AbilityController>().Invoke(2, transform);

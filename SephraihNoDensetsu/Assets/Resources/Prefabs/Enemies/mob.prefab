@@ -12,6 +12,21 @@ PrefabInstance:
       propertyPath: attackPos
       value: 
       objectReference: {fileID: 5108183225608951107}
+    - target: {fileID: 1955912533838993911, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: useParticleSlashEffect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4047496929096329682, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4047496929096329682, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5765252530442742022, guid: b693122c99ecd174bac378e802c54425,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -62,6 +77,27 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5765252530442742073, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: d8375fffe63d5ba42ae989f5e09ef8c0,
+        type: 3}
+    - target: {fileID: 5765252530442742074, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5765252530442742074, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5765252530442742075, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: d4d04181bb191ed488721469fbced235, type: 2}
     - target: {fileID: 5765252530442742076, guid: b693122c99ecd174bac378e802c54425,
         type: 3}
       propertyPath: m_Name

@@ -12,6 +12,11 @@ PrefabInstance:
       propertyPath: attackPos
       value: 
       objectReference: {fileID: 1678532175718306922}
+    - target: {fileID: 5765252529138207892, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5765252530442742022, guid: b693122c99ecd174bac378e802c54425,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -61,6 +66,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5765252530442742073, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5765252530442742076, guid: b693122c99ecd174bac378e802c54425,
         type: 3}

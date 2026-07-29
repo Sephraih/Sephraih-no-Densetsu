@@ -10,6 +10,13 @@ public class BasicAttack : Ability
 
     public LayerMask units;
 
+    // The slash used to be a standalone particle effect with no character animation behind it -
+    // now that real slash-sprite animations exist (starting with AttackDown), that particle
+    // becomes optional. Off by default so the new animation is what actually plays; flip this on
+    // per-instance (e.g. mob, which still uses Jätter's art and has no AttackDown state yet) to
+    // fall back to the old look instead of attacking silently.
+    public bool useParticleSlashEffect = false;
+
     private float attackRangeX = 2.5f;
     private float attackRangeY = 1.5f;
 
@@ -48,14 +55,18 @@ public class BasicAttack : Ability
 
         if (cd <= 0)
         {
-            // instantiate slash prefab
-            GameObject slash = Instantiate(slashEffect, user.transform.position + attackPos.localPosition, Quaternion.identity);
+            user.GetComponent<MovementController>().PlayDirectionalAttack("Attack");
 
+            if (useParticleSlashEffect)
+            {
+                // instantiate slash prefab
+                GameObject slash = Instantiate(slashEffect, user.transform.position + attackPos.localPosition, Quaternion.identity);
 
-            //effect
-            slash.transform.parent = user.transform;
-            slash.transform.Rotate(Mathf.Atan2(attackPos.localPosition.x, attackPos.localPosition.y) * Mathf.Rad2Deg, +90, 0);
-            Destroy(slash, 0.2f);
+                //effect
+                slash.transform.parent = user.transform;
+                slash.transform.Rotate(Mathf.Atan2(attackPos.localPosition.x, attackPos.localPosition.y) * Mathf.Rad2Deg, +90, 0);
+                Destroy(slash, 0.2f);
+            }
 
             //determine damaged enemies, apply damage
             Collider2D[] enemiesToDamage = Physics2D.OverlapBoxAll(attackPos.position, new Vector2(attackRangeX, attackRangeY), attackPos.localPosition.x * 90, units);

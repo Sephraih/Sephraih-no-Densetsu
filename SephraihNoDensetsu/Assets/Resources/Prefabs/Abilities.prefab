@@ -58,7 +58,7 @@ MonoBehaviour:
   range: 0
   units:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 640
   particleColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}

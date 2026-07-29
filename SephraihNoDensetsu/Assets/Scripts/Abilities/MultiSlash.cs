@@ -13,6 +13,11 @@ public class MultiSlash : Ability
 
     public LayerMask units; //Layer specified in editor "player" then matched against tags of objects to be determined player or not
 
+    // See BasicAttack.useParticleSlashEffect - same idea. MultiSlash is player-only (no enemy AI
+    // ever calls it), so unlike BasicAttack this doesn't need a per-character override for a
+    // Jätter-skinned fallback.
+    public bool useParticleSlashEffect = false;
+
    
     //damage area of slash
     private float attackRangeX = 2.5f;
@@ -35,6 +40,11 @@ public class MultiSlash : Ability
     {
         if (cd <= 0) //can't attack if the attack isnt ready to be used again
         {
+            // Combo step 1 plays the base directional attack; steps 2/3/4 use the "2"/"3"/"4"
+            // variant clips where they exist for the current facing direction - PlayDirectionalAttack
+            // falls back to the base attack for any direction missing a given variant.
+            string variant = comboCount >= 4 ? "4" : comboCount == 3 ? "3" : comboCount == 2 ? "2" : "";
+            user.GetComponent<MovementController>().PlayDirectionalAttack("Attack", variant);
 
             int dmg = basedmg;
             //use different slash animations based on the combo
@@ -94,6 +104,7 @@ public class MultiSlash : Ability
     //create a particle system in based on color and rotation angle
     private void Slash(float angle, Color color)
     {
+        if (!useParticleSlashEffect) return;
 
         //instantiate slash prefab
         GameObject slash = Instantiate(slashEffect, user.transform.position + attackPos.localPosition, Quaternion.identity);
