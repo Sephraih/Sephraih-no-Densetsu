@@ -13,7 +13,7 @@ public class Teleport : Ability
         for (float range = this.range; range > 0; range--) //shorter jump distance if location jumped at was out of boundary
         {
             Vector2 candidate = (Vector2)user.transform.position + (Vector2)direction * range;
-            if (!ObstacleQuery.BlocksTeleport(user.transform.position, candidate)) //check for obstacle/boundary colliders along the way
+            if (!SpellBlocked(user.transform.position, candidate)) //check for obstacle/boundary colliders along the way
             {
                 if (cd <= 0f) // if ability ready to use
                 {
@@ -46,7 +46,7 @@ public class Teleport : Ability
         for (float range = distance; range > 0; range--) //shorter jump distance if location jumped at was out of boundary
         {
             Vector2 candidate = (Vector2)user.transform.position + direction * range;
-            if (!ObstacleQuery.BlocksTeleport(user.transform.position, candidate)) //check for obstacle/boundary colliders along the way
+            if (!SpellBlocked(user.transform.position, candidate)) //check for obstacle/boundary colliders along the way
             {
                 if (cd <= 0f) // if ability ready to use
                 {

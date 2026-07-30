@@ -21,7 +21,9 @@ public class FireStorm : Ability
         float distance = Vector3.Distance(user.position,mousePosition);
         Mathf.Abs(distance);
         //check whether the ability is ready to use
-        if (cd <= 0 && distance <= range)
+        // Placement-type spell: reject placing the AoE on the far side of anything the caster
+        // couldn't also teleport to (Obstacle.BlocksSpell) - e.g. behind a boundary wall.
+        if (cd <= 0 && distance <= range && !SpellBlocked(user.position, mousePosition))
         {
             //instantiate and assign values to a firebolt projectile, which handles damaging, position and collision logic based on the fireboltprojectile script attached to it.
             var storm = Instantiate(projectile, mousePosition + new Vector3(0, 0, 10), Quaternion.Euler(0f, 0f, 0f)); //-0.75 for animation offset

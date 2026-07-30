@@ -20,9 +20,7 @@ public class ChargeAttack : Ability
     public float trailEffectInterval = 0.1f; // how often the trail particle spawns during the dash
     private int dmg = 80;
 
-    private Vector2 chargeDirection;
-    private Vector2 chargeDestination;
-    private float distanceToTarget;
+    private List<Vector2> chargeWaypoints;
     private Transform target;
 
 
@@ -33,16 +31,21 @@ public class ChargeAttack : Ability
         {
             if (cd <= 0f) // if ability ready to use
             {
-                //determine direction
-                distanceToTarget = Vector2.Distance(user.position, target.position);
-                if (distanceToTarget <= range) // && distanceToTarget >= 2.0f at point blank atm
+                // Charge attack is "walk to destination", not a teleport - it must obey the same
+                // obstacle rules as ordinary walking, and its range must reflect the TRUE walking
+                // distance (around obstacles), not straight-line distance - a target on the far
+                // side of a long wall might be well within straight-line range but require a much
+                // longer real walk, and that should count as out of range too. TryGetWalkPath's
+                // pathDistance is measured on the untrimmed path (the real distance to the target
+                // itself); waypoints comes back already trimmed meleeRange short so the charge
+                // stops just outside melee range instead of walking onto the target.
+                // waypoints.Count >= 2 excludes the degenerate case where the user is already
+                // within meleeRange - nothing to charge into, so don't fire (no cooldown wasted).
+                if (TryGetWalkPath(user.position, target.position, meleeRange, out var waypoints, out float pathDistance)
+                    && pathDistance <= range
+                    && waypoints.Count >= 2)
                 {
-                    chargeDirection = target.position - user.position;
-                    chargeDirection.Normalize();
-                    // Stop just short of the target instead of dashing a fixed distance for a fixed
-                    // duration - the old approach overshot a close target and undershot a far one,
-                    // regardless of how far away it actually was.
-                    chargeDestination = (Vector2)target.position - chargeDirection * meleeRange;
+                    chargeWaypoints = waypoints;
                     this.target = target; //classwide access
                     StartCoroutine(ChargeCoroutine()); //execute the charge, this is a process happening over time and will hence not be completed in a single frame.
                     cd = acd; //reset cooldown
@@ -96,26 +99,36 @@ public class ChargeAttack : Ability
 
         movement.stuck = true; //disallow any other movement of the charging character
 
-        float rotZ = Mathf.Atan2(chargeDirection.y, chargeDirection.x) * Mathf.Rad2Deg; //determine rotation
         float elapsed = 0f;
         float sinceLastEffect = trailEffectInterval; // spawn one immediately on the first step
+        int waypointIndex = 0;
 
-        // Distance-based, not time-based: stop as soon as the destination is reached rather than
-        // always covering a fixed distance in a fixed time. maxChargeDuration is only a safety net
-        // in case something (an obstacle, the target dying mid-charge) prevents ever arriving.
-        while (elapsed < maxChargeDuration && Vector2.Distance(rb.position, chargeDestination) > 0.05f)
+        // Walks the precomputed, obstacle-avoiding waypoint chain one corner at a time instead of a
+        // single straight MovePosition to one fixed point. chargeWaypoints already has the
+        // meleeRange-short trim applied (see TryGetWalkPath) - reaching the final waypoint IS
+        // arriving, no separate stop-check needed. 0.05f corner-arrival epsilon matches the
+        // original single-destination arrival check. maxChargeDuration is only a safety net in case
+        // something (the target dying mid-charge) prevents ever arriving.
+        while (elapsed < maxChargeDuration && waypointIndex < chargeWaypoints.Count)
         {
-            movement.WalkTowards(chargeDirection); // set movement animation, as default is disabled due to being stuck
+            Vector2 currentTarget = chargeWaypoints[waypointIndex];
+            Vector2 segmentDirection = (currentTarget - rb.position).normalized;
+
+            movement.WalkTowards(segmentDirection); // set movement animation, as default is disabled due to being stuck
 
             if (sinceLastEffect >= trailEffectInterval)
             {
+                float rotZ = Mathf.Atan2(segmentDirection.y, segmentDirection.x) * Mathf.Rad2Deg; //determine rotation for the current path segment
                 GameObject cef = Instantiate(chargeEffect, user.position, Quaternion.Euler(0f, 0f, rotZ - 90)); //instantiate effect prefab at position and rotation
                 cef.transform.parent = user; // make child of the charging character so its emission point moves along with it
                 Destroy(cef, 0.5f); //free up memory
                 sinceLastEffect = 0f;
             }
 
-            rb.MovePosition(Vector2.MoveTowards(rb.position, chargeDestination, chargeSpeed * Time.fixedDeltaTime));
+            rb.MovePosition(Vector2.MoveTowards(rb.position, currentTarget, chargeSpeed * Time.fixedDeltaTime));
+
+            if (Vector2.Distance(rb.position, currentTarget) <= 0.05f)
+                waypointIndex++;
 
             elapsed += Time.fixedDeltaTime;
             sinceLastEffect += Time.fixedDeltaTime;

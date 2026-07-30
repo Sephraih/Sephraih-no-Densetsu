@@ -52,7 +52,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 4b3382462637e8c44bfaeb9e97cc3fb7, type: 2}
+  m_Motion: {fileID: 7400000, guid: 7c531fde0ae056a4b8498c575d2b09cb, type: 2}
   m_Tag: Attack
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -79,7 +79,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 7e9d674412e2dd545b7bb1f8fd223066, type: 2}
+  m_Motion: {fileID: 7400000, guid: 4b3382462637e8c44bfaeb9e97cc3fb7, type: 2}
   m_Tag: Attack
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -172,7 +172,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 58f7a24ce3349c44e950e81d970a3414, type: 2}
+  m_Motion: {fileID: 7400000, guid: e636fa898391aed46933f3b1de6bc25e, type: 2}
   m_Tag: Attack
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -296,7 +296,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 8efadbcc223201b44b015e01460d2ef1, type: 2}
+  m_Motion: {fileID: 7400000, guid: 58f7a24ce3349c44e950e81d970a3414, type: 2}
   m_Tag: Attack
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -753,7 +753,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: e20e5674089904448b1e3cc4c23288f3, type: 2}
+  m_Motion: {fileID: 7400000, guid: 7e9d674412e2dd545b7bb1f8fd223066, type: 2}
   m_Tag: Attack
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -780,7 +780,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: d1cadbf67107c194ba9ad381ccb3ff7e, type: 2}
+  m_Motion: {fileID: 7400000, guid: 8efadbcc223201b44b015e01460d2ef1, type: 2}
   m_Tag: Attack
   m_SpeedParameter: 
   m_MirrorParameter: 

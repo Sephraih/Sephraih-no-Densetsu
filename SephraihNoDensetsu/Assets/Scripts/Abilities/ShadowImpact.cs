@@ -84,7 +84,7 @@ public class ShadowImpact : Ability
             // repositioning for this hit (stay put, still slash/damage from the current spot)
             // rather than blindly teleporting into whatever is there.
             Vector2 candidate = target.position + offset(hit);
-            if (!ObstacleQuery.BlocksTeleport(user.position, candidate))
+            if (!SpellBlocked(user.position, candidate))
             {
                 user.position = candidate;
             }

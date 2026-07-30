@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Raycast-and-filter helpers answering "is the line between two points clear of X". Each does one
-// combined-layer raycast, walks hits in distance order, and defers to the hit Obstacle's flag -
-// or treats the hit as blocking if it has no registered Obstacle yet (fail-safe during rollout).
+// Raycast-and-filter helpers answering "is the line between two points clear of X" - X being
+// sight / projectiles / spell-placement-or-teleport / walking. Each does one combined-layer
+// raycast, walks hits in distance order, and defers to the hit Obstacle's flag - or treats the hit
+// as blocking if it has no registered Obstacle yet (fail-safe during rollout).
 public static class ObstacleQuery
 {
     static int obstacleLayerMask = -1;
@@ -44,5 +45,6 @@ public static class ObstacleQuery
 
     public static bool BlocksSight(Vector2 a, Vector2 b) => IsBlocked(a, b, o => o.BlocksSight);
     public static bool BlocksProjectile(Vector2 a, Vector2 b) => IsBlocked(a, b, o => o.BlocksProjectiles);
-    public static bool BlocksTeleport(Vector2 a, Vector2 b) => IsBlocked(a, b, o => o.BlocksMovement);
+    public static bool BlocksSpell(Vector2 a, Vector2 b) => IsBlocked(a, b, o => o.BlocksSpell);
+    public static bool BlocksWalk(Vector2 a, Vector2 b) => IsBlocked(a, b, o => o.BlocksMovement);
 }

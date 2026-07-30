@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Ability : MonoBehaviour
 {
@@ -64,6 +65,77 @@ public class Ability : MonoBehaviour
             if (d < bestDist) { bestDist = d; best = h.transform; }
         }
         return best;
+    }
+
+    // "Walk"-type movement check - cheap single-raycast test against the same flag ordinary
+    // Collider2D/Rigidbody2D movement already respects (Obstacle.BlocksMovement). For abilities
+    // that just need a yes/no answer over a short straight hop, not full pathing - use
+    // TryGetWalkPath instead for anything that needs to actually navigate around an obstacle (see
+    // ChargeAttack).
+    protected bool WalkBlocked(Vector2 from, Vector2 to) => ObstacleQuery.BlocksWalk(from, to);
+
+    // "Teleport"-type movement / spell-placement check - shared flag (Obstacle.BlocksSpell) because
+    // in practice they're the same question: if a spell can be conjured on the far side of an
+    // obstacle, a teleport may as validly land there. Used by Teleport, ShadowImpact's per-hit
+    // repositioning, and FireStorm's placement gate.
+    protected bool SpellBlocked(Vector2 from, Vector2 to) => ObstacleQuery.BlocksSpell(from, to);
+
+    // Excludes "Not Walkable" (the NavMesh area NavMeshObstacleSync tags every BlocksMovement=true
+    // obstacle proxy with) from a path query - same exclusion EnemyController.Awake() applies to
+    // its own NavMeshAgent.areaMask, duplicated here since abilities have no agent of their own to
+    // carry it.
+    static int walkableAreaMaskCache = -1;
+    protected static int WalkableAreaMask
+    {
+        get
+        {
+            if (walkableAreaMaskCache == -1)
+                walkableAreaMaskCache = NavMesh.AllAreas & ~(1 << NavMesh.GetAreaFromName("Not Walkable"));
+            return walkableAreaMaskCache;
+        }
+    }
+
+    // Computes a NavMesh path from `from` to `to` (via the static NavMesh.CalculatePath API, which
+    // - unlike EnemyController's GetPathDirection - needs no NavMeshAgent component, so this works
+    // identically for the player, who has none, and AI casters alike), trimmed so it stops
+    // `trimTail` units short of `to` measured ALONG the path rather than as a straight line (e.g.
+    // so a melee charge stops just outside melee range without walking onto the target). Returns
+    // false (and pathDistance = float.MaxValue) if no path exists at all - callers should treat
+    // "unreachable" and "reachable but too far" identically. pathDistance is the TRUE walking
+    // distance (sum of path corner segments) measured on the UNTRIMMED path, for range checks that
+    // must reflect how far a character actually has to walk, not straight-line distance to target.
+    protected bool TryGetWalkPath(Vector3 from, Vector3 to, float trimTail, out List<Vector2> waypoints, out float pathDistance)
+    {
+        waypoints = null;
+        pathDistance = float.MaxValue;
+
+        var path = new NavMeshPath();
+        bool ok = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), NavMesh2DUtility.ToNavMesh(to), WalkableAreaMask, path);
+        if (!ok || path.status == NavMeshPathStatus.PathInvalid || path.corners.Length < 2)
+            return false;
+
+        var corners = new List<Vector2>();
+        foreach (var c in path.corners) corners.Add(NavMesh2DUtility.ToGame(c));
+
+        float total = 0f;
+        for (int i = 1; i < corners.Count; i++) total += Vector2.Distance(corners[i - 1], corners[i]);
+        pathDistance = total;
+
+        float remaining = trimTail;
+        while (corners.Count > 1 && remaining > 0f)
+        {
+            float segLen = Vector2.Distance(corners[corners.Count - 1], corners[corners.Count - 2]);
+            if (segLen <= remaining) { remaining -= segLen; corners.RemoveAt(corners.Count - 1); }
+            else
+            {
+                Vector2 dir = (corners[corners.Count - 2] - corners[corners.Count - 1]).normalized;
+                corners[corners.Count - 1] = corners[corners.Count - 1] + dir * remaining;
+                remaining = 0f;
+            }
+        }
+
+        waypoints = corners;
+        return true;
     }
 
     public void InvokeMouse(Transform user)

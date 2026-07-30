@@ -180,6 +180,13 @@ public class MovementController : MonoBehaviour
     // sensibly to the shorter Left/Right clips too. Tune per feel.
     public float repeatAttackStartFraction = 0.27f;
 
+    // States listed here always restart at frame 0 on a repeat hit instead of skipping ahead by
+    // repeatAttackStartFraction - for clips whose meaningful motion is weighted toward the END of
+    // the clip rather than spread evenly (e.g. AttackRight3/AttackLeft3, which after the side-combo
+    // reshuffle hold the side4 art), the normal skip-ahead cuts into the actual swing instead of
+    // just skipping a redundant wind-up, so those clips look wrong when resumed mid-combo.
+    public List<string> repeatFromStartStates = new List<string> { "AttackRight3", "AttackLeft3" };
+
     // All 4 directional attack states now exist (AttackUp/Down/Left/Right) - this picks the one
     // matching whichever way the character is CURRENTLY drawn facing, read back from the same
     // moveX/moveY params the Aniwalk blend tree itself uses, so attack direction always agrees
@@ -202,7 +209,6 @@ public class MovementController : MonoBehaviour
         // (rather than listing all state names here) means any attack state added later is
         // covered automatically without touching this method.
         bool alreadyAttacking = animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack");
-        float startTime = alreadyAttacking ? repeatAttackStartFraction : 0f;
 
         string direction = GetFacingDirectionName();
         string stateName = actionPrefix + direction; // base attack, always assumed to exist
@@ -218,6 +224,7 @@ public class MovementController : MonoBehaviour
             }
         }
 
+        float startTime = (alreadyAttacking && !repeatFromStartStates.Contains(stateName)) ? repeatAttackStartFraction : 0f;
         animator.Play(stateName, 0, startTime);
     }
 

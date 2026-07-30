@@ -12,6 +12,31 @@ PrefabInstance:
       propertyPath: attackPos
       value: 
       objectReference: {fileID: 7226194584268423881}
+    - target: {fileID: 868327017447262887, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: acd
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 868327017447262887, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: range
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1552973607175345453, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: acd
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1919151906359403396, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: acd
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1919151906359403396, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: range
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5765252530442742022, guid: b693122c99ecd174bac378e802c54425,
         type: 3}
       propertyPath: m_LocalPosition.x
