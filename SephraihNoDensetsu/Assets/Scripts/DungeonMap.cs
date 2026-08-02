@@ -54,7 +54,16 @@ public class DungeonMap : MapBehaviour
         // portal.SetActive(true);
 
         ActivateLevel(Level);
-        RebuildNavMesh();
+        // NOT RebuildNavMesh() here - see OnMapEntered. This Start() runs as part of MapManager's
+        // additive load of this scene, which happens BEFORE the scene being traveled FROM (e.g.
+        // MainCity) is unloaded (TravelRoutine unloads it one frame later). navMeshSurface bakes
+        // with collectObjects=All, which sweeps every currently loaded scene, not just this one -
+        // baking here caught the previous scene's still-present geometry mid-transition and
+        // produced a corrupted/disconnected Level1 mesh (some areas across a wall became
+        // unreachable despite a real route existing). LoadNextLevel/GoToExit's own direct
+        // RebuildNavMesh() calls are unaffected since those are same-scene transitions with no
+        // other scene involved, which is why only the very first entry into the dungeon (not later
+        // level-to-level transitions) ever showed this.
 
     }
 
@@ -214,6 +223,11 @@ public class DungeonMap : MapBehaviour
 
     public override void OnMapEntered(string spawnPointId)
     {
+        // Baking here instead of Start() - see the comment on Start()'s call site. MapManager only
+        // invokes OnMapEntered after confirming the scene traveled FROM is fully unloaded, so this
+        // is the first point at which collectObjects=All is guaranteed to see only this scene.
+        RebuildNavMesh();
+
         if (level1Entry != null)
         {
             Player.transform.position = level1Entry.transform.position;

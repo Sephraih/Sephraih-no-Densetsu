@@ -14,7 +14,7 @@ public class MobBehaviour : EnemyController
     {
         if (GetComponent<MovementController>().stunned) { return; }
 
-        target = FindNearestEnemy(detectionRange, requireLineOfSight: state != BotState.Chase);
+        target = FindNearestEnemy(isAcquiring: state != BotState.Chase);
         UpdateState();
         Move();
         if (state == BotState.Chase) Aim();
@@ -27,7 +27,7 @@ public class MobBehaviour : EnemyController
         {
             case BotState.Chase:
                 float dist = Vector2.Distance(transform.position, target.position);
-                movementDirection = GetPathDirection(target.position);
+                movementDirection = DeflectAroundOtherUnits(GetPathDirection(target.position));
                 msi = dist > 1.0f ? 1f : 0f;
                 break;
 
@@ -41,7 +41,7 @@ public class MobBehaviour : EnemyController
                 }
                 else
                 {
-                    movementDirection = GetPathDirection(spawnSpot);
+                    movementDirection = DeflectAroundOtherUnits(GetPathDirection(spawnSpot));
                     msi = movementDirection.sqrMagnitude > 0.0001f ? 1f : 0f;
                 }
                 break;

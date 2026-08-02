@@ -35,8 +35,14 @@ public class FireStormEffect : MonoBehaviour
             {
                 if (!damagedTargets.Contains(collider)) //before the bolt is destroyed, it checks for colliders on every frame, which might result in duplicate application, which is unwished for
                 {
-                    collider.GetComponent<HealthController>().TakeDamage(dmg, user); //apply damage to the character the collider belongs to
-                    collider.GetComponent<StatusController>().Slow(slow, 0.3f); //slow the character
+                    var health = collider.GetComponent<HealthController>();
+                    health.TakeDamage(dmg, user); //apply damage to the character the collider belongs to
+                    // Skip Slow() if this hit was lethal - TakeDamage synchronously deactivates the
+                    // target via HealthController.OnDeath -> EnemyController.HandleDeath (SetActive
+                    // false) before returning, and StatusController.Slow() -> StartCoroutine() throws
+                    // "Coroutine couldn't be started because the game object is inactive!" on an
+                    // already-deactivated target.
+                    if (!health.isDead) collider.GetComponent<StatusController>().Slow(slow, 0.3f); //slow the character
                     damagedTargets.Add(collider);
 
                     StartCoroutine(DamageableCoroutine(collider));

@@ -10,12 +10,20 @@ public class WizardBehaviour : EnemyController
         spawnSpot = transform.position;
         teamID = GetComponent<StatusController>().teamID;
         GetComponent<StatusController>().Int = 10;
-        detectionRange = 20f;
+
+        // Perception tiers (visionRange/visionDegrees/awarenessRange/blindSpotDegrees/
+        // detectionRange/maxChaseDistance, inherited from EnemyController) are deliberately NOT
+        // set here - they're plain serialized fields on this prefab's Inspector, tunable per enemy
+        // type without touching code. Setting them here would silently overwrite whatever's
+        // configured on the prefab every time Start() runs. NOTE if tuning these on the prefab:
+        // maxChaseDistance must stay >= visionRange, or a target detected right at the edge of the
+        // vision cone would immediately exceed a smaller leash and bounce straight back to Return
+        // the very next frame.
     }
 
     void Update()
     {
-        target = FindNearestEnemy(detectionRange, requireLineOfSight: state != BotState.Chase);
+        target = FindNearestEnemy(isAcquiring: state != BotState.Chase);
         distanceToTarget = (target != null && target != transform)
             ? Vector2.Distance(transform.position, target.position)
             : float.MaxValue;
@@ -33,10 +41,11 @@ public class WizardBehaviour : EnemyController
             case BotState.Chase:
                 // Kite: close the gap from far, hold position at mid range, escape if too close
                 if (distanceToTarget >= 15f && distanceToTarget <= 20f)
-                    movementDirection = GetPathDirection(target.position);
+                    movementDirection = DeflectAroundOtherUnits(GetPathDirection(target.position));
                 else if (distanceToTarget <= 5f)
                 {
-                    GetComponentInChildren<AbilityController>().Invoke(6, transform);
+                    GetComponentInChildren<AbilityController>().Invoke(6, transform); // Teleport - relocates transform directly, bypassing the NavMeshAgent
+                    ResyncNavMeshAgent(); // keep the agent's path state in sync with the post-teleport position (see ResyncNavMeshAgent's doc comment)
                     movementDirection = GetFleeDirection(target.position, 5f);
                 }
                 else
@@ -52,7 +61,7 @@ public class WizardBehaviour : EnemyController
                 }
                 else
                 {
-                    movementDirection = GetPathDirection(spawnSpot);
+                    movementDirection = DeflectAroundOtherUnits(GetPathDirection(spawnSpot));
                 }
                 break;
         }

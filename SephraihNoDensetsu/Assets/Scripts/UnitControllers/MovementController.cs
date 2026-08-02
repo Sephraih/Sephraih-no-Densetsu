@@ -228,6 +228,14 @@ public class MovementController : MonoBehaviour
         animator.Play(stateName, 0, startTime);
     }
 
+    // Raw (moveX, moveY) facing vector - the same signal Aniwalk's blend tree and
+    // GetFacingDirectionName() read, but unsnapped (continuous, not cardinal) - usable directly for
+    // angle-based checks (e.g. EnemyController's vision-cone detection) rather than animation state.
+    public Vector2 GetFacingVector()
+    {
+        return animator.isInitialized ? new Vector2(animator.GetFloat("moveX"), animator.GetFloat("moveY")) : Vector2.zero;
+    }
+
     private string GetFacingDirectionName()
     {
         float x = animator.GetFloat("moveX");

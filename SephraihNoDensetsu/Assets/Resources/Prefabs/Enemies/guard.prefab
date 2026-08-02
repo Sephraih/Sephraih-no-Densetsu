@@ -121,7 +121,12 @@ MonoBehaviour:
   attackingDirection: {fileID: 4497875012699089440}
   teamID: 0
   saveSpot: {x: 0, y: 0, z: 0}
-  detectionRange: 8
+  visionRange: 5
+  visionDegrees: 120
+  awarenessRange: 3
+  blindSpotDegrees: 30
+  detectionRange: 1.2
+  maxChaseDistance: 15
   repathInterval: 0.35
   targetLayerMask:
     serializedVersion: 2

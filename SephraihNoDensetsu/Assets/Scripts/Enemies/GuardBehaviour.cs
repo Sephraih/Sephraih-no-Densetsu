@@ -14,12 +14,19 @@ public class GuardBehaviour : EnemyController
         guardSpot = transform.position;
         teamID = GetComponent<StatusController>().teamID;
         GetComponentInChildren<FireBolt>().acd = 5.0f;
-        detectionRange = guardRadius;
+
+        // Perception tiers (visionRange/visionDegrees/awarenessRange/blindSpotDegrees/
+        // detectionRange/maxChaseDistance, inherited from EnemyController) are deliberately NOT
+        // set here - they're plain serialized fields on this prefab's Inspector, tunable per enemy
+        // type without touching code. Setting them here would silently overwrite whatever's
+        // configured on the prefab every time Start() runs. guardRadius stays a separate field
+        // (still used for this file's own melee/ranged-ability-range checks in Move()/Attack()) -
+        // it's no longer linked to visionRange in code, so the two can be tuned independently.
     }
 
     void Update()
     {
-        target = FindNearestEnemy(detectionRange, requireLineOfSight: state != BotState.Chase);
+        target = FindNearestEnemy(isAcquiring: state != BotState.Chase);
         distanceToTarget = (target != null && target != transform)
             ? Vector2.Distance(transform.position, target.position)
             : float.MaxValue;
@@ -49,7 +56,7 @@ public class GuardBehaviour : EnemyController
                 // sliver of distance closed every single frame via normal solid-body movement,
                 // physically shoving the target the entire time it's stuck in that gap - a
                 // sustained push, not a one-off nudge.
-                movementDirection = distanceToTarget < 1.2f ? Vector2.zero : GetPathDirection(target.position);
+                movementDirection = distanceToTarget < 1.2f ? Vector2.zero : DeflectAroundOtherUnits(GetPathDirection(target.position));
                 break;
 
             case BotState.Idle:
@@ -61,7 +68,7 @@ public class GuardBehaviour : EnemyController
                 }
                 else
                 {
-                    movementDirection = GetPathDirection(guardSpot);
+                    movementDirection = DeflectAroundOtherUnits(GetPathDirection(guardSpot));
                 }
                 break;
         }
