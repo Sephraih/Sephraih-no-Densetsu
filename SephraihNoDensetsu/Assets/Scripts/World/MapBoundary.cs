@@ -11,6 +11,15 @@ public class MapBoundary : MonoBehaviour
     [Tooltip("Every Obstacle that forms this map/level's outer edge.")]
     public List<Obstacle> BoundaryObstacles = new();
 
+    [Tooltip("Any GameObject known to sit INSIDE this map/level's play area (e.g. its spawn point). " +
+             "NavMeshObstacleSync flood-fills the floor outward from here through open (non-boundary) " +
+             "tiles, so the generated floor matches the boundary's actual shape instead of just its " +
+             "bounding rectangle - required for any boundary that isn't itself roughly rectangular " +
+             "(a diamond/organic outline, etc). Leave unset only for a boundary that genuinely IS " +
+             "rectangular; NavMeshObstacleSync falls back to the old rectangle-fill behavior with a " +
+             "warning if this is missing.")]
+    public Transform InteriorSeed;
+
     public Bounds ComputeWorldBounds()
     {
         Bounds bounds = default;

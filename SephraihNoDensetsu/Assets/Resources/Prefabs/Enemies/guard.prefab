@@ -16,6 +16,17 @@ PrefabInstance:
       propertyPath: attackPos
       value: 
       objectReference: {fileID: 4497875012699089440}
+    - target: {fileID: 868327017447262887, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: rangePercent
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 868327017447262887, guid: b693122c99ecd174bac378e802c54425,
+        type: 3}
+      propertyPath: rangeSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: 93e1e028086789e48b011dcf208a06b0,
+        type: 2}
     - target: {fileID: 3699976396759297765, guid: b693122c99ecd174bac378e802c54425,
         type: 3}
       propertyPath: acd
@@ -121,13 +132,16 @@ MonoBehaviour:
   attackingDirection: {fileID: 4497875012699089440}
   teamID: 0
   saveSpot: {x: 0, y: 0, z: 0}
-  visionRange: 5
+  rangeSettings: {fileID: 11400000, guid: 93e1e028086789e48b011dcf208a06b0, type: 2}
+  visionRangePercent: 0.5
   visionDegrees: 120
-  awarenessRange: 3
+  awarenessRangePercent: 0.6
   blindSpotDegrees: 30
-  detectionRange: 1.2
-  maxChaseDistance: 15
+  detectionRangePercent: 0.25
+  maxChaseDistancePercent: 1.15
   repathInterval: 0.35
+  separationRadius: 1.2
+  separationStrength: 1.2
   targetLayerMask:
     serializedVersion: 2
     m_Bits: 640

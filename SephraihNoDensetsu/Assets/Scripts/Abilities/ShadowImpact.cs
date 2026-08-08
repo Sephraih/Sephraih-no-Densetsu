@@ -84,9 +84,20 @@ public class ShadowImpact : Ability
             // repositioning for this hit (stay put, still slash/damage from the current spot)
             // rather than blindly teleporting into whatever is there.
             Vector2 candidate = target.position + offset(hit);
-            if (!SpellBlocked(user.position, candidate))
+            // TryFindReachableLanding requires the snapped destination be actually reachable BY
+            // WALKING from the user's current spot, not just spatially close - unlike Teleport, this
+            // is a melee-range combo reposition, not a deliberate long-distance jump, so it must
+            // never strand the attacker somewhere their own feet couldn't otherwise get them out of
+            // (e.g. on top of a tower the target happened to be standing on). See
+            // TryFindReachableLanding's own doc comment - its CalculatePath requirement already
+            // guarantees a real walkable route exists, which is a strictly stronger condition than
+            // any straight-line clear check could add, so there's no separate SpellBlocked call here
+            // (dropped alongside Teleport's - see Teleport.cs for why). A target standing right next
+            // to a wall can put one of the 4 cardinal offsets above exactly on/in it, which is
+            // exactly the case this is meant to catch.
+            if (TryFindReachableLanding(user.position, candidate, DefaultLandingSearchRadius, out Vector2 landing))
             {
-                user.position = candidate;
+                user.position = landing;
             }
             //GameObject tef = Instantiate(tpEffect, transform.position + new Vector3(0, -0.7f, 0), Quaternion.Euler(0f, 0f, 0)); //instantiate effect prefab at position and rotation
             //Destroy(tef, 0.5f); //free up memory

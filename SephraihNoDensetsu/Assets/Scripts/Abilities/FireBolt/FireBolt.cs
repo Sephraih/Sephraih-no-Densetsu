@@ -9,10 +9,24 @@ public class FireBolt : Ability
     //public string enemy = "Enemy";
 
     public GameObject projectile; //prefab
-    
+
     private int dmg = 50;
-    
+
     public float slow = 0.5f; //default movement speed * slow
+
+    // Shared screen-relative reference distance - see RangeSettings' own doc comment. This bolt's
+    // actual max travel distance (the inherited `range` field, enforced by FireBoltProjectile) is
+    // rangePercent of this asset's FieldOfView, computed once in Awake() - not a live camera read.
+    [SerializeField] private RangeSettings rangeSettings;
+    // % of rangeSettings.FieldOfView this bolt travels before self-destructing. Public so casters
+    // with a shorter effective range (e.g. Guard vs. Wizard) can each tune their own FireBolt
+    // instance independently while still deriving from the one shared global distance.
+    public float rangePercent = 1.0f;
+
+    private void Awake()
+    {
+        range = (rangeSettings != null ? rangeSettings.FieldOfView : 0f) * rangePercent;
+    }
 
 
     // blast towards casters attacking point
@@ -46,6 +60,7 @@ public class FireBolt : Ability
             //instantiate and assign values to a firebolt projectile, which handles damaging, position and collision logic based on the fireboltprojectile script attached to it.
             var bolt = Instantiate(projectile, user.position, attackPos.transform.rotation);
             bolt.GetComponent<FireBoltProjectile>().user = user;
+            bolt.GetComponent<FireBoltProjectile>().maxRange = range;
             bolt.GetComponent<FireBoltProjectile>().dmg = dmg * (user.GetComponent<StatusController>().lvl + user.transform.GetComponent<StatusController>().Int); //+= this.GetComponent<StatusController>().matk;
             //bolt.GetComponent<FireBoltProjectile>().dotd += this.GetComponent<StatusController>().matk;
             //bolt.GetComponent<FireBoltProjectile>().slow = slow;

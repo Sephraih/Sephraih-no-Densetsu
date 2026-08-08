@@ -70,6 +70,11 @@ public class MapManager : MonoBehaviour
         NavMesh2DUtility.InvalidateCache();
         CurrentMap = FindMap(newScene);
         CurrentMapScene = sceneName;
+        // One shared Camera lives in Bootstrap (never destroyed across map transitions) - so a
+        // per-map backdrop has to be applied here on entry rather than being a per-scene Inspector
+        // value, which is what MainCamera.backgroundColor would otherwise look like it already is.
+        if (CurrentMap != null && Camera.main != null)
+            Camera.main.backgroundColor = CurrentMap.BackgroundColor;
         CurrentMap?.OnMapEntered(spawnPointId);
 
         isTraveling = false;

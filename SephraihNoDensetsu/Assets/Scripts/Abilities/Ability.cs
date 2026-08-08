@@ -74,24 +74,143 @@ public class Ability : MonoBehaviour
     // ChargeAttack).
     protected bool WalkBlocked(Vector2 from, Vector2 to) => ObstacleQuery.BlocksWalk(from, to);
 
-    // "Teleport"-type movement / spell-placement check - shared flag (Obstacle.BlocksSpell) because
-    // in practice they're the same question: if a spell can be conjured on the far side of an
-    // obstacle, a teleport may as validly land there. Used by Teleport, ShadowImpact's per-hit
-    // repositioning, and FireStorm's placement gate.
+    // Straight-line placement gate (Obstacle.BlocksSpell) for spells that conjure something AT a
+    // point rather than moving the caster there - FireStorm's placement check is the only user now.
+    // Teleport/ShadowImpact used to also gate on this, but a straight-line raycast and "is this
+    // point reachable/reachable-by-walking" (TryFindWalkableLanding/TryFindReachableLanding) are
+    // different questions - the raycast could block a destination that was perfectly legitimate by
+    // NavMesh's own account whenever the straight line merely grazed a wall's corner (e.g. a bend in
+    // the map boundary), and NavMesh's own floor generation already guarantees nothing walkable
+    // exists beyond the map's true edge, so the raycast wasn't even load-bearing for that case. See
+    // Teleport.cs's comment for the full reasoning.
     protected bool SpellBlocked(Vector2 from, Vector2 to) => ObstacleQuery.BlocksSpell(from, to);
 
-    // Excludes "Not Walkable" (the NavMesh area NavMeshObstacleSync tags every BlocksMovement=true
-    // obstacle proxy with) from a path query - same exclusion EnemyController.Awake() applies to
-    // its own NavMeshAgent.areaMask, duplicated here since abilities have no agent of their own to
-    // carry it.
+    // Default search radius for snapping a candidate teleport/reposition point onto the navmesh -
+    // see TryFindWalkableLanding/TryFindReachableLanding below. Generous enough to reliably find a
+    // nearby walkable point across a typical wall's thickness in this project (walls are usually a
+    // single tile) without searching so far that a snap ends up somewhere unrelated to where the
+    // ability was actually aimed.
+    protected const float DefaultLandingSearchRadius = 3f;
+
+    // Finds the nearest point ON the navmesh to `point`, within `searchRadius` - purely spatial,
+    // makes no attempt to verify that point is actually reachable (connected by a walkable route)
+    // from anywhere else. This is deliberately how a "caster teleport" should behave: it can
+    // relocate the user into a walkable pocket that's otherwise fully sealed off (e.g. the top of a
+    // tower surrounded by walls) - NavMesh.SamplePosition only ever answers "what's nearby," never
+    // "what's connected to what," and for this kind of ability that IS the intended behavior, not a
+    // gap to close (a teleport that could only ever land somewhere you could otherwise walk to would
+    // defeat half the point of having one). Use TryFindReachableLanding instead for any ability that
+    // must never strand the user somewhere their own feet couldn't otherwise get them out of.
+    //
+    // The one thing this DOES still check: `from` must be able to reach the landing point without
+    // crossing a "Spell Boundary"-tagged obstacle (Obstacle.BlocksSpell) - see the two-check
+    // reasoning below. This is a real connectivity/area-tag query, not a straight-line raycast, so
+    // it can't be fooled by a destination merely sitting near a wall's corner the way the old
+    // SpellBlocked raycast was (see Teleport.cs's comment for that history).
+    protected bool TryFindWalkableLanding(Vector2 from, Vector2 point, float searchRadius, out Vector2 landing)
+    {
+        landing = point;
+        if (!NavMesh.SamplePosition(NavMesh2DUtility.ToNavMesh(point), out var hit, searchRadius, WalkableAreaMask))
+            return false;
+
+        // Two connectivity checks, not one, to tell "blocked by an ordinary wall" (allowed - the
+        // whole point of this method is to ignore that, see above) apart from "blocked specifically
+        // by a Spell Boundary obstacle" (rejected). This is NOT redundant with a single mask-
+        // restricted check: confirmed empirically via NavMesh.CalculateTriangulation() that Unity's
+        // own BUILT-IN "Not Walkable" area produces ZERO real triangles anywhere in the bake (Unity
+        // special-cases its own default area name - contrary to an earlier, apparently mistaken
+        // assumption logged elsewhere in this project's memory) - so literally no mask can ever
+        // route a CalculatePath across one; a single "is there a path" check would incorrectly
+        // reject every ordinary sealed pocket too, not just Spell Boundary ones. "Spell Boundary" is
+        // a CUSTOM area, which Unity does NOT special-case - it keeps real, walkable-shaped geometry,
+        // just tagged - so a path CAN cross it unless that specific area is excluded from the query
+        // mask. That asymmetry is what makes the two-check comparison meaningful: only reject when
+        // removing Spell Boundary specifically from the mask is what breaks an otherwise-complete
+        // route.
+        var permissivePath = new NavMeshPath();
+        bool reachableIgnoringEverything = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, NavMesh.AllAreas, permissivePath)
+            && permissivePath.status == NavMeshPathStatus.PathComplete;
+
+        if (reachableIgnoringEverything)
+        {
+            var restrictedPath = new NavMeshPath();
+            bool reachableRespectingSpellBoundary = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, TeleportConnectivityMask, restrictedPath)
+                && restrictedPath.status == NavMeshPathStatus.PathComplete;
+            if (!reachableRespectingSpellBoundary)
+                return false; // reachable with Spell Boundary treated as passable, not without it - that IS the blocker
+        }
+        // Else: unreachable even with Spell Boundary geometry treated as passable - blocked by an
+        // ordinary wall/true hole instead, which isn't this check's concern (allowed, per the
+        // sealed-tower design above).
+
+        landing = NavMesh2DUtility.ToGame(hit.position);
+        return true;
+    }
+
+    // Same nearest-point search as TryFindWalkableLanding, but additionally requires the found point
+    // be genuinely reachable FROM `from` by a real walkable path (NavMeshPathStatus.PathComplete),
+    // not just spatially nearby - the same connectivity check TryGetWalkPath/ChargeAttack already
+    // relies on to never walk a charge onto or through a wall. This is deliberately how a
+    // "melee-ish" teleport/reposition should behave: it rejects a point that's close to the aim but
+    // topologically sealed off (the tower again, but this time landing there would strand the
+    // attacker with no way back down) instead of snapping to it the way TryFindWalkableLanding
+    // would. Callers should treat a `false` return the same as "no valid reposition" - skip it
+    // rather than falling back to the raw, unvalidated `point`.
+    protected bool TryFindReachableLanding(Vector2 from, Vector2 point, float searchRadius, out Vector2 landing)
+    {
+        landing = point;
+        if (!NavMesh.SamplePosition(NavMesh2DUtility.ToNavMesh(point), out var hit, searchRadius, WalkableAreaMask))
+            return false;
+
+        var path = new NavMeshPath();
+        bool ok = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, WalkableAreaMask, path);
+        if (!ok || path.status != NavMeshPathStatus.PathComplete)
+            return false;
+
+        landing = NavMesh2DUtility.ToGame(hit.position);
+        return true;
+    }
+
+    // Excludes "Not Walkable" (BlocksMovement=true, BlocksSpell=false obstacles) AND "Spell Boundary"
+    // (BlocksMovement=true, BlocksSpell=true obstacles) - both physically block movement, so both
+    // must be excluded for any ordinary movement/landing-on-the-ground purpose (this is the mask
+    // TryGetWalkPath/ChargeAttack uses, and the one TryFindWalkableLanding/TryFindReachableLanding
+    // use to find a real ground point to snap onto). Deliberately does NOT exclude "Spell Barrier"
+    // (BlocksMovement=false, BlocksSpell=true obstacles, e.g. a spellBarrier tile) - those don't
+    // physically block movement (their real Collider2D is a trigger), so ordinary pathing should see
+    // straight through them same as physics does; only TeleportConnectivityMask cares about that
+    // area. Same "Not Walkable" exclusion EnemyController.Awake() applies to its own
+    // NavMeshAgent.areaMask, duplicated here since abilities have no agent of their own to carry it.
     static int walkableAreaMaskCache = -1;
     protected static int WalkableAreaMask
     {
         get
         {
             if (walkableAreaMaskCache == -1)
-                walkableAreaMaskCache = NavMesh.AllAreas & ~(1 << NavMesh.GetAreaFromName("Not Walkable"));
+                walkableAreaMaskCache = NavMesh.AllAreas & ~(1 << NavMesh.GetAreaFromName("Not Walkable")) & ~(1 << NavMesh.GetAreaFromName("Spell Boundary"));
             return walkableAreaMaskCache;
+        }
+    }
+
+    // Excludes "Spell Boundary" AND "Spell Barrier" - deliberately does NOT exclude "Not Walkable",
+    // unlike WalkableAreaMask above. Unity's built-in "Not Walkable" area is a genuine hole (zero
+    // real triangles - confirmed via NavMesh.CalculateTriangulation(), see the correction in
+    // project-navmesh-2d-gotchas memory bug #5), so by NOT excluding it here, a CalculatePath query
+    // against this mask can never route through it anyway - which is exactly what preserves
+    // TryFindWalkableLanding's deliberate "can reach a sealed-by-an-ordinary-wall pocket" behavior.
+    // "Spell Boundary"/"Spell Barrier" are CUSTOM areas, which Unity does NOT special-case into
+    // holes - they keep real, walkable-shaped geometry, so excluding them here genuinely blocks a
+    // path that would otherwise cross them. Both are excluded (not just one) because either
+    // combination of Obstacle.BlocksMovement + BlocksSpell=true should reject Teleport equally - see
+    // NavMeshObstacleSync.Sync()'s area-tagging comment for which combination gets which area.
+    static int teleportConnectivityMaskCache = -1;
+    protected static int TeleportConnectivityMask
+    {
+        get
+        {
+            if (teleportConnectivityMaskCache == -1)
+                teleportConnectivityMaskCache = NavMesh.AllAreas & ~(1 << NavMesh.GetAreaFromName("Spell Boundary")) & ~(1 << NavMesh.GetAreaFromName("Spell Barrier"));
+            return teleportConnectivityMaskCache;
         }
     }
 

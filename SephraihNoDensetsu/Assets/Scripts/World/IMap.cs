@@ -3,6 +3,9 @@
 public interface IMap
 {
     MapBoundary Boundary { get; }
+    // Applied to Camera.main by MapManager.TravelRoutine whenever this map becomes the current one -
+    // lets each map/scene show its own backdrop color instead of one fixed color for every map.
+    UnityEngine.Color BackgroundColor { get; }
     SpawnPoint GetSpawnPoint(string id);
 
     // Called by MapManager once this map's scene has finished its own Start()-time setup.

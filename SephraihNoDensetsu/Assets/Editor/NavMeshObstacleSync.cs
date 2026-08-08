@@ -188,6 +188,216 @@ public static class NavMeshObstacleSync
         return result;
     }
 
+    // Generates one MapBoundary's floor as a set of BoxColliders covering exactly its true interior
+    // extent - found via a flood fill from InteriorSeed through cells NOT covered by any tilemap-
+    // backed boundary obstacle - rather than the old single box spanning ComputeWorldBounds()'s
+    // bounding RECTANGLE. The rectangle approach silently included real, walkable, NavMesh-reachable
+    // floor in every corner outside a non-rectangular boundary's actual outline (confirmed live:
+    // Level3's diamond-shaped boundary left all four bounding-rect corners as genuine Teleport-
+    // reachable NavMesh despite no boundary tile anywhere near them - units could reposition straight
+    // past the visible wall into that phantom area). Interior Obstacle-tagged cells are deliberately
+    // NOT treated as walls by this flood fill - they still get individually carved into "Not
+    // Walkable" holes by the obstacle loop in Sync() above, same as before; finding the boundary's
+    // true outer extent is this method's only job. Falls back to the old single-rectangle behavior
+    // (with a warning) when InteriorSeed isn't assigned, so an existing MapBoundary doesn't silently
+    // lose its floor before someone assigns a seed - correct only for a genuinely rectangular
+    // boundary, same as this project's behavior always was.
+    static int GenerateFloor(MapBoundary boundary, int bakeLayer)
+    {
+        var outerBounds = boundary.ComputeWorldBounds();
+        if (outerBounds.size.x <= 0f || outerBounds.size.y <= 0f)
+        {
+            Debug.LogWarning($"[NavMeshObstacleSync] MapBoundary on '{boundary.name}' has no BoundaryObstacles with real bounds - skipped.");
+            return 0;
+        }
+
+        var floorHolder = new GameObject(FloorName);
+        floorHolder.transform.SetParent(boundary.transform, false);
+
+        if (boundary.InteriorSeed == null)
+        {
+            Debug.LogWarning($"[NavMeshObstacleSync] MapBoundary on '{boundary.name}' has no InteriorSeed assigned - using its full bounding rectangle as floor (may include phantom walkable area outside a non-rectangular boundary shape, e.g. the corners of a diamond/organic outline). Assign InteriorSeed to any GameObject known to sit inside the play area to fix.");
+            var floorObj = new GameObject("floor");
+            floorObj.transform.SetParent(floorHolder.transform, true);
+            floorObj.transform.position = outerBounds.center;
+            floorObj.layer = bakeLayer;
+            var rectBox = floorObj.AddComponent<BoxCollider>();
+            rectBox.size = new Vector3(outerBounds.size.x, outerBounds.size.y, ZThickness);
+            return 1;
+        }
+
+        // Boundary obstacles can be tilemap-backed (Dungeon/MainCity) or discrete-Collider2D-backed
+        // (Arena's BoundaryL/R/T/B, plain BoxCollider2Ds with no Tilemap) - same dual handling
+        // ComputeWorldBounds() already does above, reusing the same BoxesForCollider() rasterization
+        // the obstacle-proxy loop uses, so a non-rectangular discrete boundary would be handled
+        // correctly too, not just tilemap ones.
+        var boundaryTilemaps = new List<Tilemap>();
+        var boundaryBoxes = new List<Bounds>();
+        foreach (var obs in boundary.BoundaryObstacles)
+        {
+            if (obs == null) continue;
+            var tm = obs.GetComponentInChildren<Tilemap>(true);
+            if (tm != null) { boundaryTilemaps.Add(tm); continue; }
+            foreach (var col in obs.GetComponentsInChildren<Collider2D>(true))
+            {
+                if (col is TilemapCollider2D tilemapCol && tilemapCol.usedByComposite) continue;
+                boundaryBoxes.AddRange(BoxesForCollider(col));
+            }
+        }
+
+        // Tilemap.WorldToCell() relies on the same live-transform-matrix caching as
+        // GetCellCenterWorld()/CellToLocal() (see CellCenterWorld()'s own comment above) and is
+        // JUST AS BROKEN on an inactive hierarchy - confirmed the hard way: this returned degenerate
+        // cells for every query while Level3 was inactive (the normal state whenever Sync() runs on
+        // a level that isn't the currently-active one), so IsWall() below silently never matched
+        // anything and the flood fill filled the entire bounding rectangle anyway, identical to the
+        // bug this method exists to fix. WorldToCellManual is CellCenterWorld's exact inverse - pure
+        // matrix math via InverseTransformPoint, unaffected by active state.
+        Vector3Int WorldToCellManual(Tilemap tm, Vector3 worldPos)
+        {
+            Vector3 local = tm.transform.InverseTransformPoint(worldPos) - Vector3.Scale(tm.cellSize, tm.tileAnchor);
+            return new Vector3Int(Mathf.FloorToInt(local.x / tm.cellSize.x), Mathf.FloorToInt(local.y / tm.cellSize.y), 0);
+        }
+
+        bool IsWall(Vector2 worldPos)
+        {
+            foreach (var tm in boundaryTilemaps)
+                if (tm.HasTile(WorldToCellManual(tm, worldPos))) return true;
+            foreach (var b in boundaryBoxes)
+                if (worldPos.x >= b.min.x && worldPos.x <= b.max.x && worldPos.y >= b.min.y && worldPos.y <= b.max.y) return true;
+            return false;
+        }
+
+        const float cell = 1f; // this project's level tilemaps are uniformly 1-unit cells
+        int xMin = Mathf.FloorToInt(outerBounds.min.x / cell);
+        int xMax = Mathf.CeilToInt(outerBounds.max.x / cell);
+        int yMin = Mathf.FloorToInt(outerBounds.min.y / cell);
+        int yMax = Mathf.CeilToInt(outerBounds.max.y / cell);
+
+        Vector2 CellWorldCenter(int gx, int gy) => new Vector2((gx + 0.5f) * cell, (gy + 0.5f) * cell);
+
+        int seedX = Mathf.FloorToInt(boundary.InteriorSeed.position.x / cell);
+        int seedY = Mathf.FloorToInt(boundary.InteriorSeed.position.y / cell);
+
+        if (IsWall(CellWorldCenter(seedX, seedY)))
+        {
+            Debug.LogWarning($"[NavMeshObstacleSync] MapBoundary on '{boundary.name}': InteriorSeed sits exactly on a boundary tile - floor flood-fill found nothing. Move it further inside the play area.");
+            return 0;
+        }
+
+        var visited = new HashSet<Vector2Int>();
+        var stack = new Stack<Vector2Int>();
+        var start = new Vector2Int(seedX, seedY);
+        visited.Add(start);
+        stack.Push(start);
+        while (stack.Count > 0)
+        {
+            var c = stack.Pop();
+            foreach (var d in new[] { new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(0, -1) })
+            {
+                var n = c + d;
+                if (n.x < xMin || n.x >= xMax || n.y < yMin || n.y >= yMax) continue;
+                if (visited.Contains(n)) continue;
+                if (IsWall(CellWorldCenter(n.x, n.y))) continue;
+                visited.Add(n);
+                stack.Push(n);
+            }
+        }
+
+        // Merge each row's cells into contiguous horizontal runs - one box per run instead of one
+        // per cell, keeping box count proportional to the boundary's silhouette complexity (a
+        // handful of runs per row) rather than its full interior cell count (thousands for a large
+        // level).
+        int boxCount = 0;
+        var rows = new Dictionary<int, List<int>>();
+        foreach (var g in visited)
+        {
+            if (!rows.TryGetValue(g.y, out var xs)) rows[g.y] = xs = new List<int>();
+            xs.Add(g.x);
+        }
+        foreach (var kv in rows)
+        {
+            var xs = kv.Value;
+            xs.Sort();
+            int runStart = xs[0];
+            for (int i = 1; i <= xs.Count; i++)
+            {
+                bool endOfRun = i == xs.Count || xs[i] != xs[i - 1] + 1;
+                if (!endOfRun) continue;
+
+                int runEnd = xs[i - 1];
+                float width = (runEnd - runStart + 1) * cell;
+                float worldX = (runStart + runEnd + 1) / 2f * cell;
+                float worldY = (kv.Key + 0.5f) * cell;
+
+                var floorObj = new GameObject("floor");
+                floorObj.transform.SetParent(floorHolder.transform, true);
+                floorObj.transform.position = new Vector3(worldX, worldY, 0f);
+                floorObj.layer = bakeLayer;
+                var box = floorObj.AddComponent<BoxCollider>();
+                box.size = new Vector3(width, cell, ZThickness);
+                boxCount++;
+
+                if (i < xs.Count) runStart = xs[i];
+            }
+        }
+
+        if (boxCount == 0)
+            Debug.LogWarning($"[NavMeshObstacleSync] MapBoundary on '{boundary.name}': floor flood-fill produced 0 boxes - check InteriorSeed and BoundaryObstacles.");
+
+        return boxCount;
+    }
+
+    // Every obstacle tilemap tier's TilemapCollider2D/CompositeCollider2D pair is configured with
+    // CompositeCollider2D.generationType = Manual (both on MapArea.prefab, for every future zone,
+    // and retrofitted onto every existing scene's tiers) - Unity's DEFAULT (Synchronous) recomputes
+    // the full composite physics shape on every single Tilemap.SetTile call, which is what made
+    // painting many tiles in one stroke stall on "Application.updating scene info" (a well-known
+    // Unity Tilemap+CompositeCollider2D characteristic, not specific to this project - see
+    // https://issuetracker.unity3d.com/issues/stuck-on-applicaton-dot-updatescene-when-drawing-tilemap).
+    // Manual generation means painting is instant, but the real Collider2D shape then only updates
+    // when GenerateGeometry() is explicitly called - this method is that call, run once at the
+    // start of every Sync() so anything that reads collider bounds downstream (this method itself,
+    // any live Physics2D query) always sees the just-painted tiles, not a stale shape.
+    static void RegenerateManualComposites()
+    {
+        int count = 0;
+        foreach (var cc in Object.FindObjectsByType<CompositeCollider2D>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (cc.generationType != CompositeCollider2D.GenerationType.Manual) continue;
+
+            // Toggling TilemapCollider2D.usedByComposite off/on forces the composite to fully
+            // re-pull from the tilemap collider rather than trusting whatever it already cached -
+            // covers the ordinary "tiles were painted/erased since the last Sync()" case a plain
+            // GenerateGeometry() call handles anyway, plus this extra step for free.
+            //
+            // NOTE what this does NOT cover, confirmed directly: a per-tile Collider2D SHAPE that
+            // was already baked in at paint time does not get re-derived just from this toggle, or
+            // even from GenerateGeometry() alone, if the source Tile ASSET's own colliderType
+            // changes afterward (e.g. the project-wide Sprite->Grid fix this method's comment used
+            // to describe). That shape is only re-derived by a real SetTile pass over the affected
+            // positions (remove then re-place - confirmed live: one project boundary tilemap stayed
+            // stuck at 3301 composite paths through every combination of GenerateGeometry()/toggle/
+            // RefreshAllTiles(), and only dropped to 4 once every position was actually re-set).
+            // Deliberately NOT doing that heavier full-retile pass here on every Sync() - it's
+            // proportional to total tile count and would reintroduce exactly the kind of paint/sync
+            // lag this whole system exists to avoid, for a case (a Tile asset's own colliderType
+            // changing) that's a rare, deliberate one-time edit, not routine level-building. If a
+            // Tile asset's colliderType ever changes again, re-run the one-time full-retile fix by
+            // hand (see project_navmesh_2d_gotchas memory) rather than assuming Sync() catches it.
+            var tc = cc.GetComponent<TilemapCollider2D>();
+            if (tc != null)
+            {
+                tc.usedByComposite = false;
+                tc.usedByComposite = true;
+            }
+
+            cc.GenerateGeometry();
+            count++;
+        }
+        if (count > 0) Debug.Log($"[NavMeshObstacleSync] Regenerated {count} manually-deferred CompositeCollider2D(s).");
+    }
+
     [MenuItem("Tools/Sephraih/Sync NavMesh Obstacle Proxies")]
     public static void Sync()
     {
@@ -198,6 +408,61 @@ public static class NavMeshObstacleSync
             return;
         }
         int notWalkable = NavMesh.GetAreaFromName("Not Walkable");
+        // Three-way area tagging, keyed off the BlocksMovement/BlocksSpell COMBINATION, not either
+        // flag alone - a single NavMesh area can only ever encode one combination, so
+        // "blocks movement AND spell" (boundary tier) and "blocks spell only" (spellBarrier tier)
+        // need genuinely separate tags for Ability's two masks to treat them differently:
+        //   - "Not Walkable": BlocksMovement=true, BlocksSpell=false (ordinary wall) - a true hole,
+        //     Unity's own built-in area, no real geometry (confirmed via CalculateTriangulation()).
+        //   - "Spell Boundary": BlocksMovement=true, BlocksSpell=true (e.g. the boundary tier) -
+        //     real, walkable-shaped geometry just tagged differently (custom areas aren't special-
+        //     cased into holes the way the built-in name is) - WalkableAreaMask excludes this too
+        //     (so ordinary movement/pathing correctly treats it as solid, same as Not Walkable),
+        //     while TeleportConnectivityMask excludes it specifically for Teleport's connectivity
+        //     check to catch.
+        //   - "Spell Barrier": BlocksMovement=false, BlocksSpell=true (e.g. spellBarrier tier) -
+        //     same real geometry, but WalkableAreaMask does NOT exclude this one - ordinary
+        //     movement/pathing (ChargeAttack included) sees straight through it, matching what its
+        //     real (trigger) Collider2D already does - only TeleportConnectivityMask excludes it.
+        int spellBoundary = NavMesh.GetAreaFromName("Spell Boundary");
+        int spellBarrier = NavMesh.GetAreaFromName("Spell Barrier");
+
+        // "Spell Boundary"/"Spell Barrier" proxies get ZERO automatic erosion clearance from
+        // adjacent walkable floor - confirmed live via NavMesh.SamplePosition probes (landed exactly
+        // on the tile edge, distance 0.000). Unity's agentRadius erosion only pushes the walkable
+        // region away from genuinely non-walkable-classified geometry; "Not Walkable" gets that
+        // treatment (built-in name, confirmed zero real triangles - see this file's earlier comment
+        // and project-navmesh-2d-gotchas bug #5's correction), but a CUSTOM area like these two is
+        // still walkable-classified terrain as far as the erosion pass is concerned, just relabeled
+        // afterward - so there's no hole for erosion to measure distance from. Without a fix here,
+        // Teleport (whose only remaining gate near these obstacles is TryFindWalkableLanding's
+        // SamplePosition) can land the character flush against - visually clipped into - a boundary/
+        // spellBarrier tile, something an ordinary "Not Walkable" wall never allows. Manually padding
+        // the proxy box by agentRadius on every side recreates the same clearance an automatic hole
+        // would have gotten - it doesn't matter that this makes the "Spell Boundary"/"Spell Barrier"
+        // area itself bigger than the tile, since nothing is ever supposed to path/land inside a wall
+        // anyway. Minor accepted tradeoff: at a tier transition (a spell-tagged tile sitting right
+        // next to a differently-tagged neighbor), this padding can bleed a sliver of that neighbor's
+        // own footprint into the spell tag - harmless since that sliver still sits inside solid wall
+        // geometry either way.
+        //
+        // Deliberately its OWN tunable constant, not tied to agentRadius (0.6, tuned separately for
+        // enemy pathing/corner-wedging - see project_navmesh_2d_gotchas memory) - using the full
+        // agentRadius here was needlessly generous and produced a noticeable "nudge back" when
+        // teleporting from right next to a wall (SamplePosition snapping the landing out past the
+        // padded margin). 0.45 sits just above the player's real worst-case (diagonal) half-extent
+        // (~0.42, from its 0.67x0.50 BoxCollider2D) - enough to prevent visual clipping with a little
+        // headroom for voxel-rounding, without padding out further than necessary.
+        const float SpellAreaPadding = 0.45f;
+
+        // Every obstacle tilemap tier's CompositeCollider2D is set to Manual generation (see
+        // MapArea.prefab / RegenerateManualComposites' own doc comment) specifically so painting
+        // tiles doesn't trigger a synchronous physics-shape recompute on every single brush stroke
+        // (the "Application.updating scene info" lag). That means its real Collider2D geometry can
+        // be stale relative to whatever was just painted - regenerate every one now, before this
+        // method reads any collider bounds, so the sync (and the bake that follows it) always sees
+        // the current tiles, not last session's.
+        RegenerateManualComposites();
 
         // Wipe every previous run's output before regenerating (there can be more than one floor
         // now - one per MapBoundary - so this can't rely on GameObject.Find finding just one).
@@ -211,7 +476,13 @@ public static class NavMeshObstacleSync
         var obstacles = Object.FindObjectsByType<Obstacle>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var obstacle in obstacles)
         {
-            if (!obstacle.BlocksMovement || !obstacle.NavigationStatic) continue;
+            // Previously gated on BlocksMovement alone, which silently skipped every
+            // BlocksMovement=false obstacle - including a spellBarrier (BlocksMovement=false,
+            // BlocksSpell=true), meaning it would never get ANY NavMesh proxy/area tag and
+            // TryFindWalkableLanding's Spell Boundary check would have nothing to detect. An
+            // obstacle needs a proxy if it blocks movement OR spell-crossing - either alone
+            // justifies generating one.
+            if ((!obstacle.BlocksMovement && !obstacle.BlocksSpell) || !obstacle.NavigationStatic) continue;
 
             var boxes = new List<Bounds>();
             var tilemap = obstacle.GetComponentInChildren<Tilemap>(true);
@@ -252,33 +523,28 @@ public static class NavMeshObstacleSync
                 proxy.transform.position = b.center;
                 proxy.layer = bakeLayer;
                 var box = proxy.AddComponent<BoxCollider>();
-                box.size = new Vector3(Mathf.Max(b.size.x, 0.05f), Mathf.Max(b.size.y, 0.05f), ZThickness);
+                // BlocksSpell obstacles get padded by SpellAreaPadding on every side (see the comment
+                // above) - ordinary BlocksMovement-only obstacles don't need this, since
+                // "Not Walkable" already gets real erosion for free.
+                float pad = obstacle.BlocksSpell ? SpellAreaPadding * 2f : 0f;
+                box.size = new Vector3(Mathf.Max(b.size.x, 0.05f) + pad, Mathf.Max(b.size.y, 0.05f) + pad, ZThickness);
                 var mod = proxy.AddComponent<NavMeshModifier>();
                 mod.overrideArea = true;
-                mod.area = notWalkable;
+                mod.area = obstacle.BlocksSpell
+                    ? (obstacle.BlocksMovement ? spellBoundary : spellBarrier)
+                    : notWalkable;
                 totalBoxes++;
             }
             processed++;
         }
 
         int boundaryFloors = 0;
+        int totalFloorBoxes = 0;
         var mapBoundaries = Object.FindObjectsByType<MapBoundary>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var boundary in mapBoundaries)
         {
-            var floorBounds = boundary.ComputeWorldBounds();
-            if (floorBounds.size.x <= 0f || floorBounds.size.y <= 0f)
-            {
-                Debug.LogWarning($"[NavMeshObstacleSync] MapBoundary on '{boundary.name}' has no BoundaryObstacles with real bounds - skipped.");
-                continue;
-            }
-
-            var floorHolder = new GameObject(FloorName);
-            floorHolder.transform.SetParent(boundary.transform, false);
-            floorHolder.transform.position = new Vector3(floorBounds.center.x, floorBounds.center.y, 0f);
-            floorHolder.layer = bakeLayer;
-            var floorBox = floorHolder.AddComponent<BoxCollider>();
-            floorBox.size = new Vector3(floorBounds.size.x, floorBounds.size.y, ZThickness);
-            boundaryFloors++;
+            int boxes = GenerateFloor(boundary, bakeLayer);
+            if (boxes > 0) { boundaryFloors++; totalFloorBoxes += boxes; }
         }
 
         if (boundaryFloors == 0)
@@ -286,6 +552,6 @@ public static class NavMeshObstacleSync
 
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         Debug.Log("[NavMeshObstacleSync] Processed " + processed + " obstacle(s), created " + totalBoxes +
-                   " obstacle proxy box(es). Boundary floors: " + boundaryFloors + ".");
+                   " obstacle proxy box(es). Boundary floors: " + boundaryFloors + " (" + totalFloorBoxes + " floor box(es)).");
     }
 }

@@ -8,20 +8,23 @@ public class GuardBehaviour : EnemyController
 
     private float distanceToTarget;
     private float distanceToGuardSpot;
+    private FireBolt fireBolt;
 
     void Start()
     {
         guardSpot = transform.position;
         teamID = GetComponent<StatusController>().teamID;
-        GetComponentInChildren<FireBolt>().acd = 5.0f;
+        fireBolt = GetComponentInChildren<FireBolt>();
+        fireBolt.acd = 5.0f;
 
-        // Perception tiers (visionRange/visionDegrees/awarenessRange/blindSpotDegrees/
-        // detectionRange/maxChaseDistance, inherited from EnemyController) are deliberately NOT
-        // set here - they're plain serialized fields on this prefab's Inspector, tunable per enemy
-        // type without touching code. Setting them here would silently overwrite whatever's
-        // configured on the prefab every time Start() runs. guardRadius stays a separate field
-        // (still used for this file's own melee/ranged-ability-range checks in Move()/Attack()) -
-        // it's no longer linked to visionRange in code, so the two can be tuned independently.
+        // Perception percentages (visionRangePercent/visionDegrees/awarenessRangePercent/
+        // blindSpotDegrees/detectionRangePercent/maxChaseDistancePercent, inherited from
+        // EnemyController) are deliberately NOT set here - they're plain serialized fields on this
+        // prefab's Inspector, tunable per enemy type without touching code. Setting them here would
+        // silently overwrite whatever's configured on the prefab every time Start() runs.
+        // guardRadius stays a separate field (still used for this file's own melee/ranged-ability-
+        // range checks in Move()/Attack()) - it's not derived from visionRange, so the two can be
+        // tuned independently.
     }
 
     void Update()
@@ -84,7 +87,7 @@ public class GuardBehaviour : EnemyController
         {
             attackingDirection.transform.localPosition = movementDirection;
         }
-        else if (target != null && target != transform && distanceToTarget < 20.0f)
+        else if (target != null && target != transform && distanceToTarget < maxChaseDistance)
         {
             Vector2 dir = (target.position - transform.position).normalized;
             attackingDirection.transform.localPosition = (Vector3)dir;
@@ -106,7 +109,11 @@ public class GuardBehaviour : EnemyController
         else if (distanceToTarget < guardRadius && distanceToGuardSpot <= guardMaxChaseRadius)
             GetComponentInChildren<AbilityController>().Invoke(2, transform);
 
-        if (distanceToTarget > 5.0f && distanceToTarget < 10.0f)
+        // 0.5x/1x of fireBolt.range - carried over from the original 5/10 absolute values (same
+        // derivation as WizardBehaviour's kite/attack thresholds), so the guard never fires at a
+        // target its own bolt can't actually reach before self-destructing.
+        float castRange = fireBolt.range;
+        if (distanceToTarget > castRange * 0.5f && distanceToTarget < castRange)
             GetComponentInChildren<AbilityController>().Invoke(4, transform);
     }
 }

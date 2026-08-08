@@ -14,6 +14,14 @@ public class FireBoltProjectile : MonoBehaviour
     public Transform user;
     public int teamID;
 
+    // Max distance this bolt can travel from its spawn point before self-destructing - set by
+    // FireBolt.Bolt() from its own computed `range` (see FireBolt.rangePercent/RangeSettings).
+    // Independent of `lifetime` above: lifetime is a time-based safety net, this is the actual
+    // enforced "max spell range" the ability is tuned to. 0 (unset) disables the check, matching
+    // this field's default before this was wired up.
+    public float maxRange;
+    private Vector3 spawnPosition;
+
     private List<Collider2D> damagedTargets = new List<Collider2D>(); // list to save targets that have been damaged,
 
     public GameObject destroyEffect;
@@ -24,11 +32,17 @@ public class FireBoltProjectile : MonoBehaviour
         Invoke("DestroyProjectile", lifetime);
         teamID = user.GetComponent<StatusController>().teamID;
         transform.Translate(Vector2.up*1);
+        spawnPosition = transform.position;
     }
 
     // every frame
     private void FixedUpdate()
     {
+        if (maxRange > 0f && Vector2.Distance(transform.position, spawnPosition) >= maxRange)
+        {
+            DestroyProjectile();
+            return;
+        }
 
         Collider2D[] overlapColliders = Physics2D.OverlapCircleAll(transform.position, 0.3f); //a circle located at the projectile's position scanning for any colliders overlapped and adding them to a list
 

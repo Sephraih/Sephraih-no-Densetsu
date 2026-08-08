@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Tilemaps;
-using Unity.AI.Navigation;
 
-// Generic dungeon Map controller: level-toggle machinery, reusable across any dungeon. Mobs and
-// the advance-portal are now authored directly in each Level's hierarchy (drag-and-drop in the
-// Editor) rather than spawned/positioned by code - the dungeon is freely explorable, not gated by
-// waves, so there's no runtime reason to instantiate either. The old wave-clear/mob-spawn-by-code
-// machinery is kept below, commented out rather than deleted, since that pattern (spawn on wave
-// clear, gate a portal until N enemies die) could be useful again for something like a boss room.
-public class DungeonMap : MapBehaviour
+// Dungeon-specific Map controller: linear Level1/2/3 bookkeeping and legacy wave/mob machinery on
+// top of MultiAreaMap's shared zone-activation/NavMesh-rebake/stuck-rescue/GoToExit machinery.
+// Mobs and the advance-portal are now authored directly in each Level's hierarchy (drag-and-drop
+// in the Editor) rather than spawned/positioned by code - the dungeon is freely explorable, not
+// gated by waves, so there's no runtime reason to instantiate either. The old wave-clear/mob-
+// spawn-by-code machinery is kept below, commented out rather than deleted, since that pattern
+// (spawn on wave clear, gate a portal until N enemies die) could be useful again for something
+// like a boss room.
+public class DungeonMap : MultiAreaMap
 {
     private string enemyPath = "Prefabs/Enemies/";
     private int Waves;
@@ -24,26 +24,29 @@ public class DungeonMap : MapBehaviour
     // branches) even though nothing spawns from it anymore - kept as a ready-made reference/backup
     // for a future wave-gated encounter rather than deleted.
     [SerializeField] private List<LevelConfig> levels = new List<LevelConfig>(); // index 0 = Level1, index 1 = Level2, ...
+    // Convention for any scene hosting more than one MapArea (this one included, if it ever stops
+    // being strictly linear): place each instance at a distinct, well-separated world position -
+    // not stacked at the origin - even though only one is ever SetActive at a time today.
+    // NavMeshSurface registers its baked data globally while enabled - if two areas' colliders
+    // ever end up active (and therefore baked) at the same time while occupying the same world
+    // space, their meshes overlap and corrupt the bake (hit and fixed once already, see
+    // project_navmesh_2d_gotchas memory). Spatial separation costs nothing now (SetActive-toggling
+    // for perf/culling still works exactly as before) and is a prerequisite for any future
+    // non-linear or concurrently-active scenario.
     public GameObject LevelMaps;
     // private GameObject portal; // dead: the advance portal used to be a single runtime-
                                    // instantiated instance reused across all levels at a hardcoded
                                    // position - now each Level has its own portal child instead,
                                    // authored in the Editor, active whenever that level is.
 
-    [SerializeField] private NavMeshSurface navMeshSurface;
-
-    // Where a fresh City -> Dungeon arrival lands, and the level that PortalExit belongs to
-    // determines which level gets activated. Replaces the old GetSpawnPoint("Entry") lookup for
-    // this same purpose - that resolved to a single scene-wide SpawnPoint that, since nothing kept
+    // Where a fresh City -> Dungeon arrival lands, and the level that this SpawnPoint belongs to
+    // determines which level gets activated. Dungeon has exactly one entrance, always Level1, so
+    // it deliberately does NOT use MultiAreaMap.OnMapEntered's spawnPointId-driven multi-entrance
+    // resolution below - this fixed reference replaces the old GetSpawnPoint("Entry") lookup for
+    // this same purpose, which resolved to a single scene-wide SpawnPoint that, since nothing kept
     // its typed string ID and its actual position in sync, had drifted to sitting at (0,0,0),
     // unrelated to any level's real layout.
-    [SerializeField] private PortalExit level1Entry;
-
-    private Vector2 worldPoint;
-    [SerializeField] private Tilemap obstacleMap;
-    [SerializeField] private Tilemap boundaryMap;
-
-    GameObject Player => MapManager.Instance.Player;
+    [SerializeField] private SpawnPoint level1Entry;
 
     // Start is called before the first frame update
     void Start()
@@ -68,8 +71,9 @@ public class DungeonMap : MapBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+        base.Update(); // Unstuck() - see MultiAreaMap
         // Wave-clear gating removed - the dungeon is freely explorable now and mobs are pre-placed
         // in the scene instead of spawned by code. Commented out rather than deleted: "N enemies
         // must die before the exit unlocks" could be exactly what a boss room wants later.
@@ -80,35 +84,19 @@ public class DungeonMap : MapBehaviour
             LoadEnemies();
         }
         */
-        Unstuck();
-
-
     }
 
-    // Rebuilds the NavMesh for whichever level is currently active. Only one Dungeon level is
-    // ever active at a time (the rest sit disabled), so a single shared NavMeshSurface is baked
-    // fresh on every level transition rather than maintaining one pre-baked NavMeshData per level.
-    private void RebuildNavMesh()
-    {
-        if (navMeshSurface != null) navMeshSurface.BuildNavMesh();
-        // The baked mesh's real height (navmesh Z) can shift between bakes - drop the cached
-        // value so the next NavMesh2DUtility query re-discovers it instead of using a stale one.
-        NavMesh2DUtility.InvalidateCache();
-    }
-
-    // Single source of truth for "make level N the active one" - always resolves obstacle/boundary
-    // tilemaps via each level's LevelBehaviour component rather than hardcoded sibling indices,
-    // since level sub-hierarchies aren't uniformly structured. `level` is a 1-based dungeon level
-    // number (Level1 = 1); LevelMaps' child index is level-1 since Level0 (the former hub, now its
-    // own MainCity scene) no longer occupies child index 0 here. Each level's own mobs/advance-
-    // portal are authored as children of that LevelN GameObject, so they activate/deactivate for
-    // free alongside it here - no separate bookkeeping needed.
+    // Single source of truth for "make level N the active one" (index-based, only meaningful for
+    // this strictly linear Level1/2/3 dungeon). `level` is a 1-based dungeon level number;
+    // LevelMaps' child index is level-1 since Level0 (the former hub, now its own MainCity scene)
+    // no longer occupies child index 0 here. Each level's own mobs/advance-portal are authored as
+    // children of that LevelN GameObject, so they activate/deactivate for free alongside it via
+    // MultiAreaMap.ActivateArea, which also handles deactivating whatever was previously active
+    // (via activeAreaObject) regardless of whether it got there via this index-based path or via
+    // GoToExit's direct-reference path - the two can't leave two levels active at once.
     private void ActivateLevel(int level)
     {
-        LevelMaps.transform.GetChild(level - 1).gameObject.SetActive(true);
-        var lb = LevelMaps.transform.GetChild(level - 1).GetComponent<LevelBehaviour>();
-        obstacleMap = lb.obstacleMap;
-        boundaryMap = lb.boundaryMap;
+        ActivateArea(LevelMaps.transform.GetChild(level - 1).gameObject);
     }
 
     /*
@@ -137,8 +125,12 @@ public class DungeonMap : MapBehaviour
     public void DungeonClear() {
         Level = 1;
         // mobs.Clear(); // dead: mobs are pre-placed per level now, not spawned into a shared list
-        ActivateLevel(Level);
-        RebuildNavMesh();
+        ActivateLevel(Level); // also rebakes, via MultiAreaMap.ActivateArea
+        // Explicit reposition, not just relying on wherever the player physically stood when the
+        // last AdvancePortal fired - that only ever looked reasonable by coincidence, since every
+        // level currently sits stacked near the same world-space origin (see LevelMaps' own doc
+        // comment on the spatial-separation convention) rather than because this was ever correct.
+        Player.transform.position = level1Entry.transform.position;
         // LoadLevel(); // dead: wave/mob data no longer drives spawning
         // portal.SetActive(true); // dead: portals are per-level scene children now
     }
@@ -147,26 +139,38 @@ public class DungeonMap : MapBehaviour
     public void InstantiateEnemy(string enemy, Vector3 pos) {Instantiate((Resources.Load(Path.Combine(enemyPath, enemy)) as GameObject), pos, Quaternion.identity);}
 
 
+    // Legacy fallback for a portal that hasn't been given an explicit target (see OnPortalUsed) -
+    // every currently-authored AdvancePortal HAS an explicit target now (see the fix note on
+    // OnPortalUsed below), so in normal play this only ever fires for the Level3->clear wrap-
+    // around. If a future level's AdvancePortal is ever left unconfigured, this still advances it
+    // linearly, just without a precise landing spot - level1Entry is used as a not-wrong (if
+    // imprecise) placeholder rather than the old GetSpawnPoint("Entry"), which resolved to a
+    // scene-root SpawnPoint sitting at literal world (0,0,0), unrelated to any level's actual
+    // layout - the same bug the entry flow already had fixed via level1Entry, just never applied
+    // here too.
     public void LoadNextLevel()
     {
         // portal.SetActive(false); // dead: see DungeonClear() note above
         Level++;
-        LevelMaps.transform.GetChild(Level - 2).gameObject.SetActive(false);
+        // Deactivation of the previous level now happens inside MultiAreaMap.ActivateArea (via
+        // activeAreaObject), not here - needed once GoToExit could also have been the one that
+        // last activated something, since a manual GetChild(Level-2)-style deactivate would assume
+        // Level was always kept in lockstep with whatever's actually active, which GoToExit
+        // (reference-based, no Level bookkeeping) doesn't guarantee.
         // CurrentWave = 0; // dead: wave state no longer used
         // cleared = false; // dead: wave state no longer used
-        Player.transform.position = GetSpawnPoint("Entry").transform.position;
+        Player.transform.position = level1Entry.transform.position;
 
         if (Level <= MaxLevel) {
-            ActivateLevel(Level);
-            RebuildNavMesh();
+            ActivateLevel(Level); // also rebakes, via MultiAreaMap.ActivateArea
             // LoadLevel(); // dead: wave/mob data no longer drives spawning
-        } else DungeonClear();
+        } else DungeonClear(); // also repositions correctly, overriding the line above
 
 
     }
 
     public void ReloadLevel() {
-        Player.transform.position = GetSpawnPoint("Entry").transform.position;
+        Player.transform.position = level1Entry.transform.position;
         // CurrentWave = 0; // dead: wave state no longer used
         // mobs.Clear(); // dead: mobs are pre-placed per level now
         // LoadLevel(); // dead: wave/mob data no longer drives spawning
@@ -191,36 +195,9 @@ public class DungeonMap : MapBehaviour
     }
     */
 
-
-    public void Unstuck()
-    {
-        // change to a foreach loop to loop over all active units
-
-        // Try to get a tile from cell position matching player position
-        var obstacle = obstacleMap.GetTile(obstacleMap.WorldToCell(Player.transform.position));
-        var boundary = boundaryMap.GetTile(boundaryMap.WorldToCell(Player.transform.position));
-
-        var unitController = Player.GetComponent<UnitController>();
-
-        if (obstacle || boundary) // if a tile (obstacle or boundary) was found -> move player
-        {
-            // saveSpot used to only be refreshed by ChargeAttack/ShadowImpact's own "reset if stuck
-            // in a wall" calls - meaning a false-positive tile detection anywhere else (e.g. a spawn
-            // point sitting close to a tile edge right at a level entrance) would snap the player
-            // back to wherever they last cast one of those two abilities, or to (0,0,0) if they
-            // never had - a genuinely random-looking teleport. Now saveSpot is kept up to date every
-            // frame the player is confirmed NOT stuck (below), so any rescue snaps back to wherever
-            // they actually just were instead of an unrelated stale position.
-            Player.transform.position = unitController.saveSpot;
-        }
-        else
-        {
-            unitController.SetSaveSpot(Player.transform.position);
-        }
-
-
-    }
-
+    // Dungeon has exactly one entrance (always Level1), so it overrides MultiAreaMap's generic
+    // spawnPointId-driven multi-entrance resolution and always lands at level1Entry instead -
+    // deliberately ignores spawnPointId, unlike the base implementation.
     public override void OnMapEntered(string spawnPointId)
     {
         // Baking here instead of Start() - see the comment on Start()'s call site. MapManager only
@@ -243,34 +220,14 @@ public class DungeonMap : MapBehaviour
         // mobs.Clear(); // dead: mobs are pre-placed per level now, nothing accumulates in this list
     }
 
+    // A portal with no explicit target falls back to the legacy linear "advance one level"
+    // behavior; one WITH a target uses MultiAreaMap.OnPortalUsed's reference-based GoToExit instead.
     public override void OnPortalUsed(PortalBehaviour portalUsed)
     {
-        if (portalUsed.exit != null)
-            GoToExit(portalUsed.exit);
+        if (portalUsed.Target != null)
+            base.OnPortalUsed(portalUsed);
         else
-            LoadNextLevel(); // legacy fallback for a portal that hasn't been given an explicit exit yet
-    }
-
-    // Activates whichever level the given exit belongs to (found by walking up its hierarchy to
-    // the owning LevelBehaviour, so a level's own sibling index IS its level number - no separate
-    // bookkeeping needed) and places the player exactly at the exit's position. Replaces the old
-    // "OnPortalUsed always means advance exactly one level" assumption, so the same mechanism now
-    // works for both advancing and going back to a previous level.
-    private void GoToExit(PortalExit exit)
-    {
-        var targetLevel = exit.GetComponentInParent<LevelBehaviour>(true);
-        if (targetLevel == null)
-        {
-            Debug.LogError($"[DungeonMap] PortalExit '{exit.name}' isn't nested under a Level - can't tell which level to activate.");
-            return;
-        }
-
-        int targetIndex = targetLevel.transform.GetSiblingIndex() + 1; // 1-based, matches ActivateLevel's convention
-        LevelMaps.transform.GetChild(Level - 1).gameObject.SetActive(false);
-        Level = targetIndex;
-        ActivateLevel(Level);
-        RebuildNavMesh();
-        Player.transform.position = exit.transform.position;
+            LoadNextLevel(); // legacy fallback for a portal that hasn't been given an explicit target yet
     }
 
     [Serializable]

@@ -15,30 +15,50 @@ public class EnemyController : UnitController
     // UseMouse(), which only makes sense for the human player's actual mouse cursor.
     public Transform CurrentTarget => target;
 
-    [Header("Perception")]
+    // Single shared "how far can anything reasonably see/chase/shoot" reference distance (screen-
+    // relative, computed once from the camera's FOV - see RangeSettings' own doc comment). Every
+    // enemy type's actual perception ranges below are a PERCENTAGE of this one asset rather than
+    // an independent absolute number, so retuning the camera or the game's overall "how far" feel
+    // is one edit to the asset instead of hunting down every prefab that also encodes a distance.
+    [SerializeField] protected RangeSettings rangeSettings;
+
+    [Header("Perception (percentages)")]
     // Three nested detection tiers, checked closest-tier-first (see CanSense) - together they
-    // replace a single omnidirectional detectionRange with something closer to a real field of
-    // view: a bot notices anything right next to it regardless of facing (detectionRange), notices
-    // most of its surroundings except a small blind spot directly behind it at medium range
-    // (awarenessRange / blindSpotDegrees), and only notices things ahead of it at long range
-    // (visionRange / visionDegrees). All five are public so each enemy type can configure its own
-    // values - see GuardBehaviour/WizardBehaviour's Start() for per-type overrides; Mob/Dummy use
-    // these base defaults (matching Mob's old un-overridden detectionRange of 8).
-    public float visionRange = 8f;
-    public float visionDegrees = 120f; // total cone width, centered on facing
-    public float awarenessRange = 4f;
+    // form something closer to a real field of view than a single omnidirectional range: a bot
+    // notices anything right next to it regardless of facing (detectionRange), notices most of its
+    // surroundings except a small blind spot directly behind it at medium range (awarenessRange /
+    // blindSpotDegrees), and only notices things ahead of it at long range (visionRange /
+    // visionDegrees). visionRangePercent is a % of the shared rangeSettings.FieldOfView;
+    // awarenessRangePercent/detectionRangePercent are each a % of THIS type's own resulting
+    // visionRange, not of the global value directly - so "detection is roughly a quarter of my
+    // vision" stays true regardless of how the global FieldOfView is tuned. All four percentages
+    // are public so each enemy type can configure its own values on the prefab.
+    public float visionRangePercent = 0.8f;
+    public float visionDegrees = 120f; // total cone width, centered on facing - not a distance, not tied to rangeSettings
+    public float awarenessRangePercent = 0.5f;
     public float blindSpotDegrees = 30f; // total blind arc directly behind, awareness tier only
-    public float detectionRange = 2f; // closest tier: full 360, no angle check at all
+    public float detectionRangePercent = 0.25f; // closest tier: full 360, no angle check at all
 
     // How far a Chase can drift from the target before giving up regardless of line of sight - a
     // separate concern from LostSightDelay below (which only governs actually losing sight, not
     // simply being led further and further away by a target that's still visible the whole time,
-    // e.g. across open ground). Must stay >= visionRange for a given type, or a bot could detect a
-    // target at the edge of its vision cone and immediately re-Return the very next frame because
-    // that same distance already exceeds the leash - see WizardBehaviour.Start()'s override.
+    // e.g. across open ground). Expressed as a % of THIS type's own visionRange and must stay
+    // >= 1 (100%), or a bot could detect a target at the edge of its vision cone and immediately
+    // re-Return the very next frame because that same distance already exceeds the leash - the
+    // extra headroom above 100% is deliberate buffer against exactly that flicker.
     // GuardBehaviour additionally leashes to its own guard spot on top of this (see
     // guardMaxChaseRadius) - this generic one applies to every type, Guard included.
-    public float maxChaseDistance = 15f;
+    public float maxChaseDistancePercent = 1.15f;
+
+    // Effective world-unit ranges, computed once in Awake() from the percentages above - every
+    // consumer (CanSense, FindNearestEnemy, UpdateState) reads these exactly as it read the old
+    // plain absolute fields; only where the numbers come FROM changed. Read-only from outside so
+    // nothing can silently reintroduce the old "overwritten every Start()" footgun these were
+    // already fixed away from once (see git history).
+    public float visionRange { get; private set; }
+    public float awarenessRange { get; private set; }
+    public float detectionRange { get; private set; }
+    public float maxChaseDistance { get; private set; }
 
     [Header("Pathfinding")]
     public float repathInterval = 0.35f;
@@ -90,6 +110,16 @@ public class EnemyController : UnitController
     {
         base.Awake();
         GetComponent<HealthController>().OnDeath += HandleDeath;
+
+        // Cascading percentage -> world-units resolution, once, before any Update() reads these -
+        // see the Perception fields' own doc comments for why each tier multiplies against the
+        // PREVIOUS result rather than the raw global value directly.
+        float fieldOfView = rangeSettings != null ? rangeSettings.FieldOfView : 0f;
+        visionRange = fieldOfView * visionRangePercent;
+        awarenessRange = visionRange * awarenessRangePercent;
+        detectionRange = visionRange * detectionRangePercent;
+        maxChaseDistance = visionRange * maxChaseDistancePercent;
+
         agent = GetComponent<NavMeshAgent>();
         if (agent != null)
         {
