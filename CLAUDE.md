@@ -179,11 +179,19 @@ Lives in `Assets/Prefabs/Maps/MapArea.prefab`'s `Grid/GroundMaterials/` (identit
 required — any offset compounds with the render tilemap's own `(0.5,0.5)` offset), so it's available
 on every map automatically. Current instances: `MudRedData`/`MudRedRender` (order `-6`),
 `WaterCyanData`/`WaterCyanRender` + `WaterMatteBlueData`/`WaterMatteBlueRender` (order `-8` each,
-independent alternates, not stacked). Sorting scheme (all layer `"tiles"`): Terrain background `-10`
-< ground-material layers (spaced, room for more) < `GroundTiles` decorative overlay `0` = wall/
-obstacle tiers `0`. Adding a new material needs no code changes — slice its 16-sprite sheet, make a
-marker `Tile` asset, add a Data+Render pair under `GroundMaterials`, add
-`DualGridTilemapModule` pointing at the new sprite path/prefix, set sorting order per this scale.
+independent alternates, not stacked), `GrassData`/`GrassRender` (order `-4`). Sorting scheme (all
+layer `"tiles"`): Terrain background `-10` < ground-material layers (spaced, room for more) <
+`GroundTiles` decorative overlay `0` = wall/obstacle tiers `0`. Adding a new material needs no code
+changes — slice its 16-sprite sheet (cell pixel size must equal the texture's `spritePixelsPerUnit`
+so every sprite renders as exactly 1x1 world unit, whatever the source resolution — grass1 is
+256x256/64px-cell/64ppu vs. mudred/water's 512x512/128px-cell/128ppu, both correct), make a marker
+`Tile` asset, add a Data+Render pair under `GroundMaterials`, add `DualGridTilemapModule` pointing
+at the new sprite path/prefix, set sorting order per this scale. Note: the project's actual baseline
+ground-decoration art (`grf_tiles/grf.png`) is 64px/unit — grass1 matches that exactly; mudred/water's
+128px/unit is the higher-detail outlier, not the norm, if resolution comes up again. Data layers are
+currently always fully invisible (`TilemapRenderer.enabled = false`, no in-Editor paint-guide) for
+every material — a translucent-guide improvement was discussed once but never actually built, don't
+assume it exists.
 
 The older, non-dual-grid `grf_tiles` tileset (`Assets/Resources/Sprites/grf_tiles/`) is still in use
 on `GroundTiles` for general ground decoration — its Tile Palette definition is stored as
