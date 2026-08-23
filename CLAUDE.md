@@ -175,28 +175,76 @@ ortho2`, enumerated as 256 raw 8-neighbor rules mapped down to 16 sprites. A sin
 (non-offset) version was tried first and rejected — it can't render a 1-wide line or an isolated
 single-tile dot/hole as connected shapes, only true dual-grid's sub-cell resolution can.
 
-Lives in `Assets/Prefabs/Maps/MapArea.prefab`'s `Grid/GroundMaterials/` (identity transform
-required — any offset compounds with the render tilemap's own `(0.5,0.5)` offset), so it's available
-on every map automatically. Current instances: `MudRedData`/`MudRedRender` (order `-6`),
-`WaterCyanData`/`WaterCyanRender` + `WaterMatteBlueData`/`WaterMatteBlueRender` (order `-8` each,
-independent alternates, not stacked), `GrassData`/`GrassRender` (order `-4`). Sorting scheme (all
-layer `"tiles"`): Terrain background `-10` < ground-material layers (spaced, room for more) <
-`GroundTiles` decorative overlay `0` = wall/obstacle tiers `0`. Adding a new material needs no code
-changes — slice its 16-sprite sheet (cell pixel size must equal the texture's `spritePixelsPerUnit`
-so every sprite renders as exactly 1x1 world unit, whatever the source resolution — grass1 is
-256x256/64px-cell/64ppu vs. mudred/water's 512x512/128px-cell/128ppu, both correct), make a marker
-`Tile` asset, add a Data+Render pair under `GroundMaterials`, add `DualGridTilemapModule` pointing
-at the new sprite path/prefix, set sorting order per this scale. Note: the project's actual baseline
-ground-decoration art (`grf_tiles/grf.png`) is 64px/unit — grass1 matches that exactly; mudred/water's
-128px/unit is the higher-detail outlier, not the norm, if resolution comes up again. Data layers are
-currently always fully invisible (`TilemapRenderer.enabled = false`, no in-Editor paint-guide) for
-every material — a translucent-guide improvement was discussed once but never actually built, don't
-assume it exists.
+Lives in `Assets/Prefabs/Maps/MapArea.prefab`'s `Grid/GroundMaterials/`, split into two subgroups —
+`Data/` and `Render/` — each listing every material ordered by `sortingOrder` (back-most first,
+matching Unity's own Sorting Layers window convention), since the artist mostly looks at/paints on
+the Data tilemaps and this keeps them scannable as more materials accumulate. Identity transform
+required on every level of this hierarchy — any offset compounds with the render tilemap's own
+`(0.5,0.5)` offset. Current instances and sorting order (all layer `"tiles"`):
+```
+GrassBg        -20   (deliberately below the Terrain background too — an always-there fallback base)
+Terrain bg     -10   (existing, baked-Terrain sprite)
+WaterMatteBlue  -8
+MudRed          -6
+WaterCyan       -5
+Grass           -4
+GroundTiles      0   (decorative overlay) = wall/obstacle tiers (also 0)
+```
+Values are spaced deliberately — insert new materials into the gaps rather than renumbering existing
+ones. Adding a new material needs no code changes — slice its 16-sprite sheet (cell pixel size must
+equal the texture's `spritePixelsPerUnit` so every sprite renders as exactly 1x1 world unit,
+whatever the source resolution — grass1/`_grass` are 256x256/64px-cell/64ppu vs. mudred/water's
+512x512/128px-cell/128ppu, both correct), make a marker `Tile` asset, add a Data+Render pair under
+the `Data`/`Render` subgroups, add `DualGridTilemapModule` pointing at the new sprite path/prefix,
+set sorting order per this scale. The project's actual baseline ground-decoration art
+(`grf_tiles/grf.png`) is 64px/unit — grass1/`_grass` match that exactly; mudred/water's 128px/unit is
+the higher-detail outlier, not the norm, if resolution comes up again. Data layers are currently
+always fully invisible (`TilemapRenderer.enabled = false`, no in-Editor paint-guide) for every
+material — a translucent-guide improvement was discussed once but never actually built, don't assume
+it exists.
+
+**Local (per-map) stacking exceptions**: build these as an extra named Data+Render pair defined in
+the prefab (e.g. `WaterCyanData_AboveMud`), added reactively per real case, not a full pairwise
+matrix up front — not a per-instance `sortingOrder` override on a specific map. Per-instance
+overrides on this field are a real footgun: they're a frozen absolute value, not a live link, so a
+later prefab-default change silently leaves an overridden instance behind (confirmed live — a stale
+`WaterCyanRender` override from unknown origin stayed pinned at an old value after its prefab default
+moved, invisible until compared directly against the prefab source). Typing the same value back in
+does *not* clear an override; only Inspector "Revert" (or `PrefabUtility.RevertPropertyOverride`)
+does. If a `sortingOrder` default changes, it's worth auditing existing map instances for stale
+overrides on that field rather than assuming they're all still tracking cleanly.
+
+**Cross-material shape merging (`groundType`) — built, tested, currently unused**: `DualGridTilemapModule`
+has a `groundType` string field (default `""` = ungrouped, unaffected) that merges corner-fill SHAPE
+across every same-groundType member's data at a shared border (OR across own corners) while each
+render cell is still written by exactly one owning member (most filled corners wins; ties break
+alphabetically) — texture is never blended, only the seam shape. The mechanism itself is correct and
+fully verified (regression-clean for ungrouped materials, correct border/dominance/ownership-shift
+behavior when tested). **Not currently assigned to anything** — trying it on `WaterCyanData`/
+`WaterMatteBlueData` exposed a real structural gap: ownership can silently move a cell between members
+that render at *different* `sortingOrder`s (Cyan `-5` vs. MatteBlue `-8`, straddling MudRed's `-6`),
+so a cell can flip from "in front of mud" to "behind mud" with no warning — confirmed live as water
+appearing to vanish behind mud. A second, separate issue: even where depth isn't a problem, removing
+the rim art at a boundary between two *visually distinct* textures just leaves an abrupt unframed
+color cut, not a blend. Reverted for both grouped pairs as a result. **If revisited**: only group
+materials that already share the same `sortingOrder` — depth can't flip if there's only one depth to
+begin with. Full root-cause writeup in local memory `project_dual_grid_tilemap_system.md`.
 
 The older, non-dual-grid `grf_tiles` tileset (`Assets/Resources/Sprites/grf_tiles/`) is still in use
 on `GroundTiles` for general ground decoration — its Tile Palette definition is stored as
 `Ground.prefab` in that folder (has a "Palette Settings" component; it's the picker/swatch board,
 not painted map content).
+
+**Manual quadrant-patch fallback**: an automated cross-material shape-merge (`groundType` grouping on
+`DualGridTilemapModule`) was tried for fixing bad edges where two different materials border each
+other, but hit a real structural conflict with per-material sorting order and was reverted (code
+stays in place, unused — see local memory `project_dual_grid_tilemap_system.md`). Instead,
+`MapArea.prefab` has a `FineGrid` (`cellSize=(0.5,0.5,0)`, same origin as `Grid`) holding one plain,
+non-reactive `Tilemap` per material needing hand-fixes (e.g. `WaterCyanPatch`, sortingOrder `-1`,
+above all ground materials/below `GroundTiles`) — painted by hand from a duplicate, finer-sliced
+spritesheet (`Assets/Resources/Tiles/{material}_fine.png`, 64 quadrant pieces) via a dedicated Tile
+Palette (`Assets/Palettes/{Material}FinePalette.prefab`). Static/non-reactive by design — won't
+auto-update if the automated layers underneath get repainted later.
 
 ## Terrain (painted background) pipeline
 

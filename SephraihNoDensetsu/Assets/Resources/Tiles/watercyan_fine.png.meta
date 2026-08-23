@@ -1,0 +1,1849 @@
+fileFormatVersion: 2
+guid: 84a580ddd4888d346b161a6d83bac6ef
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4176397708451349682
+    second: watercyan_0
+  - first:
+      213: -2218195369344890361
+    second: watercyan_0_0
+  - first:
+      213: -3929891807156802922
+    second: watercyan_0_1
+  - first:
+      213: 4731757598430440121
+    second: watercyan_0_2
+  - first:
+      213: -6733159821435671428
+    second: watercyan_0_3
+  - first:
+      213: 1682500277299940302
+    second: watercyan_1_0
+  - first:
+      213: 8390362731485711436
+    second: watercyan_1_1
+  - first:
+      213: 5085572851159605803
+    second: watercyan_1_2
+  - first:
+      213: 7121354757486765253
+    second: watercyan_1_3
+  - first:
+      213: -7273278640587141382
+    second: watercyan_2_0
+  - first:
+      213: -7253421293573163679
+    second: watercyan_2_1
+  - first:
+      213: 7876245788974849702
+    second: watercyan_2_2
+  - first:
+      213: -7068936815088230027
+    second: watercyan_2_3
+  - first:
+      213: 7582778713656359628
+    second: watercyan_3_0
+  - first:
+      213: -521284610831133255
+    second: watercyan_3_1
+  - first:
+      213: 4249478147907570520
+    second: watercyan_3_2
+  - first:
+      213: 8042845302406901370
+    second: watercyan_3_3
+  - first:
+      213: 5979096270529472463
+    second: watercyanfine_0_0
+  - first:
+      213: 3867692500389260421
+    second: watercyanfine_0_1
+  - first:
+      213: -7477748889013614718
+    second: watercyanfine_0_2
+  - first:
+      213: -3641943721340223127
+    second: watercyanfine_0_3
+  - first:
+      213: 2076792191900589764
+    second: watercyanfine_0_4
+  - first:
+      213: 4608735411332524678
+    second: watercyanfine_0_5
+  - first:
+      213: 8356014170306199075
+    second: watercyanfine_0_6
+  - first:
+      213: 1938326598903921263
+    second: watercyanfine_0_7
+  - first:
+      213: -8028489151574095883
+    second: watercyanfine_1_0
+  - first:
+      213: -3727772234264889387
+    second: watercyanfine_1_1
+  - first:
+      213: -4012051868915903214
+    second: watercyanfine_1_2
+  - first:
+      213: -833511565840350107
+    second: watercyanfine_1_3
+  - first:
+      213: -7330875498037386164
+    second: watercyanfine_1_4
+  - first:
+      213: -7207847855276035041
+    second: watercyanfine_1_5
+  - first:
+      213: 2730540091050375539
+    second: watercyanfine_1_6
+  - first:
+      213: 5340329762284451368
+    second: watercyanfine_1_7
+  - first:
+      213: -6116028971988451438
+    second: watercyanfine_2_0
+  - first:
+      213: 3577290314205237780
+    second: watercyanfine_2_1
+  - first:
+      213: -958180881690489494
+    second: watercyanfine_2_2
+  - first:
+      213: -1745155564364948237
+    second: watercyanfine_2_3
+  - first:
+      213: 1399750492819830323
+    second: watercyanfine_2_4
+  - first:
+      213: -2712951333325824372
+    second: watercyanfine_2_5
+  - first:
+      213: 6009554311838269043
+    second: watercyanfine_2_6
+  - first:
+      213: -4850719323887530656
+    second: watercyanfine_2_7
+  - first:
+      213: -1600094865252798394
+    second: watercyanfine_3_0
+  - first:
+      213: 4043239935141224385
+    second: watercyanfine_3_1
+  - first:
+      213: -4817735607602240608
+    second: watercyanfine_3_2
+  - first:
+      213: 5742485939192399633
+    second: watercyanfine_3_3
+  - first:
+      213: 176747905085251438
+    second: watercyanfine_3_4
+  - first:
+      213: -4134160624178770904
+    second: watercyanfine_3_5
+  - first:
+      213: 4063349592632845696
+    second: watercyanfine_3_6
+  - first:
+      213: 8673358080394457654
+    second: watercyanfine_3_7
+  - first:
+      213: 1037991440002464323
+    second: watercyanfine_4_0
+  - first:
+      213: 4503841540199661920
+    second: watercyanfine_4_1
+  - first:
+      213: -3940659317942880207
+    second: watercyanfine_4_2
+  - first:
+      213: -5581099693018139003
+    second: watercyanfine_4_3
+  - first:
+      213: 4903903180496603676
+    second: watercyanfine_4_4
+  - first:
+      213: 5594723951386236386
+    second: watercyanfine_4_5
+  - first:
+      213: -3299726503599744868
+    second: watercyanfine_4_6
+  - first:
+      213: -7015771197026153684
+    second: watercyanfine_4_7
+  - first:
+      213: 7535590309103440384
+    second: watercyanfine_5_0
+  - first:
+      213: -1844422631197669622
+    second: watercyanfine_5_1
+  - first:
+      213: 3288499779772276072
+    second: watercyanfine_5_2
+  - first:
+      213: 4457121987254431046
+    second: watercyanfine_5_3
+  - first:
+      213: -5745177043456378834
+    second: watercyanfine_5_4
+  - first:
+      213: 2949733207042841437
+    second: watercyanfine_5_5
+  - first:
+      213: 457161711346999873
+    second: watercyanfine_5_6
+  - first:
+      213: 7216224998444019610
+    second: watercyanfine_5_7
+  - first:
+      213: 3995496694668928209
+    second: watercyanfine_6_0
+  - first:
+      213: -8586807506350976340
+    second: watercyanfine_6_1
+  - first:
+      213: -5460016941489950794
+    second: watercyanfine_6_2
+  - first:
+      213: -5196234263258894993
+    second: watercyanfine_6_3
+  - first:
+      213: -1503714335137217465
+    second: watercyanfine_6_4
+  - first:
+      213: -4719357202486290713
+    second: watercyanfine_6_5
+  - first:
+      213: -4371565478601363257
+    second: watercyanfine_6_6
+  - first:
+      213: -1839895521700668672
+    second: watercyanfine_6_7
+  - first:
+      213: -2954379550967304908
+    second: watercyanfine_7_0
+  - first:
+      213: 3982657121680849696
+    second: watercyanfine_7_1
+  - first:
+      213: -914012928305505937
+    second: watercyanfine_7_2
+  - first:
+      213: -2798489835214005016
+    second: watercyanfine_7_3
+  - first:
+      213: -3862153649871463063
+    second: watercyanfine_7_4
+  - first:
+      213: 7392114790779868861
+    second: watercyanfine_7_5
+  - first:
+      213: -3445172962006232572
+    second: watercyanfine_7_6
+  - first:
+      213: 2006895989584109886
+    second: watercyanfine_7_7
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 128
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: watercyanfine_0_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 448
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc7a5c221640af250800000000000000
+      internalID: 5979096270529472463
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_0_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 448
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58ce42256ddcca530800000000000000
+      internalID: 3867692500389260421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_0_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 448
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28785c61103b93890800000000000000
+      internalID: -7477748889013614718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_0_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 448
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9614d853b77357dc0800000000000000
+      internalID: -3641943721340223127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_0_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 448
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ce1a86ce7f32dc10800000000000000
+      internalID: 2076792191900589764
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_0_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 448
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68a2d30407485ff30800000000000000
+      internalID: 4608735411332524678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_0_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 448
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32e3b37ad9686f370800000000000000
+      internalID: 8356014170306199075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_0_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 448
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6afb52a5c156ea10800000000000000
+      internalID: 1938326598903921263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_1_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 384
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f7495547a3159090800000000000000
+      internalID: -8028489151574095883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_1_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 384
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d7b31d47ea444cc0800000000000000
+      internalID: -3727772234264889387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_1_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 384
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21553dcf4145258c0800000000000000
+      internalID: -4012051868915903214
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_1_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 384
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56408e1a5a5ce64f0800000000000000
+      internalID: -833511565840350107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_1_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 384
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c44edde339f734a90800000000000000
+      internalID: -7330875498037386164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_1_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 384
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f14f53f709498fb90800000000000000
+      internalID: -7207847855276035041
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_1_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 384
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 379350ceeb3d4e520800000000000000
+      internalID: 2730540091050375539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_1_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 384
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8263960ef99ac1a40800000000000000
+      internalID: 5340329762284451368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_2_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 320
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29f71a8dd008f1ba0800000000000000
+      internalID: -6116028971988451438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_2_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 320
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41216a4669615a130800000000000000
+      internalID: 3577290314205237780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_2_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 320
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6d8444909bd3b2f0800000000000000
+      internalID: -958180881690489494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_2_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 320
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fc1b3ca246f7c7e0800000000000000
+      internalID: -1745155564364948237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_2_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 320
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33634b238a9ec6310800000000000000
+      internalID: 1399750492819830323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_2_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 320
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8e113cd229a95ad0800000000000000
+      internalID: -2712951333325824372
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_2_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 320
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37e798f7ec9366350800000000000000
+      internalID: 6009554311838269043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_2_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 320
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06d8f82a978ceacb0800000000000000
+      internalID: -4850719323887530656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_3_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6403ead92325bc9e0800000000000000
+      internalID: -1600094865252798394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_3_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 256
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1cf14cb8c497c1830800000000000000
+      internalID: 4043239935141224385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_3_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 256
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a32e178df6f32db0800000000000000
+      internalID: -4817735607602240608
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_3_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 256
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1170d35698861bf40800000000000000
+      internalID: 5742485939192399633
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_3_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 256
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6f9661884fe37200800000000000000
+      internalID: 176747905085251438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_3_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 256
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82cca67e0d280a6c0800000000000000
+      internalID: -4134160624178770904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_3_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 256
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 085eb1b0deae36830800000000000000
+      internalID: 4063349592632845696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_3_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 256
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 632fcaf7835fd5870800000000000000
+      internalID: 8673358080394457654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_4_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 34a3e3517bfa76e00800000000000000
+      internalID: 1037991440002464323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_4_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 192
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 061cf38b40cd08e30800000000000000
+      internalID: 4503841540199661920
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_4_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 192
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1387e259a37ff49c0800000000000000
+      internalID: -3940659317942880207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_4_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 192
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 586bc9d2663fb82b0800000000000000
+      internalID: -5581099693018139003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_4_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 192
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1a886ee5f92e0440800000000000000
+      internalID: 4903903180496603676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_4_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 192
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e51fbaaac374ad40800000000000000
+      internalID: 5594723951386236386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_4_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 192
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c98def84a340532d0800000000000000
+      internalID: -3299726503599744868
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_4_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 192
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2bc6d77449f2ae90800000000000000
+      internalID: -7015771197026153684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_5_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0029cfaf57bc39860800000000000000
+      internalID: 7535590309103440384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_5_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 128
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0785cb936b4766e0800000000000000
+      internalID: -1844422631197669622
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_5_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 128
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86dd641602913ad20800000000000000
+      internalID: 3288499779772276072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_5_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 128
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64d22e225d0eadd30800000000000000
+      internalID: 4457121987254431046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_5_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 128
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e28bd011be70540b0800000000000000
+      internalID: -5745177043456378834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_5_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 128
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5b56f339be8fe820800000000000000
+      internalID: 2949733207042841437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_5_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 128
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1426fb1872a285600800000000000000
+      internalID: 457161711346999873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_5_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 128
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9fac83276e252460800000000000000
+      internalID: 7216224998444019610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_6_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d42df2231bd27730800000000000000
+      internalID: 3995496694668928209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_6_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca2da4d511885d880800000000000000
+      internalID: -8586807506350976340
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_6_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bf60e6258f1a34b0800000000000000
+      internalID: -5460016941489950794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_6_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6d6db8e77443e7b0800000000000000
+      internalID: -5196234263258894993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_6_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 744cb7a77cbb12be0800000000000000
+      internalID: -1503714335137217465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_6_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e69f99e0a9718eb0800000000000000
+      internalID: -4719357202486290713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_6_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c0fa97db541553c0800000000000000
+      internalID: -4371565478601363257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_6_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00b133d65c06776e0800000000000000
+      internalID: -1839895521700668672
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_7_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43d6aec837feff6d0800000000000000
+      internalID: -2954379550967304908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_7_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02b77f71d8d354730800000000000000
+      internalID: 3982657121680849696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_7_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f695c389516c053f0800000000000000
+      internalID: -914012928305505937
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_7_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ec17886254c929d0800000000000000
+      internalID: -2798489835214005016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_7_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96dde6fc7bfd66ac0800000000000000
+      internalID: -3862153649871463063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_7_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db65853bc31169660800000000000000
+      internalID: 7392114790779868861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_7_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40296d1c1794030d0800000000000000
+      internalID: -3445172962006232572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: watercyanfine_7_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e312150054de9db10800000000000000
+      internalID: 2006895989584109886
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      watercyan_0: -4176397708451349682
+      watercyan_0_0: -2218195369344890361
+      watercyan_0_1: -3929891807156802922
+      watercyan_0_2: 4731757598430440121
+      watercyan_0_3: -6733159821435671428
+      watercyan_1_0: 1682500277299940302
+      watercyan_1_1: 8390362731485711436
+      watercyan_1_2: 5085572851159605803
+      watercyan_1_3: 7121354757486765253
+      watercyan_2_0: -7273278640587141382
+      watercyan_2_1: -7253421293573163679
+      watercyan_2_2: 7876245788974849702
+      watercyan_2_3: -7068936815088230027
+      watercyan_3_0: 7582778713656359628
+      watercyan_3_1: -521284610831133255
+      watercyan_3_2: 4249478147907570520
+      watercyan_3_3: 8042845302406901370
+      watercyanfine_0_0: 5979096270529472463
+      watercyanfine_0_1: 3867692500389260421
+      watercyanfine_0_2: -7477748889013614718
+      watercyanfine_0_3: -3641943721340223127
+      watercyanfine_0_4: 2076792191900589764
+      watercyanfine_0_5: 4608735411332524678
+      watercyanfine_0_6: 8356014170306199075
+      watercyanfine_0_7: 1938326598903921263
+      watercyanfine_1_0: -8028489151574095883
+      watercyanfine_1_1: -3727772234264889387
+      watercyanfine_1_2: -4012051868915903214
+      watercyanfine_1_3: -833511565840350107
+      watercyanfine_1_4: -7330875498037386164
+      watercyanfine_1_5: -7207847855276035041
+      watercyanfine_1_6: 2730540091050375539
+      watercyanfine_1_7: 5340329762284451368
+      watercyanfine_2_0: -6116028971988451438
+      watercyanfine_2_1: 3577290314205237780
+      watercyanfine_2_2: -958180881690489494
+      watercyanfine_2_3: -1745155564364948237
+      watercyanfine_2_4: 1399750492819830323
+      watercyanfine_2_5: -2712951333325824372
+      watercyanfine_2_6: 6009554311838269043
+      watercyanfine_2_7: -4850719323887530656
+      watercyanfine_3_0: -1600094865252798394
+      watercyanfine_3_1: 4043239935141224385
+      watercyanfine_3_2: -4817735607602240608
+      watercyanfine_3_3: 5742485939192399633
+      watercyanfine_3_4: 176747905085251438
+      watercyanfine_3_5: -4134160624178770904
+      watercyanfine_3_6: 4063349592632845696
+      watercyanfine_3_7: 8673358080394457654
+      watercyanfine_4_0: 1037991440002464323
+      watercyanfine_4_1: 4503841540199661920
+      watercyanfine_4_2: -3940659317942880207
+      watercyanfine_4_3: -5581099693018139003
+      watercyanfine_4_4: 4903903180496603676
+      watercyanfine_4_5: 5594723951386236386
+      watercyanfine_4_6: -3299726503599744868
+      watercyanfine_4_7: -7015771197026153684
+      watercyanfine_5_0: 7535590309103440384
+      watercyanfine_5_1: -1844422631197669622
+      watercyanfine_5_2: 3288499779772276072
+      watercyanfine_5_3: 4457121987254431046
+      watercyanfine_5_4: -5745177043456378834
+      watercyanfine_5_5: 2949733207042841437
+      watercyanfine_5_6: 457161711346999873
+      watercyanfine_5_7: 7216224998444019610
+      watercyanfine_6_0: 3995496694668928209
+      watercyanfine_6_1: -8586807506350976340
+      watercyanfine_6_2: -5460016941489950794
+      watercyanfine_6_3: -5196234263258894993
+      watercyanfine_6_4: -1503714335137217465
+      watercyanfine_6_5: -4719357202486290713
+      watercyanfine_6_6: -4371565478601363257
+      watercyanfine_6_7: -1839895521700668672
+      watercyanfine_7_0: -2954379550967304908
+      watercyanfine_7_1: 3982657121680849696
+      watercyanfine_7_2: -914012928305505937
+      watercyanfine_7_3: -2798489835214005016
+      watercyanfine_7_4: -3862153649871463063
+      watercyanfine_7_5: 7392114790779868861
+      watercyanfine_7_6: -3445172962006232572
+      watercyanfine_7_7: 2006895989584109886
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
