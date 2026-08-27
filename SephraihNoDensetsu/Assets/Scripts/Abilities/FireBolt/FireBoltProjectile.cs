@@ -70,7 +70,12 @@ public class FireBoltProjectile : MonoBehaviour
                 {
                     if (obs.BlocksProjectiles) DestroyProjectile();
                 }
-                else DestroyProjectile(); // solid collider with no Obstacle component yet: fail-safe, keep prior behavior
+                else if (!collider.isTrigger && collider.CompareTag("Player"))
+                {
+                    // a unit's own solid/movement collider (as opposed to its trigger hurtbox) -
+                    // a graze on this should pass through untouched, not detonate the bolt
+                }
+                else DestroyProjectile(); // solid collider with no Obstacle component and not a unit's movement collider: fail-safe
             }
 
         }

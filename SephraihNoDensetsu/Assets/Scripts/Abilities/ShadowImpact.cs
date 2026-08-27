@@ -80,10 +80,7 @@ public class ShadowImpact : Ability
             //transform.position = trpos + direction * range;
             // Only actually teleport if the destination is clear - one of the 4 offset positions
             // around the target can land inside or past a wall/boundary if the target happens to
-            // be standing close to one, which would otherwise put the user out of bounds. Skip the
-            // repositioning for this hit (stay put, still slash/damage from the current spot)
-            // rather than blindly teleporting into whatever is there.
-            Vector2 candidate = target.position + offset(hit);
+            // be standing close to one, which would otherwise put the user out of bounds.
             // TryFindReachableLanding requires the snapped destination be actually reachable BY
             // WALKING from the user's current spot, not just spatially close - unlike Teleport, this
             // is a melee-range combo reposition, not a deliberate long-distance jump, so it must
@@ -92,12 +89,22 @@ public class ShadowImpact : Ability
             // TryFindReachableLanding's own doc comment - its CalculatePath requirement already
             // guarantees a real walkable route exists, which is a strictly stronger condition than
             // any straight-line clear check could add, so there's no separate SpellBlocked call here
-            // (dropped alongside Teleport's - see Teleport.cs for why). A target standing right next
-            // to a wall can put one of the 4 cardinal offsets above exactly on/in it, which is
-            // exactly the case this is meant to catch.
-            if (TryFindReachableLanding(user.position, candidate, DefaultLandingSearchRadius, out Vector2 landing))
+            // (dropped alongside Teleport's - see Teleport.cs for why).
+            //
+            // A target standing near a wall can make this beat's natural offset direction invalid
+            // while the other 3 cardinal offsets are perfectly fine - rather than skipping the
+            // reposition entirely on the first failure, rotate through all 4 starting from the
+            // natural one and only give up (stay put, still slash/damage from the current spot) if
+            // every direction is blocked.
+            int baseDir = ((int)hit - 1) / 2 % cardinalOffsets.Length;
+            for (int i = 0; i < cardinalOffsets.Length; i++)
             {
-                user.position = landing;
+                Vector2 candidate = target.position + cardinalOffsets[(baseDir + i) % cardinalOffsets.Length];
+                if (TryFindReachableLanding(user.position, candidate, DefaultLandingSearchRadius, out Vector2 landing))
+                {
+                    user.position = landing;
+                    break;
+                }
             }
             //GameObject tef = Instantiate(tpEffect, transform.position + new Vector3(0, -0.7f, 0), Quaternion.Euler(0f, 0f, 0)); //instantiate effect prefab at position and rotation
             //Destroy(tef, 0.5f); //free up memory
@@ -119,25 +126,12 @@ public class ShadowImpact : Ability
        user.GetComponent<MovementController>().stuck = false;
     }
 
-    private Vector3 offset(float count) {
-
-         Vector3 v = new Vector3(0, 1, 0);
-        
-        if (count > 2)
-        {
-            v = new Vector3(1, 0, 0);
-        }
-        if (count > 4)
-        {
-            v = new Vector3(0, -1, 0);
-        }
-        if (count > 6)
-        {
-            v = new Vector3(-1, 0, 0);
-        }
-
-        return v;
-    }
+    private static readonly Vector3[] cardinalOffsets = {
+        new Vector3(0, 1, 0),
+        new Vector3(1, 0, 0),
+        new Vector3(0, -1, 0),
+        new Vector3(-1, 0, 0),
+    };
 
 
     private void Slash(float angle, Color color)

@@ -235,6 +235,29 @@ on `GroundTiles` for general ground decoration — its Tile Palette definition i
 `Ground.prefab` in that folder (has a "Palette Settings" component; it's the picker/swatch board,
 not painted map content).
 
+**Per-material Grid size + obstacle-companion (TowerWall)**: a material that needs to paint at a
+coarser granularity than the shared 1x1 `Grid` gets its own sibling `Grid` GameObject at the desired
+`cellSize` (e.g. `TowerWallGrid`, `cellSize=(2,2,0)`) instead of a generic per-tileset scale setting —
+`DualGridTilemapModule` needs no code changes for this, its corner math only reads relative neighbor
+offsets. When moving/creating a material on a non-1x1 Grid, `spritePixelsPerUnit` must be scaled to
+match (e.g. halved for a 2x Grid) or tiles render with gaps — this is a texture-import property,
+independent of the Grid/prefab setup, easy to forget. `DualGridTilemapModule` also has optional
+`obstacleTilemap`/`obstacleMarkerTile` fields (both null by default, zero effect unless wired) — when
+set, a companion invisible Tilemap gets per-QUADRANT obstacle markers (not per whole render cell) so
+the blocking footprint tightly hugs the actual rim art instead of blocking whole cells around an edge;
+this companion Tilemap must live on its own Grid at HALF the data/render cellSize, with the same local
+offset as `renderTilemap` (mirrors the `FineGrid` quadrant-patch convention) — nesting a finer Grid
+inside a coarser one works fine, `Tilemap.layoutGrid` always resolves to the nearest ancestor Grid.
+Each quadrant blocks iff its own corner flag is filled AND the render cell isn't the fully-filled
+"castle top" combo (confirmed against a user-supplied 16-tile reference diagram — every combo's own
+green/filled quadrants ARE its collider, 1:1, no wider analysis). A wall painted thicker than 1 data
+cell gets a walkable middle layer by design (the "top" of a thick wall) — intentional, not a bug; an
+8-neighbor "true edge depth" alternative was tried and explicitly reverted, don't re-attempt it without
+a new request. See
+local memory `project_dual_grid_tilemap_system.md` for the full TowerWall build, including the
+now-built "high wall" Obstacle tier (`BlocksSight=true` added to `high`, still `BlocksSpell=false`
+unlike `boundary`).
+
 **Manual quadrant-patch fallback**: an automated cross-material shape-merge (`groundType` grouping on
 `DualGridTilemapModule`) was tried for fixing bad edges where two different materials border each
 other, but hit a real structural conflict with per-material sorting order and was reverted (code

@@ -38,20 +38,26 @@ public static class NavMesh2DUtility
 
     public static void InvalidateCache() => cachedZOffset = null;
 
-    static float ZOffset
+    // Probes near the position actually being converted rather than a fixed point - multi-area
+    // maps (e.g. Dungeon) rebake a single shared NavMeshSurface fresh with only the CURRENTLY
+    // ACTIVE area's geometry every time the player switches areas (see MultiAreaMap.RebuildNavMesh),
+    // so a fixed probe point only ever finds something if that specific point happens to fall
+    // inside whichever area is presently active. World origin only works for an area that happens
+    // to sit there (e.g. Dungeon's Level1) - every other area (Level2, Level3, ...) would find
+    // nothing nearby and permanently fall through to the 0f fallback for that whole session. The
+    // discovered value itself is still assumed uniform across the whole map (a baking-rotation
+    // quirk, not geometry-dependent) and is cached the same way - only the probe LOCATION changes.
+    static float ZOffset(Vector2 nearPosition)
     {
-        get
+        if (cachedZOffset.HasValue) return cachedZOffset.Value;
+        if (NavMesh.SamplePosition(new Vector3(nearPosition.x, nearPosition.y, 0f), out var hit, ProbeSearchRadius, NavMesh.AllAreas))
         {
-            if (cachedZOffset.HasValue) return cachedZOffset.Value;
-            if (NavMesh.SamplePosition(Vector3.zero, out var hit, ProbeSearchRadius, NavMesh.AllAreas))
-            {
-                cachedZOffset = hit.position.z;
-                return cachedZOffset.Value;
-            }
-            return 0f; // no baked mesh reachable yet - don't cache a failure, retry next call
+            cachedZOffset = hit.position.z;
+            return cachedZOffset.Value;
         }
+        return 0f; // no baked mesh reachable yet - don't cache a failure, retry next call
     }
 
-    public static Vector3 ToNavMesh(Vector2 gamePos) => new Vector3(gamePos.x, gamePos.y, ZOffset);
+    public static Vector3 ToNavMesh(Vector2 gamePos) => new Vector3(gamePos.x, gamePos.y, ZOffset(gamePos));
     public static Vector2 ToGame(Vector3 navPos) => new Vector2(navPos.x, navPos.y);
 }

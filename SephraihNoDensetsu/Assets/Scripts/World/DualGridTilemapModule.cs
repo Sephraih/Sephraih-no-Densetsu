@@ -35,6 +35,23 @@ public class DualGridTilemapModule : MonoBehaviour
         "standalone, unchanged behavior.")]
     [SerializeField] string groundType = "";
 
+    [Tooltip("Optional companion Tilemap for wall-like materials that are only partially solid (e.g. " +
+        "a wall's rim blocks movement, its top interior is walkable floor). Must live on its own Grid " +
+        "at HALF the cellSize of dataTilemap/renderTilemap, with the same local offset as " +
+        "renderTilemap (mirrors the FineGrid quadrant-patch convention) - each render cell has 4 " +
+        "quadrant sub-cells here, one per corner flag, matching exactly which quadrants that render " +
+        "cell's own sprite shows as filled. A quadrant is marked iff its own corner flag is filled AND " +
+        "the cell isn't the fully-filled 'castle top' combo (which stays entirely clear - it's " +
+        "walkable floor, not rim, the one exception). A wall painted thicker than 1 data cell will " +
+        "have a walkable middle layer by design - that's intentional, not a bug. Leave null for " +
+        "ordinary purely-cosmetic materials (mud/water/grass/etc.) - zero behavior change when unset.")]
+    [SerializeField] Tilemap obstacleTilemap;
+
+    [Tooltip("Marker tile written to obstacleTilemap. Any non-null Tile works - obstacleTilemap's own " +
+        "TilemapRenderer should stay disabled, matching the Data-layer convention; the real visuals " +
+        "come from renderTilemap, this layer is logic-only.")]
+    [SerializeField] Tile obstacleMarkerTile;
+
     Dictionary<(bool nw, bool ne, bool sw, bool se), Tile> tileByCorner;
 
     // Grouped modules merge corner-fill SHAPE across every member sharing the same groundType+scene
@@ -205,7 +222,9 @@ public class DualGridTilemapModule : MonoBehaviour
     {
         if (!Grouped)
         {
-            WriteMergedTile(renderCell, ComputeOwnCorners(renderCell));
+            var c = ComputeOwnCorners(renderCell);
+            WriteMergedTile(renderCell, c);
+            WriteObstacleCell(renderCell, c);
             return;
         }
 
@@ -239,6 +258,31 @@ public class DualGridTilemapModule : MonoBehaviour
             renderTilemap.SetTile(renderCell, null);
             return;
         }
-        WriteMergedTile(renderCell, (nw, ne, sw, se));
+        var merged = (nw, ne, sw, se);
+        WriteMergedTile(renderCell, merged);
+        WriteObstacleCell(renderCell, merged);
+    }
+
+    // Quadrant granularity: each render cell's 4 corners map to one quadrant sub-cell on
+    // obstacleTilemap's finer Grid (same SW/SE/NW/NE = (2X,2Y)/(2X+1,2Y)/(2X,2Y+1)/(2X+1,2Y+1)
+    // mapping as the FineGrid quadrant-patch system). Blocking is derived purely from THIS render
+    // cell's own painted combo - a quadrant blocks iff its own corner flag is filled AND the combo
+    // isn't the fully-filled "castle top" (walkable floor, zero collider - the one exception,
+    // confirmed by the user against a reference 16-tile diagram: every other combo's green/filled
+    // quadrants are exactly its collider, 1:1, regardless of what's painted elsewhere). This is
+    // deliberately LOCAL, not derived from a wider "is this data cell truly on the mass's outer edge"
+    // check (a 8-neighbor rim test was tried and reverted) - a wall painted more than 1 data-cell
+    // thick will have its middle layer(s) read as walkable "wall-top" under this rule, which is
+    // intentional per the user's own original framing ("the wall part needs a collider, the top part
+    // acts as a walkable floor") - a thick wall's top is naturally more than 1 cell wide.
+    void WriteObstacleCell(Vector3Int renderCell, (bool nw, bool ne, bool sw, bool se) c)
+    {
+        if (obstacleTilemap == null) return;
+        bool allFilled = c.nw && c.ne && c.sw && c.se;
+        int qx = renderCell.x * 2, qy = renderCell.y * 2;
+        obstacleTilemap.SetTile(new Vector3Int(qx, qy, 0), (c.sw && !allFilled) ? obstacleMarkerTile : null);
+        obstacleTilemap.SetTile(new Vector3Int(qx + 1, qy, 0), (c.se && !allFilled) ? obstacleMarkerTile : null);
+        obstacleTilemap.SetTile(new Vector3Int(qx, qy + 1, 0), (c.nw && !allFilled) ? obstacleMarkerTile : null);
+        obstacleTilemap.SetTile(new Vector3Int(qx + 1, qy + 1, 0), (c.ne && !allFilled) ? obstacleMarkerTile : null);
     }
 }

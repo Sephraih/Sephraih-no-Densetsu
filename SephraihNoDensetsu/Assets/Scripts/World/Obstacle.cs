@@ -35,11 +35,16 @@ using UnityEngine;
 // Tier reference (flag combinations content authors should use - set per-obstacle in the Inspector;
 // GroundTiles-style purely-cosmetic layers need no Obstacle component at all):
 //   boundary      (blocks everything):        BlocksMovement=true,  BlocksSight=true,  BlocksProjectiles=true,  BlocksSpell=true
+//   high wall     (blocks walk+shots+sight):  BlocksMovement=true,  BlocksSight=true,  BlocksProjectiles=true,  BlocksSpell=false
 //   high          (blocks walk+shots):        BlocksMovement=true,  BlocksSight=false, BlocksProjectiles=true,  BlocksSpell=false
 //   low           (blocks walk only):         BlocksMovement=true,  BlocksSight=false, BlocksProjectiles=false, BlocksSpell=false
 //   spellBarrier  (blocks spells only):       BlocksMovement=false, BlocksSight=false, BlocksProjectiles=false, BlocksSpell=true
-//   Not yet built: a ledge that only blocks from one direction (jump-down), and a high-wall variant
-//   that also blocks sight (BlocksSight=true) - both deliberately deferred, see [[project-teleport-wall-landing]].
+//   "high wall" is a real architectural wall - occludes vision like boundary does, but still lets
+//   spells/teleport through (that's reserved for sealed-room/outer-map perimeters). Put it on the
+//   Obstacles layer (not Boundaries) - ObstacleQuery's raycast mask includes both layers for every
+//   query type, so layer choice is purely a tier-family/organizational label, never a functional gate.
+//   Not yet built: a ledge that only blocks from one direction (jump-down) - deliberately deferred,
+//   see [[project-teleport-wall-landing]].
 [DisallowMultipleComponent]
 public class Obstacle : MonoBehaviour
 {
