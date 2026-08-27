@@ -61,3 +61,6 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# Claude Code agent worktrees (isolated background-agent checkouts, local only)
+.claude/worktrees/
+
