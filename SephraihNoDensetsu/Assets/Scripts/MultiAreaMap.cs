@@ -14,6 +14,16 @@ public abstract class MultiAreaMap : MapBehaviour
 {
     [SerializeField] protected NavMeshSurface navMeshSurface;
 
+    // Second, much-tighter-radius bake (the "TeleportLanding" agent type, see ProjectSettings/
+    // NavMeshAreas.asset) used ONLY by Ability.TryFindWalkableLanding/TryFindReachableLanding
+    // (Teleport, ShadowImpact) so those can land as close to a collider as the player could
+    // physically walk, independent of navMeshSurface's agentRadius (tuned instead for
+    // EnemyController's NavMeshAgent pathing/corner-wedging - see project_navmesh_2d_gotchas
+    // memory). Baked from the identical proxy geometry NavMeshObstacleSync generates - just
+    // re-eroded at a different radius - so every floor-gap/rasterization fix already in place
+    // applies to this bake automatically, no separate logic needed here.
+    [SerializeField] protected NavMeshSurface teleportNavMeshSurface;
+
     // Tracks whichever Level/MapArea GameObject is currently active - the authoritative "what's on
     // now" reference for both GoToExit (same-scene) and OnMapEntered (cross-scene arrival) below,
     // so the two paths can never leave two areas active at once, even if a subclass additionally
@@ -33,6 +43,7 @@ public abstract class MultiAreaMap : MapBehaviour
     protected void RebuildNavMesh()
     {
         if (navMeshSurface != null) navMeshSurface.BuildNavMesh();
+        if (teleportNavMeshSurface != null) teleportNavMeshSurface.BuildNavMesh();
         // The baked mesh's real height (navmesh Z) can shift between bakes - drop the cached
         // value so the next NavMesh2DUtility query re-discovers it instead of using a stale one.
         NavMesh2DUtility.InvalidateCache();
@@ -84,6 +95,22 @@ public abstract class MultiAreaMap : MapBehaviour
     // tier (low/high/boundary all have BlocksMovement=true, hence non-trigger colliders) with no
     // per-tilemap references needed. A trigger collider (spellBarrier, BlocksMovement=false)
     // correctly does NOT count as stuck - standing there is legitimate, not a rescue case.
+    //
+    // Deliberately OverlapCircle, NOT OverlapPoint - project_navmesh_2d_gotchas memory (the
+    // diagnostic note right before bug #14) already proved Physics2D.OverlapPoint unreliably
+    // returns ZERO hits against a CompositeCollider2D with geometryType=Outlines (which every
+    // obstacle tier in this project uses, TowerWall's obstacle-companion included), confirmed live
+    // in Play mode standing exactly on top of a real, correctly-configured wall - "Outlines"
+    // geometry has no filled interior for a bare point-in-polygon test to land in, while every
+    // shape/sweep query (OverlapCircle/OverlapBox/Raycast/CircleCast) works fine. Unstuck() using
+    // OverlapPoint meant this exact rescue never fired for a player who ends up inside/on an
+    // Outlines-geometry obstacle (e.g. Teleported into a TowerWall structure via a NavMesh landing
+    // right at its edge) - real collision still correctly bounded them from crossing either the
+    // inner or outer edge, so they could slide around trapped inside the wall's own solid ring
+    // indefinitely, never triggering the snap-back-to-saveSpot rescue. A tiny radius (not a real
+    // player-sized check) keeps this a near-point test in practice, just one OverlapPoint can't
+    // reliably perform against this geometry type.
+    const float UnstuckCheckRadius = 0.05f;
     static readonly Collider2D[] unstuckHitBuffer = new Collider2D[8];
     static bool warnedNoMapManager = false;
 
@@ -106,7 +133,7 @@ public abstract class MultiAreaMap : MapBehaviour
             return;
         }
 
-        int count = Physics2D.OverlapPointNonAlloc(Player.transform.position, unstuckHitBuffer, ObstacleQuery.ObstacleLayerMask);
+        int count = Physics2D.OverlapCircleNonAlloc(Player.transform.position, UnstuckCheckRadius, unstuckHitBuffer, ObstacleQuery.ObstacleLayerMask);
         bool stuck = false;
         for (int i = 0; i < count; i++)
         {
@@ -121,6 +148,18 @@ public abstract class MultiAreaMap : MapBehaviour
             // so any rescue snaps back to wherever they actually just were, not an unrelated stale
             // position (e.g. from the last ChargeAttack/ShadowImpact cast, or (0,0,0) if never).
             Player.transform.position = unitController.saveSpot;
+            // A plain position snap doesn't touch the Rigidbody2D's own velocity or the physics
+            // engine's cached contact state - MovementController.Move() drives the player via
+            // rb.linearVelocity every frame (same pattern documented as bug #9's corner-wedging
+            // deadlock in project_navmesh_2d_gotchas), so leftover velocity from the moment they
+            // got stuck can carry them straight back into the same overlap on the very next
+            // physics step, producing a visible snap-back/re-stuck wobble instead of a clean
+            // rescue. Zeroing velocity plus an explicit SyncTransforms (so the physics engine
+            // re-evaluates contacts against the NEW position immediately, not on some later step)
+            // closes that window.
+            var playerRb = Player.GetComponent<Rigidbody2D>();
+            if (playerRb != null) playerRb.linearVelocity = Vector2.zero;
+            Physics2D.SyncTransforms();
         }
         else
         {

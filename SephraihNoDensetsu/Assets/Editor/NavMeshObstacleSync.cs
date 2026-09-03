@@ -40,7 +40,37 @@ public static class NavMeshObstacleSync
     const string HolderName = "[NavMeshProxies]";
     const string FloorName = "[NavMeshFloor]";
     const float ZThickness = 2f;
-    const float ObstacleRasterCellSize = 0.5f;
+    // Hoisted to class scope (was local to Sync()) so GenerateFloor() can also read it - see its own
+    // use of this constant for why: the floor gap it opens at an interior BlocksSpell=true obstacle's
+    // footprint must match the SAME padded size as that obstacle's own NavMeshModifier proxy, or a
+    // thin ring where the (larger) padded proxy extends past the (smaller) unpadded floor gap still
+    // has a floor proxy directly overlapping it - confirmed live this ring alone was enough to keep
+    // reproducing the exact same "Teleport lands inside the tree" symptom even after the floor-gap
+    // fix landed, just shrunk from the whole tree down to this ring. See Sync()'s own call site below
+    // for the full reasoning on the value itself.
+    const float SpellAreaPadding = 0.7f;
+    // Floor-gap-only minimum padding for BlocksSpell=false interior obstacles (every current tree) -
+    // see GenerateFloor()'s use of this for the full story. Zero padding there (matching the
+    // obstacle's own genuinely-unpadded NavMeshModifier proxy 1:1) gave wall-quality landings for two
+    // of three test trees but left the third - one sitting close enough to its neighbors' own floor
+    // gaps to reintroduce the giant-triangle-swallow bug - fully stuck again (dist=0.000). A small
+    // non-zero floor-gap margin (independent of SpellAreaPadding, which stays reserved for
+    // BlocksSpell=true's real erosion-compensation need) closes that without reopening the original
+    // "lands 1.5-2 units away" complaint - still well under a full SpellAreaPadding's worth.
+    const float FloorGapMinPadding = 0.3f;
+    // Only feeds discrete-Collider2D (Polygon/Circle) obstacles - decorative props like trees, never
+    // tilemap-backed tiers (walls/boundary/etc, which iterate their own tilemap.cellSize directly) -
+    // so shrinking this can never affect wall/Teleport behavior, only prop obstacles. 0.5 was too
+    // coarse for a small object: a typical pine tree's real silhouette (~1.1-1.8 units across) only
+    // spans 2-4 cells at that resolution, letting a concave notch or branch tip narrower than one
+    // cell go completely undetected by every sample point in that cell (center AND all 4 corners -
+    // see RasterizePolygon's own corner-sampling fix) - confirmed live: SpellAreaPadding=0.45 was
+    // nowhere near enough margin to compensate for gaps this size, leaving Teleport landing 0.2-0.25
+    // units deep inside the tree's real Collider2D at multiple scales. 0.2 (matching this project's
+    // established NavMesh voxelSize) gives 5-9 cells across a typical tree instead, closing gaps
+    // corner-sampling alone couldn't catch, at ~6x more proxy boxes per prop - a real but
+    // editor-Sync-time-only cost, not a runtime one.
+    const float ObstacleRasterCellSize = 0.2f;
 
     // Tilemap.GetCellCenterWorld()/CellToLocal() both silently return degenerate values (as if
     // cellPos were always zero) when the Tilemap's GameObject hierarchy is INACTIVE - the normal
@@ -167,15 +197,37 @@ public static class NavMeshObstacleSync
         float cell = ObstacleRasterCellSize;
         int xMin = Mathf.FloorToInt(minX / cell), xMax = Mathf.CeilToInt(maxX / cell);
         int yMin = Mathf.FloorToInt(minY / cell), yMax = Mathf.CeilToInt(maxY / cell);
+        bool AnyPathContains(Vector2 p)
+        {
+            foreach (var wp in worldPaths)
+                if (PointInPolygon(p, wp)) return true;
+            return false;
+        }
+
         var cellSize = new Vector3(cell, cell, 0f);
+        float half = cell * 0.5f;
         for (int x = xMin; x < xMax; x++)
         {
             for (int y = yMin; y < yMax; y++)
             {
                 Vector2 center = new Vector2((x + 0.5f) * cell, (y + 0.5f) * cell);
-                bool inside = false;
-                foreach (var wp in worldPaths)
-                    if (PointInPolygon(center, wp)) { inside = true; break; }
+                // Center-only sampling missed slivers near a polygon's edge whenever the true
+                // boundary crosses a cell without its exact center falling inside - invisible for a
+                // small/simple shape but grows with the obstacle's own scale (more perimeter, more
+                // cells straddled this way), confirmed live: a 0.5-scale tree teleported onto cleanly,
+                // an otherwise-identical 0.6/0.8-scale tree left a real gap between the padded proxy
+                // and the true Collider2D edge - `SpellAreaPadding` (a fixed absolute margin) alone
+                // can't compensate for an under-rasterized base footprint that itself grows with
+                // scale. Sampling all 4 corners in addition to the center is a cheap, deliberately
+                // conservative fix (editor-time only, never touches runtime) - guarantees this cell's
+                // rasterized footprint is always a superset of center-only sampling, catching any
+                // sliver the polygon boundary clips through without needing true polygon-cell
+                // intersection math.
+                bool inside = AnyPathContains(center) ||
+                    AnyPathContains(new Vector2(center.x - half, center.y - half)) ||
+                    AnyPathContains(new Vector2(center.x + half, center.y - half)) ||
+                    AnyPathContains(new Vector2(center.x - half, center.y + half)) ||
+                    AnyPathContains(new Vector2(center.x + half, center.y + half));
                 if (inside) result.Add(new Bounds(center, cellSize));
             }
         }
@@ -195,14 +247,39 @@ public static class NavMeshObstacleSync
     // floor in every corner outside a non-rectangular boundary's actual outline (confirmed live:
     // Level3's diamond-shaped boundary left all four bounding-rect corners as genuine Teleport-
     // reachable NavMesh despite no boundary tile anywhere near them - units could reposition straight
-    // past the visible wall into that phantom area). Interior Obstacle-tagged cells are deliberately
-    // NOT treated as walls by this flood fill - they still get individually carved into "Not
-    // Walkable" holes by the obstacle loop in Sync() above, same as before; finding the boundary's
-    // true outer extent is this method's only job. Falls back to the old single-rectangle behavior
-    // (with a warning) when InteriorSeed isn't assigned, so an existing MapBoundary doesn't silently
-    // lose its floor before someone assigns a seed - correct only for a genuinely rectangular
-    // boundary, same as this project's behavior always was.
-    static int GenerateFloor(MapBoundary boundary, int bakeLayer)
+    // past the visible wall into that phantom area).
+    //
+    // CORRECTED UNDERSTANDING (this comment previously claimed "Not Walkable" obstacles are immune to
+    // this and can be safely left out of the wall-set - that was WRONG, found the hard way): the
+    // "Not Walkable"-is-a-true-zero-triangle-hole-immune-to-floor-overlap claim, repeated all over
+    // this project's history, was only ever verified against LARGE tilemap-backed obstacles (walls,
+    // boundary rings spanning many cells). It does NOT hold for a SMALL, ISOLATED discrete-collider
+    // obstacle (a single decorative tree) sitting inside one big merged floor row - confirmed live,
+    // twice, via NavMesh.CalculateTriangulation() point-in-triangle lookup: first with trees at
+    // BlocksSpell=true (a giant floor-row triangle absorbed their "Spell Boundary" proxy tag
+    // entirely), then AGAIN after retagging trees to BlocksSpell=false/"Not Walkable" specifically to
+    // get the true-hole treatment - same giant triangle, same complete absorption, this time of a
+    // "Not Walkable"-tagged proxy that should have been unconditionally immune. Whatever makes
+    // "Not Walkable" special-cased into a real hole for Recast evidently still needs the region to
+    // clear some size/isolation threshold first; a lone small tree apparently doesn't. Bottom line:
+    // EVERY interior obstacle with BlocksMovement=true - regardless of its BlocksSpell tier - needs
+    // its own footprint excluded from the floor row-merge, not just Spell-tagged ones.
+    // `interiorMovementObstacles` (built in Sync() from every Obstacle with BlocksMovement=true, not
+    // filtered by BlocksSpell) closes this for real: each one's own tilemap/collider geometry joins
+    // this method's wall-set alongside the boundary's own, so a floor row-run breaks (opens a small
+    // gap) at its footprint too - exactly like a boundary obstacle already does - so a competing floor
+    // proxy is never generated there for ANY tier to lose a tag-fight against in the first place.
+    // Without this a "Not Walkable" hole could get silently swallowed by a floor row exactly the same
+    // way a Spell Boundary tag did - Teleport would sample a "walkable" landing exactly on the
+    // obstacle's real (still solid) Collider2D, move the player there, and MultiAreaMap.Unstuck()'s
+    // per-frame physics-overlap check would immediately snap them straight back (invisible in
+    // CityMap-based scenes, which have no such per-frame rescue - see feedback memory on this).
+    // Passed in rather than re-queried here so Sync() (which already enumerates every Obstacle in the
+    // scene once) stays the single source of truth for that list. Falls back to the old
+    // single-rectangle behavior (with a warning) when InteriorSeed isn't assigned, so an existing
+    // MapBoundary doesn't silently lose its floor before someone assigns a seed - correct only for a
+    // genuinely rectangular boundary, same as this project's behavior always was.
+    static int GenerateFloor(MapBoundary boundary, int bakeLayer, List<Obstacle> interiorMovementObstacles)
     {
         var outerBounds = boundary.ComputeWorldBounds();
         if (outerBounds.size.x <= 0f || outerBounds.size.y <= 0f)
@@ -233,6 +310,7 @@ public static class NavMeshObstacleSync
         // correctly too, not just tilemap ones.
         var boundaryTilemaps = new List<Tilemap>();
         var boundaryBoxes = new List<Bounds>();
+        var boundaryObstacleSet = new HashSet<Obstacle>(boundary.BoundaryObstacles);
         foreach (var obs in boundary.BoundaryObstacles)
         {
             if (obs == null) continue;
@@ -242,6 +320,45 @@ public static class NavMeshObstacleSync
             {
                 if (col is TilemapCollider2D tilemapCol && tilemapCol.usedByComposite) continue;
                 boundaryBoxes.AddRange(BoxesForCollider(col));
+            }
+        }
+        // EVERY interior BlocksMovement=true obstacle (every decorative tree included - regardless of
+        // its BlocksSpell tier, see this method's header comment for why that qualifier was dropped)
+        // also joins the wall-set here, not just the boundary ring: a merged floor row-run can silently
+        // paint straight over a small isolated obstacle's own proxy - "Not Walkable" tier included,
+        // despite it supposedly being a true zero-triangle hole - since neither tier is safe against
+        // this once the obstacle is small/isolated enough. Skips anything already in BoundaryObstacles
+        // to avoid duplicate entries.
+        //
+        // Padding here mirrors the main obstacle-proxy loop's own `pad` logic below EXACTLY (padded
+        // only when BlocksSpell=true) rather than being applied uniformly - that's deliberate, tuned
+        // after two rounds of getting it wrong in both directions. Applying it universally (an earlier
+        // version of this fix) matched the ring-overlap case for Spell-tagged obstacles but made
+        // ordinary "Not Walkable" obstacles (every tree, now that they're BlocksSpell=false) land
+        // noticeably short of a wall-quality landing - their own NavMeshModifier proxy carries zero
+        // padding (real automatic erosion handles clearance instead, same as any wall), so padding
+        // ONLY the floor-gap for them just pushed the floor uselessly far back with no matching
+        // exclusion to justify it. Mirroring the obstacle's own padding here keeps floor-gap size equal
+        // to actual proxy size for both tiers: BlocksSpell=true still gets the extra margin it
+        // genuinely needs (no automatic erosion for a custom area, see the padding const's own doc
+        // comment), BlocksSpell=false (every current tree) now lands as tight as a wall does, relying
+        // on the same agentRadius erosion + tight rasterization (RasterizePolygon's corner-sampling,
+        // ObstacleRasterCellSize 0.2) walls already rely on.
+        foreach (var obs in interiorMovementObstacles)
+        {
+            if (obs == null || boundaryObstacleSet.Contains(obs)) continue;
+            var tm = obs.GetComponentInChildren<Tilemap>(true);
+            if (tm != null) { boundaryTilemaps.Add(tm); continue; }
+            float pad = obs.BlocksSpell ? SpellAreaPadding * 2f : FloorGapMinPadding * 2f;
+            foreach (var col in obs.GetComponentsInChildren<Collider2D>(true))
+            {
+                if (col is TilemapCollider2D tilemapCol && tilemapCol.usedByComposite) continue;
+                foreach (var b in BoxesForCollider(col))
+                {
+                    var padded = b;
+                    padded.size += new Vector3(pad, pad, 0f);
+                    boundaryBoxes.Add(padded);
+                }
             }
         }
 
@@ -450,10 +567,22 @@ public static class NavMeshObstacleSync
         // enemy pathing/corner-wedging - see project_navmesh_2d_gotchas memory) - using the full
         // agentRadius here was needlessly generous and produced a noticeable "nudge back" when
         // teleporting from right next to a wall (SamplePosition snapping the landing out past the
-        // padded margin). 0.45 sits just above the player's real worst-case (diagonal) half-extent
-        // (~0.42, from its 0.67x0.50 BoxCollider2D) - enough to prevent visual clipping with a little
-        // headroom for voxel-rounding, without padding out further than necessary.
-        const float SpellAreaPadding = 0.45f;
+        // padded margin). Originally set to 0.45 (just above the player's real worst-case diagonal
+        // half-extent, ~0.42, from its 0.67x0.50 BoxCollider2D) when this was tuned only against flat
+        // tilemap-tier walls. Bumped to 0.7 after decorative tree obstacles (small, irregular
+        // PolygonCollider2D props, BlocksSpell=true by Obstacle's own class defaults) exposed a real
+        // gap 0.45 didn't cover: confirmed live via NavMesh.SamplePosition + Physics2D.OverlapPoint
+        // that Teleport landings still clipped 0.18-0.25 units inside a tree's real collider at 0.45,
+        // for every scale tested (0.5x/0.6x/0.8x) - REGARDLESS of independently improving the base
+        // rasterization (RasterizePolygon's corner-sampling, ObstacleRasterCellSize 0.5->0.2) or
+        // matching this same padding into GenerateFloor()'s floor-gap sizing. Only raising this value
+        // itself actually closed it (verified: 1.0 cleared all three with margin to spare; 0.7 still
+        // clears all three, chosen as the smaller of the two that measurably worked, to keep the wall
+        // "nudge back" this constant was originally tuned to avoid as small as this fix allows). If
+        // wall-teleport ever starts feeling pushed-back again, this is why - the fix would be to split
+        // this into two differently-tuned constants (a small one for flat tilemap walls, a larger one
+        // for small/irregular discrete-collider props) rather than reverting the tree fix. (Declared
+        // at class scope now - see there.)
 
         // Every obstacle tilemap tier's CompositeCollider2D is set to Manual generation (see
         // MapArea.prefab / RegenerateManualComposites' own doc comment) specifically so painting
@@ -538,12 +667,31 @@ public static class NavMeshObstacleSync
             processed++;
         }
 
+        // Every interior BlocksMovement=true obstacle needs to break the floor flood-fill/row-merge at
+        // its own footprint too, not just the map's outer boundary ring - see GenerateFloor()'s header
+        // comment for the full reasoning (a hard-won correction: this used to be scoped to
+        // BlocksSpell=true only, on the assumption "Not Walkable" didn't need it - confirmed live that
+        // assumption was wrong for small isolated obstacles). Scoped here to DISCRETE-collider
+        // obstacles only (no Tilemap component) - tilemap-tier obstacles (walls/boundary/etc.) are
+        // large, contiguous, multi-cell shapes that have never actually exhibited this bug in practice
+        // (unlike a single small tree), so leaving them out keeps this list - and every per-cell
+        // IsWall() check in GenerateFloor()'s flood fill - proportional to prop count, not total tile
+        // count. Built once here, from the same `obstacles` pass above, rather than re-querying inside
+        // GenerateFloor() per boundary.
+        var interiorMovementObstacles = new List<Obstacle>();
+        foreach (var obstacle in obstacles)
+        {
+            if (obstacle == null || !obstacle.BlocksMovement) continue;
+            if (obstacle.GetComponentInChildren<Tilemap>(true) != null) continue; // tilemap tiers excluded, see above
+            interiorMovementObstacles.Add(obstacle);
+        }
+
         int boundaryFloors = 0;
         int totalFloorBoxes = 0;
         var mapBoundaries = Object.FindObjectsByType<MapBoundary>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var boundary in mapBoundaries)
         {
-            int boxes = GenerateFloor(boundary, bakeLayer);
+            int boxes = GenerateFloor(boundary, bakeLayer, interiorMovementObstacles);
             if (boxes > 0) { boundaryFloors++; totalFloorBoxes += boxes; }
         }
 
@@ -553,5 +701,23 @@ public static class NavMeshObstacleSync
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         Debug.Log("[NavMeshObstacleSync] Processed " + processed + " obstacle(s), created " + totalBoxes +
                    " obstacle proxy box(es). Boundary floors: " + boundaryFloors + " (" + totalFloorBoxes + " floor box(es)).");
+
+        // Bakes every NavMeshSurface in the scene, not just the primary (Humanoid) one - as of the
+        // dual-agent-type Teleport-landing change, a scene carries a second surface (e.g.
+        // "NavMeshGroundTeleport") baked at a much smaller agentRadius purely for
+        // TryFindWalkableLanding/TryFindReachableLanding queries, sharing this same proxy geometry.
+        // Previously baking was always a separate manual step (the Inspector's "Bake" button, or
+        // MultiAreaMap.RebuildNavMesh() at runtime - see project_navmesh_2d_gotchas bug #16); doing
+        // it here removes that fragility for BOTH surfaces at once instead of adding a second manual
+        // step on top of the first.
+        var surfaces = Object.FindObjectsByType<NavMeshSurface>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var surface in surfaces)
+        {
+            if (surface == null) continue;
+            surface.BuildNavMesh();
+            EditorUtility.SetDirty(surface);
+        }
+        NavMesh2DUtility.InvalidateCache();
+        Debug.Log("[NavMeshObstacleSync] Baked " + surfaces.Length + " NavMeshSurface(s).");
     }
 }

@@ -110,7 +110,7 @@ public class Ability : MonoBehaviour
     protected bool TryFindWalkableLanding(Vector2 from, Vector2 point, float searchRadius, out Vector2 landing)
     {
         landing = point;
-        if (!NavMesh.SamplePosition(NavMesh2DUtility.ToNavMesh(point), out var hit, searchRadius, WalkableAreaMask))
+        if (!NavMesh.SamplePosition(NavMesh2DUtility.ToNavMesh(point), out var hit, searchRadius, LandingFilter(WalkableAreaMask)))
             return false;
 
         // Two connectivity checks, not one, to tell "blocked by an ordinary wall" (allowed - the
@@ -128,13 +128,13 @@ public class Ability : MonoBehaviour
         // removing Spell Boundary specifically from the mask is what breaks an otherwise-complete
         // route.
         var permissivePath = new NavMeshPath();
-        bool reachableIgnoringEverything = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, NavMesh.AllAreas, permissivePath)
+        bool reachableIgnoringEverything = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, LandingFilter(NavMesh.AllAreas), permissivePath)
             && permissivePath.status == NavMeshPathStatus.PathComplete;
 
         if (reachableIgnoringEverything)
         {
             var restrictedPath = new NavMeshPath();
-            bool reachableRespectingSpellBoundary = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, TeleportConnectivityMask, restrictedPath)
+            bool reachableRespectingSpellBoundary = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, LandingFilter(TeleportConnectivityMask), restrictedPath)
                 && restrictedPath.status == NavMeshPathStatus.PathComplete;
             if (!reachableRespectingSpellBoundary)
                 return false; // reachable with Spell Boundary treated as passable, not without it - that IS the blocker
@@ -159,17 +159,67 @@ public class Ability : MonoBehaviour
     protected bool TryFindReachableLanding(Vector2 from, Vector2 point, float searchRadius, out Vector2 landing)
     {
         landing = point;
-        if (!NavMesh.SamplePosition(NavMesh2DUtility.ToNavMesh(point), out var hit, searchRadius, WalkableAreaMask))
+        if (!NavMesh.SamplePosition(NavMesh2DUtility.ToNavMesh(point), out var hit, searchRadius, LandingFilter(WalkableAreaMask)))
             return false;
 
         var path = new NavMeshPath();
-        bool ok = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, WalkableAreaMask, path);
+        bool ok = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, LandingFilter(WalkableAreaMask), path);
         if (!ok || path.status != NavMeshPathStatus.PathComplete)
             return false;
 
         landing = NavMesh2DUtility.ToGame(hit.position);
         return true;
     }
+
+    // A collider-offset correction (shifting the final landing by the caster's real, non-trigger
+    // BoxCollider2D's offset from its own transform origin - this project's player has one at
+    // (-0.04,-0.25)) was tried and REVERTED here. It measurably fixed the "too far from below"
+    // feeling (confirmed live: south-approach gap closed by exactly 0.25, matching the offset), but
+    // broke something more important: shifting the ORIGIN closer to an obstacle to compensate for
+    // the collider sitting further out can push the origin outside where any real baked NavMesh
+    // geometry exists at all - confirmed live, a corrected landing's resulting origin position found
+    // NOTHING within 0.5 units via SamplePosition(AllAreas). Every subsequent Teleport cast passes
+    // `user.transform.position` as `from` into TryFindWalkableLanding's own CalculatePath check -
+    // that only kept working by luck, riding on CalculatePath's own internal snap-to-mesh tolerance,
+    // which isn't reliable enough (confirmed: intermittent "animation plays, character doesn't move"
+    // misfires reappeared after this change, tracing back to exactly this). An occasionally-broken
+    // Teleport is a worse regression than the landing being somewhat short of ideal, so reverted.
+    // If revisited, any offset correction needs to guarantee the corrected origin still resolves
+    // within a tight SamplePosition radius of real navmesh - e.g. clamping the correction's magnitude
+    // to something safely under the erosion radius, not applying the collider's raw offset in full.
+
+    // Agent type used ONLY by the two landing queries above (Teleport/ShadowImpact) - a much
+    // smaller agentRadius than EnemyController's NavMeshAgent pathing bake (see MultiAreaMap's
+    // teleportNavMeshSurface field), baked separately so a landing can sit as close to a collider
+    // as the player could physically walk, without loosening the clearance NPCs path with. Looked
+    // up by name (set in ProjectSettings/NavMeshAreas.asset as "TeleportLanding") rather than
+    // hardcoding the generated agentTypeID int, which isn't stable across a fresh asset edit.
+    // int.MinValue (not 0/-1) as the "uncomputed" sentinel - 0 is Humanoid's own real agentTypeID
+    // and -1 is a legitimate mask value (NavMesh.AllAreas), so neither is safe to reuse here.
+    static int teleportLandingAgentTypeIDCache = int.MinValue;
+    protected static int TeleportLandingAgentTypeID
+    {
+        get
+        {
+            if (teleportLandingAgentTypeIDCache == int.MinValue)
+            {
+                teleportLandingAgentTypeIDCache = 0; // fallback: default (Humanoid) bake if lookup ever fails
+                int count = NavMesh.GetSettingsCount();
+                for (int i = 0; i < count; i++)
+                {
+                    var s = NavMesh.GetSettingsByIndex(i);
+                    if (NavMesh.GetSettingsNameFromID(s.agentTypeID) == "TeleportLanding")
+                    {
+                        teleportLandingAgentTypeIDCache = s.agentTypeID;
+                        break;
+                    }
+                }
+            }
+            return teleportLandingAgentTypeIDCache;
+        }
+    }
+
+    static NavMeshQueryFilter LandingFilter(int areaMask) => new NavMeshQueryFilter { agentTypeID = TeleportLandingAgentTypeID, areaMask = areaMask };
 
     // Excludes "Not Walkable" (BlocksMovement=true, BlocksSpell=false obstacles) AND "Spell Boundary"
     // (BlocksMovement=true, BlocksSpell=true obstacles) - both physically block movement, so both

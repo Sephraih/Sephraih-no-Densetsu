@@ -120,7 +120,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8069798997620399003}
@@ -199,14 +199,9 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -1.1420081, y: 1.2083277}
-      - {x: -0.43835232, y: 0.63460577}
-      - {x: -0.0768531, y: 0.057856977}
-      - {x: 0.02040705, y: 0.054756463}
-      - {x: 0.5242263, y: 0.6994031}
-      - {x: 1.0663279, y: 1.205436}
-      - {x: 0.4568745, y: 1.639037}
-      - {x: -0.49505877, y: 1.620498}
+    - - {x: 0, y: 0.5129086}
+      - {x: 0.995, y: 1.5029086}
+      - {x: -0.995, y: 1.5029086}
   m_UseDelaunayMesh: 1
 --- !u!114 &5133871391059742979
 MonoBehaviour:
@@ -223,5 +218,5 @@ MonoBehaviour:
   BlocksMovement: 1
   BlocksSight: 1
   BlocksProjectiles: 1
-  BlocksSpell: 1
+  BlocksSpell: 0
   NavigationStatic: 1

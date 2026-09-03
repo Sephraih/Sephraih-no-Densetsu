@@ -52,6 +52,12 @@ public class DualGridTilemapModule : MonoBehaviour
         "come from renderTilemap, this layer is logic-only.")]
     [SerializeField] Tile obstacleMarkerTile;
 
+    [Tooltip("Whether the fully-filled 'castle top' combo (all 4 corners filled) is walkable floor " +
+        "(TowerWall-style - the top of a thick wall) or blocks like every other filled quadrant " +
+        "(a solid boundary material with no walkable interior, e.g. a tree-line). True preserves the " +
+        "original TowerWall behavior unchanged.")]
+    [SerializeField] bool obstacleInteriorWalkable = true;
+
     Dictionary<(bool nw, bool ne, bool sw, bool se), Tile> tileByCorner;
 
     // Grouped modules merge corner-fill SHAPE across every member sharing the same groundType+scene
@@ -271,18 +277,23 @@ public class DualGridTilemapModule : MonoBehaviour
     // confirmed by the user against a reference 16-tile diagram: every other combo's green/filled
     // quadrants are exactly its collider, 1:1, regardless of what's painted elsewhere). This is
     // deliberately LOCAL, not derived from a wider "is this data cell truly on the mass's outer edge"
-    // check (a 8-neighbor rim test was tried and reverted) - a wall painted more than 1 data-cell
-    // thick will have its middle layer(s) read as walkable "wall-top" under this rule, which is
-    // intentional per the user's own original framing ("the wall part needs a collider, the top part
-    // acts as a walkable floor") - a thick wall's top is naturally more than 1 cell wide.
+    // check (an 8-neighbor rim test AND a later whole-render-cell-blocks test were both tried and
+    // reverted - the whole-cell version turned a large filled mass into a hollow ring with the ENTIRE
+    // interior walkable, not just the single intended "top" combo, which is worse, not better) - a
+    // wall painted more than 1 data-cell thick will have its middle layer(s) read as walkable
+    // "wall-top" under this rule, which is intentional per the user's own original framing ("the wall
+    // part needs a collider, the top part acts as a walkable floor") - a thick wall's top is naturally
+    // more than 1 cell wide. Reconfirmed correct by the user a second time (2026-09-02) after the
+    // whole-cell experiment - the real remaining issue lives elsewhere, in how gaps against the
+    // fully-empty/no-data background behave, not in this quadrant-vs-corner rule itself.
     void WriteObstacleCell(Vector3Int renderCell, (bool nw, bool ne, bool sw, bool se) c)
     {
         if (obstacleTilemap == null) return;
-        bool allFilled = c.nw && c.ne && c.sw && c.se;
+        bool skipInterior = c.nw && c.ne && c.sw && c.se && obstacleInteriorWalkable;
         int qx = renderCell.x * 2, qy = renderCell.y * 2;
-        obstacleTilemap.SetTile(new Vector3Int(qx, qy, 0), (c.sw && !allFilled) ? obstacleMarkerTile : null);
-        obstacleTilemap.SetTile(new Vector3Int(qx + 1, qy, 0), (c.se && !allFilled) ? obstacleMarkerTile : null);
-        obstacleTilemap.SetTile(new Vector3Int(qx, qy + 1, 0), (c.nw && !allFilled) ? obstacleMarkerTile : null);
-        obstacleTilemap.SetTile(new Vector3Int(qx + 1, qy + 1, 0), (c.ne && !allFilled) ? obstacleMarkerTile : null);
+        obstacleTilemap.SetTile(new Vector3Int(qx, qy, 0), (c.sw && !skipInterior) ? obstacleMarkerTile : null);
+        obstacleTilemap.SetTile(new Vector3Int(qx + 1, qy, 0), (c.se && !skipInterior) ? obstacleMarkerTile : null);
+        obstacleTilemap.SetTile(new Vector3Int(qx, qy + 1, 0), (c.nw && !skipInterior) ? obstacleMarkerTile : null);
+        obstacleTilemap.SetTile(new Vector3Int(qx + 1, qy + 1, 0), (c.ne && !skipInterior) ? obstacleMarkerTile : null);
     }
 }
