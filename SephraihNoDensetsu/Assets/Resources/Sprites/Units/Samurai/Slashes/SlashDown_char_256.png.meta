@@ -1,0 +1,491 @@
+fileFormatVersion: 2
+guid: cee276a659c89a54087384d84854933a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6994168705887216180
+    second: SlashDown_char_test256_dither_0
+  - first:
+      213: -1018149072813900030
+    second: SlashDown_char_test256_dither_1
+  - first:
+      213: 6893933133141636978
+    second: SlashDown_char_test256_dither_2
+  - first:
+      213: -275230292719780365
+    second: SlashDown_char_test256_dither_3
+  - first:
+      213: -518271632276701539
+    second: SlashDown_char_test256_dither_4
+  - first:
+      213: 8839526127891203283
+    second: SlashDown_char_test256_dither_5
+  - first:
+      213: 2853879027497360094
+    second: SlashDown_char_test256_dither_6
+  - first:
+      213: -5508356107314719432
+    second: SlashDown_char_test256_dither_7
+  - first:
+      213: -8638524997982278491
+    second: SlashDown_char_test256_dither_8
+  - first:
+      213: -8004000385481435373
+    second: SlashDown_char_test256_dither_9
+  - first:
+      213: -2484726276778206450
+    second: SlashDown_char_test256_dither_10
+  - first:
+      213: 4693137966957814074
+    second: SlashDown_char_test256d_0
+  - first:
+      213: 697990669905266537
+    second: SlashDown_char_test256d_1
+  - first:
+      213: 1373781567580209601
+    second: SlashDown_char_test256d_2
+  - first:
+      213: 1582225925872141193
+    second: SlashDown_char_test256d_3
+  - first:
+      213: 3857223312777704498
+    second: SlashDown_char_test256d_4
+  - first:
+      213: -9048178401857551473
+    second: SlashDown_char_test256d_5
+  - first:
+      213: 8725377192462761127
+    second: SlashDown_char_test256d_6
+  - first:
+      213: 1834002935389838232
+    second: SlashDown_char_test256d_7
+  - first:
+      213: 6251863219947958243
+    second: SlashDown_char_test256d_8
+  - first:
+      213: 3944127879536395452
+    second: SlashDown_char_test256d_9
+  - first:
+      213: 3973817654090760578
+    second: SlashDown_char_test256d_10
+  - first:
+      213: -5106198437627137015
+    second: SlashDown_char_256_0
+  - first:
+      213: 8551304253035141970
+    second: SlashDown_char_256_1
+  - first:
+      213: 6668715454802728842
+    second: SlashDown_char_256_2
+  - first:
+      213: 4268477905082403194
+    second: SlashDown_char_256_3
+  - first:
+      213: 3743953600188583021
+    second: SlashDown_char_256_4
+  - first:
+      213: -8911954284423181445
+    second: SlashDown_char_256_5
+  - first:
+      213: -13156460445683017
+    second: SlashDown_char_256_6
+  - first:
+      213: 8468005559792049080
+    second: SlashDown_char_256_7
+  - first:
+      213: -7616259686268339889
+    second: SlashDown_char_256_8
+  - first:
+      213: -6649297420840251852
+    second: SlashDown_char_256_9
+  - first:
+      213: -4048117750532679176
+    second: SlashDown_char_256_10
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SlashDown_char_256_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 364
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 904749423932329b0800000000000000
+      internalID: -5106198437627137015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown_char_256_1
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 364
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25b527059e55ca670800000000000000
+      internalID: 8551304253035141970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown_char_256_2
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 364
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a879cafaf590c8c50800000000000000
+      internalID: 6668715454802728842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown_char_256_3
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 364
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a794a001a0eac3b30800000000000000
+      internalID: 4268477905082403194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown_char_256_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 182
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6c09ca86f135f330800000000000000
+      internalID: 3743953600188583021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown_char_256_5
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 182
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7b8f6ebbc0625480800000000000000
+      internalID: -8911954284423181445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown_char_256_6
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 182
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b232a8d44241dff0800000000000000
+      internalID: -13156460445683017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown_char_256_7
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 182
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bb1073f036648570800000000000000
+      internalID: 8468005559792049080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown_char_256_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f49f8d20b2c9d4690800000000000000
+      internalID: -7616259686268339889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown_char_256_9
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 0
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43e45e8a933f8b3a0800000000000000
+      internalID: -6649297420840251852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown_char_256_10
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 0
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f9db8e8a5232d7c0800000000000000
+      internalID: -4048117750532679176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SlashDown_char_256_0: -5106198437627137015
+      SlashDown_char_256_1: 8551304253035141970
+      SlashDown_char_256_10: -4048117750532679176
+      SlashDown_char_256_2: 6668715454802728842
+      SlashDown_char_256_3: 4268477905082403194
+      SlashDown_char_256_4: 3743953600188583021
+      SlashDown_char_256_5: -8911954284423181445
+      SlashDown_char_256_6: -13156460445683017
+      SlashDown_char_256_7: 8468005559792049080
+      SlashDown_char_256_8: -7616259686268339889
+      SlashDown_char_256_9: -6649297420840251852
+      SlashDown_char_test256_dither_0: -6994168705887216180
+      SlashDown_char_test256_dither_1: -1018149072813900030
+      SlashDown_char_test256_dither_10: -2484726276778206450
+      SlashDown_char_test256_dither_2: 6893933133141636978
+      SlashDown_char_test256_dither_3: -275230292719780365
+      SlashDown_char_test256_dither_4: -518271632276701539
+      SlashDown_char_test256_dither_5: 8839526127891203283
+      SlashDown_char_test256_dither_6: 2853879027497360094
+      SlashDown_char_test256_dither_7: -5508356107314719432
+      SlashDown_char_test256_dither_8: -8638524997982278491
+      SlashDown_char_test256_dither_9: -8004000385481435373
+      SlashDown_char_test256d_0: 4693137966957814074
+      SlashDown_char_test256d_1: 697990669905266537
+      SlashDown_char_test256d_10: 3973817654090760578
+      SlashDown_char_test256d_2: 1373781567580209601
+      SlashDown_char_test256d_3: 1582225925872141193
+      SlashDown_char_test256d_4: 3857223312777704498
+      SlashDown_char_test256d_5: -9048178401857551473
+      SlashDown_char_test256d_6: 8725377192462761127
+      SlashDown_char_test256d_7: 1834002935389838232
+      SlashDown_char_test256d_8: 6251863219947958243
+      SlashDown_char_test256d_9: 3944127879536395452
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

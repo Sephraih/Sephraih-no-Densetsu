@@ -9,6 +9,12 @@
 [Bb]uilds/
 [Ll]ogs/
 [Mm]emoryCaptures/
+[Uu]ser[Ss]ettings/
+
+# Unity Editor crash/auto-recovery snapshots - dated scene backups Unity writes on abnormal exit,
+# not real project content. Confirmed present at SephraihNoDensetsu/Assets/_Recovery/ (11MB+ stale
+# snapshot from an old session).
+[Aa]ssets/_Recovery/
 
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta

@@ -1,0 +1,321 @@
+fileFormatVersion: 2
+guid: f794a21f7bed2cf41968bec3effbade4
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4638442193309874109
+    second: slashRight2_256_ani_0
+  - first:
+      213: 2511318869938636108
+    second: slashRight2_256_ani_1
+  - first:
+      213: 4911882503938010101
+    second: slashRight2_256_ani_2
+  - first:
+      213: 7934811215129521600
+    second: slashRight2_256_ani_3
+  - first:
+      213: 5539071186668621254
+    second: slashRight2_256_ani_4
+  - first:
+      213: -5770179356092637571
+    second: slashRight2_256_ani_5
+  - first:
+      213: -1559496638809013366
+    second: slashRight2_256_ani_6
+  - first:
+      213: 490201219533994966
+    second: slashRight2_256_ani_7
+  - first:
+      213: -5777102218845151196
+    second: slashRight2_256_ani_8
+  - first:
+      213: 7820441420702436993
+    second: slashRight2_256_ani_9
+  - first:
+      213: 5228993309566374252
+    second: slashRight2_256_ani_10
+  - first:
+      213: -1990638330834127188
+    second: slashRight2_256_ani_11
+  - first:
+      213: 7405556077282005431
+    second: SlashRight2_ani_256_0
+  - first:
+      213: 2087812423329415943
+    second: SlashRight2_ani_256_1
+  - first:
+      213: 4566142356430986170
+    second: SlashRight2_ani_256_2
+  - first:
+      213: 6213531457040480410
+    second: SlashRight2_ani_256_3
+  - first:
+      213: 3287873551157639419
+    second: SlashRight2_ani_256_4
+  - first:
+      213: 904645424503944675
+    second: SlashRight2_ani_256_5
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SlashRight2_ani_256_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 213
+        width: 251
+        height: 213
+      alignment: 9
+      pivot: {x: 0.4965, y: 0.5035}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b111a61402d5c660800000000000000
+      internalID: 7405556077282005431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashRight2_ani_256_1
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 213
+        width: 251
+        height: 213
+      alignment: 9
+      pivot: {x: 0.4965, y: 0.5035}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 703823a565669fc10800000000000000
+      internalID: 2087812423329415943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashRight2_ani_256_2
+      rect:
+        serializedVersion: 2
+        x: 502
+        y: 213
+        width: 251
+        height: 213
+      alignment: 9
+      pivot: {x: 0.4965, y: 0.5035}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: abb1fecd7423e5f30800000000000000
+      internalID: 4566142356430986170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashRight2_ani_256_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 251
+        height: 213
+      alignment: 9
+      pivot: {x: 0.4965, y: 0.5035}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a98fc9180f5ea3650800000000000000
+      internalID: 6213531457040480410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashRight2_ani_256_4
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 0
+        width: 251
+        height: 213
+      alignment: 9
+      pivot: {x: 0.4965, y: 0.5035}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf8372b239fd0ad20800000000000000
+      internalID: 3287873551157639419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashRight2_ani_256_5
+      rect:
+        serializedVersion: 2
+        x: 502
+        y: 0
+        width: 251
+        height: 213
+      alignment: 9
+      pivot: {x: 0.4965, y: 0.5035}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e57d377832fd8c00800000000000000
+      internalID: 904645424503944675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SlashRight2_ani_256_0: 7405556077282005431
+      SlashRight2_ani_256_1: 2087812423329415943
+      SlashRight2_ani_256_2: 4566142356430986170
+      SlashRight2_ani_256_3: 6213531457040480410
+      SlashRight2_ani_256_4: 3287873551157639419
+      SlashRight2_ani_256_5: 904645424503944675
+      slashRight2_256_ani_0: -4638442193309874109
+      slashRight2_256_ani_1: 2511318869938636108
+      slashRight2_256_ani_10: 5228993309566374252
+      slashRight2_256_ani_11: -1990638330834127188
+      slashRight2_256_ani_2: 4911882503938010101
+      slashRight2_256_ani_3: 7934811215129521600
+      slashRight2_256_ani_4: 5539071186668621254
+      slashRight2_256_ani_5: -5770179356092637571
+      slashRight2_256_ani_6: -1559496638809013366
+      slashRight2_256_ani_7: 490201219533994966
+      slashRight2_256_ani_8: -5777102218845151196
+      slashRight2_256_ani_9: 7820441420702436993
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

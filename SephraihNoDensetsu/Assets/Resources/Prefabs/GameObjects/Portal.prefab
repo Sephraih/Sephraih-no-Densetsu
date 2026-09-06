@@ -179,6 +179,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 724fdac1e97b7c941ae402a7122d6672, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destinationType: 0
+  target: {fileID: 0}
   targetSceneName: 
   targetSpawnPointId: 

@@ -148,6 +148,14 @@ MonoBehaviour:
   obstacleTilemap: {fileID: 6986117617886832711}
   obstacleMarkerTile: {fileID: 11400000, guid: 96302ed8c8c1653478e9fa8921ae0865, type: 2}
   obstacleInteriorWalkable: 0
+  submersive: 0
+  shoreGradient: 0
+  shoreDistanceTexture: {fileID: 0}
+  shoreBakedLocalOrigin: {x: 0, y: 0}
+  shoreBakedLocalSize: {x: 0, y: 0}
+  shoreColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  deepColor: {r: 0.15, g: 0.25, b: 0.4, a: 1}
+  shoreFalloffCurve: 1
 --- !u!1 &411468670680955763
 GameObject:
   m_ObjectHideFlags: 0
@@ -4598,12 +4606,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DualGridTilemapModule
   dataTilemap: {fileID: 8879766840087301793}
   renderTilemap: {fileID: 5817917428590098664}
-  spriteResourcePath: Tiles/tileroad1
-  spriteNamePrefix: tileroad1
+  spriteResourcePath: Tiles/tileroad1n
+  spriteNamePrefix: tileroad1n
   groundType: 
   obstacleTilemap: {fileID: 0}
   obstacleMarkerTile: {fileID: 0}
   obstacleInteriorWalkable: 1
+  submersive: 0
+  shoreGradient: 0
+  shoreDistanceTexture: {fileID: 0}
+  shoreBakedLocalOrigin: {x: 0, y: 0}
+  shoreBakedLocalSize: {x: 0, y: 0}
+  shoreColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  deepColor: {r: 0.15, g: 0.25, b: 0.4, a: 1}
+  shoreFalloffCurve: 1
 --- !u!1 &529943041498808981
 GameObject:
   m_ObjectHideFlags: 0
@@ -4879,6 +4895,14 @@ MonoBehaviour:
   obstacleTilemap: {fileID: 0}
   obstacleMarkerTile: {fileID: 0}
   obstacleInteriorWalkable: 1
+  submersive: 0
+  shoreGradient: 0
+  shoreDistanceTexture: {fileID: 0}
+  shoreBakedLocalOrigin: {x: 0, y: 0}
+  shoreBakedLocalSize: {x: 0, y: 0}
+  shoreColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  deepColor: {r: 0.15, g: 0.25, b: 0.4, a: 1}
+  shoreFalloffCurve: 1
 --- !u!1 &1545095530200256367
 GameObject:
   m_ObjectHideFlags: 0
@@ -5509,6 +5533,14 @@ MonoBehaviour:
   obstacleTilemap: {fileID: 0}
   obstacleMarkerTile: {fileID: 0}
   obstacleInteriorWalkable: 1
+  submersive: 0
+  shoreGradient: 0
+  shoreDistanceTexture: {fileID: 0}
+  shoreBakedLocalOrigin: {x: 0, y: 0}
+  shoreBakedLocalSize: {x: 0, y: 0}
+  shoreColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  deepColor: {r: 0.15, g: 0.25, b: 0.4, a: 1}
+  shoreFalloffCurve: 1
 --- !u!1 &2429514285813685250
 GameObject:
   m_ObjectHideFlags: 0
@@ -6044,6 +6076,14 @@ MonoBehaviour:
   obstacleTilemap: {fileID: 0}
   obstacleMarkerTile: {fileID: 0}
   obstacleInteriorWalkable: 1
+  submersive: 0
+  shoreGradient: 0
+  shoreDistanceTexture: {fileID: 0}
+  shoreBakedLocalOrigin: {x: 0, y: 0}
+  shoreBakedLocalSize: {x: 0, y: 0}
+  shoreColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  deepColor: {r: 0.15, g: 0.25, b: 0.4, a: 1}
+  shoreFalloffCurve: 1
 --- !u!1 &3013603971885438996
 GameObject:
   m_ObjectHideFlags: 0
@@ -6395,6 +6435,14 @@ MonoBehaviour:
   obstacleTilemap: {fileID: 0}
   obstacleMarkerTile: {fileID: 0}
   obstacleInteriorWalkable: 1
+  submersive: 0
+  shoreGradient: 1
+  shoreDistanceTexture: {fileID: 0}
+  shoreBakedLocalOrigin: {x: 0, y: 0}
+  shoreBakedLocalSize: {x: 0, y: 0}
+  shoreColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  deepColor: {r: 0.15, g: 0.25, b: 0.4, a: 1}
+  shoreFalloffCurve: 1
 --- !u!1 &4403665336940988742
 GameObject:
   m_ObjectHideFlags: 0
@@ -6543,6 +6591,14 @@ MonoBehaviour:
   obstacleTilemap: {fileID: 0}
   obstacleMarkerTile: {fileID: 0}
   obstacleInteriorWalkable: 1
+  submersive: 0
+  shoreGradient: 0
+  shoreDistanceTexture: {fileID: 0}
+  shoreBakedLocalOrigin: {x: 0, y: 0}
+  shoreBakedLocalSize: {x: 0, y: 0}
+  shoreColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  deepColor: {r: 0.15, g: 0.25, b: 0.4, a: 1}
+  shoreFalloffCurve: 1
 --- !u!1 &4538792515822701783
 GameObject:
   m_ObjectHideFlags: 0
@@ -6691,6 +6747,14 @@ MonoBehaviour:
   obstacleTilemap: {fileID: 0}
   obstacleMarkerTile: {fileID: 0}
   obstacleInteriorWalkable: 1
+  submersive: 0
+  shoreGradient: 0
+  shoreDistanceTexture: {fileID: 0}
+  shoreBakedLocalOrigin: {x: 0, y: 0}
+  shoreBakedLocalSize: {x: 0, y: 0}
+  shoreColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  deepColor: {r: 0.15, g: 0.25, b: 0.4, a: 1}
+  shoreFalloffCurve: 1
 --- !u!1 &4906302957335679390
 GameObject:
   m_ObjectHideFlags: 0
@@ -6839,6 +6903,14 @@ MonoBehaviour:
   obstacleTilemap: {fileID: 0}
   obstacleMarkerTile: {fileID: 0}
   obstacleInteriorWalkable: 1
+  submersive: 0
+  shoreGradient: 1
+  shoreDistanceTexture: {fileID: 0}
+  shoreBakedLocalOrigin: {x: 0, y: 0}
+  shoreBakedLocalSize: {x: 0, y: 0}
+  shoreColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  deepColor: {r: 0.15, g: 0.25, b: 0.4, a: 1}
+  shoreFalloffCurve: 1
 --- !u!1 &5319909778322991386
 GameObject:
   m_ObjectHideFlags: 0
@@ -7469,6 +7541,14 @@ MonoBehaviour:
   obstacleTilemap: {fileID: 2370770613645672963}
   obstacleMarkerTile: {fileID: 11400000, guid: 96302ed8c8c1653478e9fa8921ae0865, type: 2}
   obstacleInteriorWalkable: 1
+  submersive: 0
+  shoreGradient: 0
+  shoreDistanceTexture: {fileID: 0}
+  shoreBakedLocalOrigin: {x: 0, y: 0}
+  shoreBakedLocalSize: {x: 0, y: 0}
+  shoreColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  deepColor: {r: 0.15, g: 0.25, b: 0.4, a: 1}
+  shoreFalloffCurve: 1
 --- !u!1 &6155797083946325632
 GameObject:
   m_ObjectHideFlags: 0
@@ -7632,7 +7712,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 2b171e3b178ca5f46bd652412e1f2b79, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -8636,7 +8716,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: be5634be1a6b24343bb1a5b48bad0dc7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

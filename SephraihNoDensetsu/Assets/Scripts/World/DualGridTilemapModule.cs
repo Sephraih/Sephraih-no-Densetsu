@@ -58,6 +58,91 @@ public class DualGridTilemapModule : MonoBehaviour
         "original TowerWall behavior unchanged.")]
     [SerializeField] bool obstacleInteriorWalkable = true;
 
+    [Tooltip("Marks this material as one a unit should look visually submerged/hidden-in when standing " +
+        "on a filled cell (tall grass, water) - see SubmersionController, which drives a unit's feet-" +
+        "clipping SpriteMask off DualGridTilemapModule.IsSubmerged(). Purely a data flag; this module " +
+        "does no visual work itself and doesn't care who reads it.")]
+    [SerializeField] bool submersive = false;
+
+    [Tooltip("Opt-in light-shore-to-dark-deep tint driven by a baked shore-distance field (see " +
+        "Tools/Sephraih/Water/Bake Shore Distance Field, ShoreDistanceBakeTool.cs, and the " +
+        "Sephraih/ShoreGradient shader). Zero effect unless true AND shoreDistanceTexture is assigned " +
+        "- run the bake tool on this GameObject after painting/repainting this material's water shape.")]
+    [SerializeField] bool shoreGradient = false;
+
+    [Tooltip("Baked shore-distance lookup texture (written by ShoreDistanceBakeTool). R channel = " +
+        "distance to nearest non-filled cell, normalized against the bake's own maxShoreDistance and " +
+        "clamped at 1 beyond it. Sampled bilinearly by the shader - this is what makes the gradient " +
+        "smooth within and across cells with no extra per-pixel computation needed here.")]
+    [SerializeField] Texture2D shoreDistanceTexture;
+
+    // Local-space (relative to this Grid's own transform - NOT world space, so the same baked shape
+    // stays correct if this GameObject/prefab instance is ever moved) min corner + size of the region
+    // ShoreDistanceBakeTool actually sampled. Combined with the live transform in ApplyShoreGradient()
+    // to get the world-space rect the shader needs, so multiple MapArea instances at different world
+    // positions each read their own bake correctly without re-baking on move.
+    [SerializeField] Vector2 shoreBakedLocalOrigin;
+    [SerializeField] Vector2 shoreBakedLocalSize;
+
+    [SerializeField] Color shoreColor = new Color(0.85f, 0.95f, 1f, 1f);
+    [SerializeField] Color deepColor = new Color(0.15f, 0.25f, 0.4f, 1f);
+
+    [Tooltip("Exponent applied to the sampled [0,1] shore distance before lerping shoreColor->deepColor " +
+        "- live-tunable in the Inspector with no re-bake needed, unlike maxShoreDistance (baked in).")]
+    [SerializeField] float shoreFalloffCurve = 1f;
+
+    static readonly int ShoreDistanceTexId = Shader.PropertyToID("_ShoreDistanceTex");
+    static readonly int ShoreOriginId = Shader.PropertyToID("_ShoreOrigin");
+    static readonly int ShoreSizeId = Shader.PropertyToID("_ShoreSize");
+    static readonly int ShoreColorId = Shader.PropertyToID("_ShoreColor");
+    static readonly int DeepColorId = Shader.PropertyToID("_DeepColor");
+    static readonly int ShoreFalloffCurveId = Shader.PropertyToID("_ShoreFalloffCurve");
+
+    // Static property of this tilemap once baked - set once here, not re-evaluated every frame the
+    // way SubmersionController drives its own per-unit MaterialPropertyBlock, since (unlike
+    // submersion) nothing about the shore gradient depends on a moving unit's live position. Public
+    // (not just OnEnable/OnValidate-triggered) so ShoreDistanceBakeTool can refresh the live preview
+    // immediately after writing a fresh bake, without relying on SerializedObject writes happening to
+    // trigger OnValidate from editor code (not guaranteed the way an Inspector-driven edit is).
+    [ContextMenu("Reapply Shore Gradient")]
+    public void ApplyShoreGradient()
+    {
+        if (!shoreGradient || shoreDistanceTexture == null || renderTilemap == null) return;
+        var renderer = renderTilemap.GetComponent<TilemapRenderer>();
+        if (renderer == null) return;
+
+        var block = new MaterialPropertyBlock();
+        renderer.GetPropertyBlock(block);
+        block.SetTexture(ShoreDistanceTexId, shoreDistanceTexture);
+        Vector2 worldOrigin = (Vector2)transform.position + shoreBakedLocalOrigin;
+        block.SetVector(ShoreOriginId, new Vector4(worldOrigin.x, worldOrigin.y, 0f, 0f));
+        block.SetVector(ShoreSizeId, new Vector4(shoreBakedLocalSize.x, shoreBakedLocalSize.y, 0f, 0f));
+        block.SetColor(ShoreColorId, shoreColor);
+        block.SetColor(DeepColorId, deepColor);
+        block.SetFloat(ShoreFalloffCurveId, shoreFalloffCurve);
+        renderer.SetPropertyBlock(block);
+    }
+
+    // Every currently-enabled submersive module registers itself here (mirrors the groundType grouping
+    // registry's lifecycle) so IsSubmerged() can answer for whichever MapArea/scene is actually active
+    // right now without any caller needing to know which scene or Tilemap instance that is.
+    static readonly HashSet<DualGridTilemapModule> submersiveModules = new();
+
+    // True if `worldPos` overlaps a filled data cell of any currently-enabled submersive material.
+    // Deliberately checks every registered module's dataTilemap directly (same direct-query approach
+    // as the rest of this class) rather than a physics trigger - a trigger collider per grass/water
+    // tile would be a lot of colliders for a purely visual effect when the paint data is already
+    // sitting right here.
+    public static bool IsSubmerged(Vector3 worldPos)
+    {
+        foreach (var m in submersiveModules)
+        {
+            if (m == null || m.dataTilemap == null) continue;
+            if (m.dataTilemap.GetTile(m.dataTilemap.WorldToCell(worldPos)) != null) return true;
+        }
+        return false;
+    }
+
     Dictionary<(bool nw, bool ne, bool sw, bool se), Tile> tileByCorner;
 
     // Grouped modules merge corner-fill SHAPE across every member sharing the same groundType+scene
@@ -76,6 +161,8 @@ public class DualGridTilemapModule : MonoBehaviour
         BuildLookup();
         Tilemap.tilemapTileChanged += OnTilemapChanged;
 
+        if (submersive) submersiveModules.Add(this);
+
         if (Grouped)
         {
             var key = GroupKey;
@@ -92,11 +179,22 @@ public class DualGridTilemapModule : MonoBehaviour
         if (Grouped)
             foreach (var sib in membersByGroup[GroupKey])
                 if (sib != this) sib.RebuildAll();
+
+        ApplyShoreGradient();
+    }
+
+    // Lets shoreColor/deepColor/shoreFalloffCurve tweaks preview live in the Scene view (this module
+    // is [ExecuteAlways]) without needing to toggle the GameObject to re-trigger OnEnable.
+    void OnValidate()
+    {
+        ApplyShoreGradient();
     }
 
     void OnDisable()
     {
         Tilemap.tilemapTileChanged -= OnTilemapChanged;
+
+        if (submersive) submersiveModules.Remove(this);
 
         if (Grouped && membersByGroup.TryGetValue(GroupKey, out var list))
         {

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 // every character object has a movement controller, enabling it to move
@@ -14,7 +15,13 @@ public class MovementController : MonoBehaviour
     private Rigidbody2D rb; // physical entity of the character, where velocity is applied to
     public bool stuck; // whether the character may not move aside from a fixed logic defined in the function causing the character to be stuck
     public bool stunned; // whether the character is stunned, meaning it cannot move at all.
-  
+
+    // Reused every Move() call to avoid a per-call List allocation - one small buffer per unit, not
+    // shared across units (each unit's Move() call fully consumes and finishes with it before any
+    // other unit's runs, so a shared/static buffer isn't needed for correctness, just isn't worth the
+    // subtlety when a plain instance field is just as cheap).
+    private readonly List<ContactPoint2D> contactsBuffer = new List<ContactPoint2D>(8);
+
     // Assigned in Awake, not Start: Start() only guarantees ordering relative to this script's own
     // Update() - it does NOT guarantee running before a DIFFERENT script's Update() on the same
     // object. When a whole level's enemies activate together (SetActive(true) cascading through a
@@ -29,6 +36,119 @@ public class MovementController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    // Prevents a visible "vibrate against the wall" wobble when holding a direction straight into a
+    // static obstacle. rb.linearVelocity gets reasserted from raw input every physics step with no
+    // awareness of what's currently being touched - Unity's own collision solver zeroes/redirects the
+    // into-wall velocity component and nudges the body back out each step, but the very next Move()
+    // call was blindly reasserting full speed back into the wall, undoing that correction every single
+    // step (confirmed as the actual cause - moving the call site from Update to FixedUpdate, the more
+    // commonly-suspected culprit, did NOT fix it on its own). This strips the component of desired
+    // velocity pointing into a contact whose other body is anything but Dynamic - i.e. Kinematic,
+    // Static, or no Rigidbody2D at all. Confirmed live this needs to cover BOTH: this project's
+    // tilemap-backed wall tiers (BoundaryTiles/HighTiles/LowTiles/TowerWallObstacle/etc., every one of
+    // them) use a Static Rigidbody2D on their CompositeCollider2D, while discrete-collider obstacle
+    // prefabs (trees) use Kinematic - an earlier version of this check only excluded Kinematic,
+    // silently skipping every tilemap wall in the game (Static != Kinematic) while still working
+    // against trees, which is exactly backwards from what "walking into a wall wobbles" needed. Every
+    // unit (player and enemies alike) uses Dynamic, so contact with another unit is still deliberately
+    // left alone here, preserving Box2D's normal mass/impulse-based push response between units -
+    // shoving another character still works exactly as before. Only removing the INTO-the-surface
+    // component (not zeroing velocity outright) is what lets a diagonal input still slide along the
+    // wall instead of fully stopping the instant any part of the input points at it.
+    // Shared across all units' Move() calls - batched and only flushed to disk periodically (see
+    // FlushDebugLogIfDue below). The FIRST version of this logging called File.AppendAllText (open +
+    // write + close a file handle) every single physics step while any contact existed - at ~50Hz for
+    // several seconds that's enough file I/O to plausibly hang the Editor outright (confirmed live:
+    // the game froze during exactly this kind of sustained wall-contact test). Buffering in memory and
+    // writing in large batches, plus skipping frames with zero contacts entirely (the vast majority),
+    // cuts real file I/O by roughly two orders of magnitude.
+    static readonly System.Text.StringBuilder debugLogBuffer = new System.Text.StringBuilder();
+    static int debugLogPendingLines = 0;
+    const int DebugLogFlushThreshold = 40;
+
+    Vector2 ClampVelocityAgainstStaticContacts(Vector2 desiredVelocity)
+    {
+        int contactCount = rb.GetContacts(contactsBuffer);
+        if (contactCount == 0) return desiredVelocity; // nothing to clamp, nothing worth logging
+
+        Vector2 originalDesired = desiredVelocity;
+
+        foreach (var contact in contactsBuffer)
+        {
+            // Do NOT trust which of rigidbody/otherRigidbody is "self" vs "the other body" - confirmed
+            // live via a full field dump that Rigidbody2D.GetContacts() does not reorient these to the
+            // calling rigidbody's perspective the way the names imply: querying from the PLAYER's own
+            // rb returned contact.rigidbody = the WALL (Static) and contact.otherRigidbody = the PLAYER
+            // itself (Dynamic) - backwards from the assumption both prior versions of this method made,
+            // which is why the clamp never engaged for ANYTHING, tree or wall, the entire time (the
+            // skip check was comparing the player's own always-Dynamic body against itself). Comparing
+            // directly against this component's own known `rb` reference sidesteps trusting Unity's
+            // naming here at all.
+            Rigidbody2D otherRb = (contact.rigidbody == rb) ? contact.otherRigidbody : contact.rigidbody;
+            bool skippedDynamic = otherRb != null && otherRb.bodyType == RigidbodyType2D.Dynamic;
+            if (!skippedDynamic)
+            {
+                // Similarly, don't trust contact.normal's sign from memory/docs either - resolve it
+                // geometrically instead, via the contact point's position relative to this body, so
+                // it's correct regardless of which "side" Box2D happened to report first.
+                Vector2 towardOther = contact.point - rb.position;
+                Vector2 intoDir = contact.normal;
+                if (Vector2.Dot(intoDir, towardOther) < 0f) intoDir = -intoDir;
+
+                float intoComponent = Vector2.Dot(desiredVelocity, intoDir);
+                if (intoComponent > 0f)
+                    desiredVelocity -= intoComponent * intoDir;
+
+                if (DebugWallClamp)
+                    debugLogBuffer.AppendLine("  APPLIED collider=" + contact.collider.name + " otherCollider=" + contact.otherCollider.name +
+                        " rigidbody=" + (contact.rigidbody != null ? contact.rigidbody.name + "/" + contact.rigidbody.bodyType : "NULL") +
+                        " otherRigidbody=" + (contact.otherRigidbody != null ? contact.otherRigidbody.name + "/" + contact.otherRigidbody.bodyType : "NULL") +
+                        " resolvedOtherRb=" + (otherRb != null ? otherRb.name + "/" + otherRb.bodyType : "NULL") +
+                        " normal=" + contact.normal + " intoDir=" + intoDir + " separation=" + contact.separation + " intoComponent=" + intoComponent);
+            }
+            else if (DebugWallClamp)
+            {
+                debugLogBuffer.AppendLine("  SKIPPED collider=" + contact.collider.name + " otherCollider=" + contact.otherCollider.name +
+                    " resolvedOtherRb=" + (otherRb != null ? otherRb.name + "/" + otherRb.bodyType : "NULL"));
+            }
+        }
+
+        if (DebugWallClamp)
+        {
+            debugLogBuffer.AppendLine("[WallClampDebug] t=" + Time.time.ToString("F3") + " unit=" + gameObject.name +
+                " pos=" + ((Vector2)transform.position).ToString("F4") + " contactCount=" + contactCount +
+                " desiredBefore=" + originalDesired.ToString("F4") + " desiredAfter=" + desiredVelocity.ToString("F4"));
+            debugLogPendingLines++;
+            if (debugLogPendingLines >= DebugLogFlushThreshold) FlushDebugLog();
+        }
+
+        return desiredVelocity;
+    }
+
+    static void FlushDebugLog()
+    {
+        if (debugLogBuffer.Length == 0) return;
+        File.AppendAllText(Application.persistentDataPath + "/WallClampDebug.log", debugLogBuffer.ToString());
+        debugLogBuffer.Clear();
+        debugLogPendingLines = 0;
+    }
+
+    // Catches whatever's left in the buffer when the unit (or Play mode) stops, so the last partial
+    // batch isn't silently lost.
+    void OnDisable()
+    {
+        if (DebugWallClamp) FlushDebugLog();
+    }
+
+    // Diagnostic toggle (off by default) - logs every Move() call (position, contact count, per-contact
+    // normal/separation, velocity before/after clamp) to a plain file at
+    // Application.persistentDataPath/WallClampDebug.log - NOT just Debug.Log, since this project's MCP
+    // console-log capture does not retain anything logged during an actual Play Mode session (confirmed
+    // live: it only ever shows Edit-mode script-execute output, nothing from a 10-second Play Mode test
+    // in between). Flip to true for a future contact/velocity investigation, see
+    // project_wall_wobble_unstuck memory for the bug this was built to diagnose.
+    public static bool DebugWallClamp = false;
+
     //md is the movement direction, msi is a value between zero and one to determine movement speed from input
     public void Move(Vector2 md, float msi)
     {
@@ -36,7 +156,8 @@ public class MovementController : MonoBehaviour
         {
             this.md = md;
             this.msi = msi;
-            rb.linearVelocity = md * msi * this.GetComponent<StatusController>().mvspd; //direction, input strength, character movement speed
+            Vector2 desiredVelocity = md * msi * this.GetComponent<StatusController>().mvspd; //direction, input strength, character movement speed
+            rb.linearVelocity = ClampVelocityAgainstStaticContacts(desiredVelocity);
             MovementAnimation();
         }
         if (stunned)

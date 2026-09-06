@@ -2,8 +2,33 @@ using UnityEngine;
 
 public class Teleport : Ability
 {
-    public GameObject teleportEffect; //effect to be displayed on teleport
+    public GameObject teleportEffect; // sparse world-space sparks left trailing behind as the user walks away
+    public GameObject teleportOutlineEffect; // bold ring flash rigidly attached to the user
 
+    // Two separate effects, not one: a single system tuned to look right both as a bold "landing
+    // flash" AND a sparse decaying trail fought its own settings - the flash needs to stay dense and
+    // rigidly glued to the user (Local sim space), while the trail needs to be sparse and left behind
+    // in World space as the user moves. teleportOutlineEffect handles the former, teleportEffect the
+    // latter; both parented to the user (worldPositionStays so they spawn exactly at the landing
+    // spot), but only the outline's own Local sim space makes it actually follow afterward.
+    void SpawnTeleportEffects()
+    {
+        // No downward offset here anymore - that -0.7 was tuned for the old ground-level ring
+        // effect. Both effects now emit from the player's own sprite silhouette (see
+        // TeleportOutlineEffect/TeleportEffect's Sprite shape), which already aligns correctly with
+        // the character when spawned at its exact position.
+        Vector3 spawnPos = user.position;
+        GameObject outline = Instantiate(teleportOutlineEffect, spawnPos, Quaternion.identity);
+        outline.transform.SetParent(user, true);
+        Destroy(outline, 0.3f); // real-world: outline's own duration(0.2s)+lifetime(0.08s) - see TeleportOutlineEffect.prefab
+
+        GameObject trail = Instantiate(teleportEffect, spawnPos, Quaternion.identity);
+        trail.transform.SetParent(user, true);
+        Destroy(trail, 0.65f); // real-world: trail's own duration(0.3s)+lifetime(0.3s) - see TeleportEffect.prefab. Note
+        // Destroy() delays are real/unscaled time, unlike the particle systems' own duration/lifetime
+        // fields, which are further divided by each system's own simulationSpeed (2.5x here) before
+        // they translate to real seconds - a subtlety that cost real debugging time this session.
+    }
 
     public override void Use()
     {
@@ -32,9 +57,7 @@ public class Teleport : Ability
             {
                 user.GetComponent<MovementController>().LookAt(attackPos.position);
                 user.transform.position = landing;
-                GameObject tef = Instantiate(teleportEffect, user.position + new Vector3(0, -0.7f, 0), Quaternion.Euler(0f, 0f, 0)); //instantiate effect prefab at position and rotation
-                //tef.transform.parent = transform; // make child of the charging character so its emission point moves along with it
-                Destroy(tef, 0.5f); //free up memory
+                SpawnTeleportEffects();
 
                 cd = acd; // start cooldown
             }
@@ -60,9 +83,7 @@ public class Teleport : Ability
             {
                 user.GetComponent<MovementController>().LookAt(mp);
                 user.transform.position = landing;
-                GameObject tef = Instantiate(teleportEffect, user.transform.position + new Vector3(0, -0.7f, 0), Quaternion.Euler(0f, 0f, 0)); //instantiate effect prefab at position and rotation
-                //tef.transform.parent = transform; // make child of the charging character so its emission point moves along with it
-                Destroy(tef, 0.5f); //free up memory
+                SpawnTeleportEffects();
                 cd = acd; // start cooldown
             }
         }

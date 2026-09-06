@@ -86,7 +86,12 @@ public class FireBoltProjectile : MonoBehaviour
     //destroy the projectile based on its lifetime / when it collides and deploy an explosion effect
     void DestroyProjectile()
     {
-        GameObject a = Instantiate(destroyEffect, transform.position, Quaternion.Euler(0, 0f, 0f));
+        // The bolt only ever moves along its own local up-axis (see FixedUpdate above) and never
+        // rotates separately from that, so transform.rotation IS the bolt's travel direction at the
+        // moment of impact - passing it through (instead of a fixed identity rotation) lets the
+        // explosion's own shape orient itself along the impact vector rather than always facing the
+        // same fixed default direction regardless of which way the bolt actually came from.
+        GameObject a = Instantiate(destroyEffect, transform.position, transform.rotation);
         Destroy(a, 1);
         Destroy(gameObject);
     }

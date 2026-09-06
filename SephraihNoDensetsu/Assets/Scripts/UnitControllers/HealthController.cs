@@ -45,7 +45,21 @@ public class HealthController : MonoBehaviour
     {
         if (isDead) return; // already dead - ignore further hits (e.g. two hits landing the same frame)
 
-        GameObject blood = Instantiate(bloodEffect, transform.position, Quaternion.identity); // at character's position without any rotation
+        // Splurt away from the attacker rather than a random/fixed direction - the effect's own
+        // Shape module is centered on local +Y (see BloodEffectPrefab), so rotate it to point +Y
+        // along the attacker-to-player vector. Falls back to identity (whatever the prefab's own
+        // default orientation is) if no attacker transform is available (e.g. environmental damage).
+        Quaternion bloodRotation = Quaternion.identity;
+        if (dmger != null)
+        {
+            Vector2 awayFromAttacker = (Vector2)(transform.position - dmger.position);
+            if (awayFromAttacker.sqrMagnitude > 0.0001f)
+            {
+                float angleFromUp = Mathf.Atan2(awayFromAttacker.y, awayFromAttacker.x) * Mathf.Rad2Deg - 90f;
+                bloodRotation = Quaternion.Euler(0f, 0f, angleFromUp);
+            }
+        }
+        GameObject blood = Instantiate(bloodEffect, transform.position, bloodRotation);
         blood.transform.parent = transform; // make the effect child of the character to let the effect follow it
         Destroy(blood, 0.7f);
 

@@ -56,9 +56,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 0.5
   range: 0
+  mouseTargetUnits:
+    serializedVersion: 2
+    m_Bits: 0
+  mouseTargetRadius: 0.5
   units:
     serializedVersion: 2
     m_Bits: 640
+  useParticleSlashEffect: 0
   particleColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
@@ -103,9 +108,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 0
   range: 0
+  mouseTargetUnits:
+    serializedVersion: 2
+    m_Bits: 0
+  mouseTargetRadius: 0.5
   units:
     serializedVersion: 2
     m_Bits: 128
+  useParticleSlashEffect: 0
 --- !u!114 &7039678331696162078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,14 +130,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 0.3
   range: 5
+  mouseTargetUnits:
+    serializedVersion: 2
+    m_Bits: 0
+  mouseTargetRadius: 0.5
   teleportEffect: {fileID: 3838902983540275944, guid: 822a85a45243e5f45adbd7dc67b9be4f,
     type: 3}
-  boundaries:
-    serializedVersion: 2
-    m_Bits: 2048
-  colliders:
-    serializedVersion: 2
-    m_Bits: 4096
+  teleportOutlineEffect: {fileID: 0}
 --- !u!114 &8660520712041953940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,9 +151,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 0.5
   range: 8
+  mouseTargetUnits:
+    serializedVersion: 2
+    m_Bits: 0
+  mouseTargetRadius: 0.5
   projectile: {fileID: 1150724258750520066, guid: 818c5605413b00641b517b1f127b8ce0,
     type: 3}
   slow: 0.5
+  rangeSettings: {fileID: 0}
+  rangePercent: 1
 --- !u!114 &3261375834084153321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,6 +174,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 0.5
   range: 5
+  mouseTargetUnits:
+    serializedVersion: 2
+    m_Bits: 0
+  mouseTargetRadius: 0.5
 --- !u!114 &6856236955953137285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,6 +192,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 0.2
   range: 0
+  mouseTargetUnits:
+    serializedVersion: 2
+    m_Bits: 0
+  mouseTargetRadius: 0.5
   effect: {fileID: 5802651140264993763, guid: fdb6ef943056669448a4d958f58b46e6, type: 3}
 --- !u!114 &5144315342777425622
 MonoBehaviour:
@@ -188,9 +211,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 0.8
   range: 5
+  mouseTargetUnits:
+    serializedVersion: 2
+    m_Bits: 0
+  mouseTargetRadius: 0.5
   chargeEffect: {fileID: 4909902925158851423, guid: 66417a4e2cfe2ef44a04fd7cc1b5c505,
     type: 3}
   stunTime: 1
+  chargeSpeed: 70
+  meleeRange: 1.1
+  maxChargeDuration: 1
+  trailEffectInterval: 0.1
 --- !u!114 &353123432350875603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,6 +236,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 1
   range: 8
+  mouseTargetUnits:
+    serializedVersion: 2
+    m_Bits: 0
+  mouseTargetRadius: 0.5
   projectile: {fileID: 6419949315111818092, guid: b72bd4923ff9afb42a80bf7304fd0fb2,
     type: 3}
 --- !u!114 &7970950348765205431
@@ -221,6 +256,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 0.5
   range: 8
+  mouseTargetUnits:
+    serializedVersion: 2
+    m_Bits: 0
+  mouseTargetRadius: 0.5
   projectile: {fileID: 377115153599935253, guid: 937abaceb1382274482cceaa3e075edf,
     type: 3}
 --- !u!114 &892845728268660045
@@ -237,6 +276,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acd: 1.2
   range: 4
+  mouseTargetUnits:
+    serializedVersion: 2
+    m_Bits: 0
+  mouseTargetRadius: 0.5
   projectile: {fileID: 1150724258750520066, guid: 574dcccba4dbc4046b5a249f0978af57,
     type: 3}
   slow: 0.5

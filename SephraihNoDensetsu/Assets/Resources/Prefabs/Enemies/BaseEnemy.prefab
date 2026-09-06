@@ -469,7 +469,7 @@ BoxCollider2D:
   m_Offset: {x: -0.045241535, y: -0.2774464}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
+    pivot: {x: 0.6573684, y: 0.49429017}
     oldSize: {x: 0.7201139, y: 1.2561669}
     newSize: {x: 1, y: 1.0833334}
     adaptiveTilingThreshold: 0.5
@@ -515,7 +515,7 @@ BoxCollider2D:
   m_Offset: {x: -0.04524152, y: -0.041000128}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
+    pivot: {x: 0.6573684, y: 0.49429017}
     oldSize: {x: 0.7201139, y: 1.2561669}
     newSize: {x: 1, y: 1.0833334}
     adaptiveTilingThreshold: 0.5
@@ -579,6 +579,10 @@ MonoBehaviour:
   stuck: 0
   stunned: 0
   stunEffectHeight: 0.9
+  repeatAttackStartFraction: 0.27
+  repeatFromStartStates:
+  - AttackRight3
+  - AttackLeft3
 --- !u!1001 &8375766638829367347
 PrefabInstance:
   m_ObjectHideFlags: 0

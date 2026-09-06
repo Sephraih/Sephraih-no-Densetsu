@@ -1,0 +1,333 @@
+fileFormatVersion: 2
+guid: e4f4990225e41184682a5616506a168b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6878529687673101211
+    second: slashDown3_256_ani_0
+  - first:
+      213: -3556150142639548853
+    second: slashDown3_256_ani_1
+  - first:
+      213: 205922221141103961
+    second: slashDown3_256_ani_2
+  - first:
+      213: -8464354831157101576
+    second: slashDown3_256_ani_3
+  - first:
+      213: 2345216764363759606
+    second: slashDown3_256_ani_4
+  - first:
+      213: -4484710833611148202
+    second: slashDown3_256_ani_5
+  - first:
+      213: 5819025526042122386
+    second: slashDown3_256_ani_6
+  - first:
+      213: 641905374707626800
+    second: slashDown3_256_ani_7
+  - first:
+      213: 9075431294431220904
+    second: slashDown3_256_ani_8
+  - first:
+      213: -1352618334594523086
+    second: slashDown3_256_ani_9
+  - first:
+      213: 7076128925899952631
+    second: slashDown3_256_ani_10
+  - first:
+      213: 8365181549992976566
+    second: slashDown3_256_ani_11
+  - first:
+      213: -28281248047293385
+    second: slashDown3_256_ani_12
+  - first:
+      213: 3555288377042603967
+    second: slashDown3_256_ani_13
+  - first:
+      213: -5442252657423347907
+    second: slashDown3_256_ani_14
+  - first:
+      213: -6468344010066681649
+    second: SlashDown3_ani_256_0
+  - first:
+      213: 6787195773431806521
+    second: SlashDown3_ani_256_1
+  - first:
+      213: 7028772180550430417
+    second: SlashDown3_ani_256_2
+  - first:
+      213: 8130658227479131630
+    second: SlashDown3_ani_256_3
+  - first:
+      213: -6364140026330909975
+    second: SlashDown3_ani_256_4
+  - first:
+      213: -6411832442801342194
+    second: SlashDown3_ani_256_5
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SlashDown3_ani_256_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 182
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc023f2c463db36a0800000000000000
+      internalID: -6468344010066681649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown3_ani_256_1
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 182
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93a7f688896f03e50800000000000000
+      internalID: 6787195773431806521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown3_ani_256_2
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 182
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1de2bd4ee073b8160800000000000000
+      internalID: 7028772180550430417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown3_ani_256_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee5300f6496e5d070800000000000000
+      internalID: 8130658227479131630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown3_ani_256_4
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 0
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e273bd5d580ea7a0800000000000000
+      internalID: -6364140026330909975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SlashDown3_ani_256_5
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 0
+        width: 280
+        height: 182
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5286}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0930875d589407a0800000000000000
+      internalID: -6411832442801342194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SlashDown3_ani_256_0: -6468344010066681649
+      SlashDown3_ani_256_1: 6787195773431806521
+      SlashDown3_ani_256_2: 7028772180550430417
+      SlashDown3_ani_256_3: 8130658227479131630
+      SlashDown3_ani_256_4: -6364140026330909975
+      SlashDown3_ani_256_5: -6411832442801342194
+      slashDown3_256_ani_0: 6878529687673101211
+      slashDown3_256_ani_1: -3556150142639548853
+      slashDown3_256_ani_10: 7076128925899952631
+      slashDown3_256_ani_11: 8365181549992976566
+      slashDown3_256_ani_12: -28281248047293385
+      slashDown3_256_ani_13: 3555288377042603967
+      slashDown3_256_ani_14: -5442252657423347907
+      slashDown3_256_ani_2: 205922221141103961
+      slashDown3_256_ani_3: -8464354831157101576
+      slashDown3_256_ani_4: 2345216764363759606
+      slashDown3_256_ani_5: -4484710833611148202
+      slashDown3_256_ani_6: 5819025526042122386
+      slashDown3_256_ani_7: 641905374707626800
+      slashDown3_256_ani_8: 9075431294431220904
+      slashDown3_256_ani_9: -1352618334594523086
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

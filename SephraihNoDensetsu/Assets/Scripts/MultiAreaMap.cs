@@ -114,6 +114,67 @@ public abstract class MultiAreaMap : MapBehaviour
     static readonly Collider2D[] unstuckHitBuffer = new Collider2D[8];
     static bool warnedNoMapManager = false;
 
+    // Root-cause fix for the wall-wobble bug (see project memory / this session's WallClampDebug +
+    // UnstuckDebug logs): resting flush against a wall - the correct, expected outcome now that
+    // MovementController clamps velocity into a contact - still leaves the player's pivot within
+    // UnstuckCheckRadius of the wall's collider, since the probe is centered ON the pivot itself.
+    // The old "any overlap at all = stuck" check couldn't tell that apart from genuinely being
+    // embedded inside solid geometry, so it fired EVERY Update() frame during ordinary wall-holding,
+    // snapping the player back to saveSpot only for held input to immediately drive them right back
+    // into the same overlap next frame - a perpetual ~0.1-unit teleport oscillation, confirmed live
+    // (UnstuckDebug.log: playerPos frozen at the wall, saveSpot frozen one snap-back behind it,
+    // hitCount=1, on effectively every frame while the key was held).
+    //
+    // Fix: gate on actual geometric penetration DEPTH against the player's own real (non-trigger)
+    // collider via Physics2D.Distance, not just "the tiny pivot probe touched something." Flush,
+    // correctly-clamped wall contact produces ~zero penetration (confirmed via WallClampDebug.log -
+    // zero position oscillation once the velocity clamp landed), so MinStuckPenetrationDepth only
+    // trips for real embedding. If a future genuinely-stuck case (e.g. bug #14's Teleport-into-an-
+    // Outlines-ring landing) turns out to be too shallow to clear this threshold, the fix is a
+    // persistence/inescapability signal (e.g. "still overlapping after N frames of movement attempts
+    // in multiple directions"), not just lowering this number back toward zero - that would
+    // reintroduce this exact false-positive.
+    const float MinStuckPenetrationDepth = 0.03f;
+    static Collider2D cachedPlayerSolidCollider;
+    static GameObject cachedPlayerSolidColliderOwner;
+
+    static Collider2D GetPlayerSolidCollider(GameObject player)
+    {
+        if (cachedPlayerSolidColliderOwner == player && cachedPlayerSolidCollider != null)
+            return cachedPlayerSolidCollider;
+
+        cachedPlayerSolidColliderOwner = player;
+        cachedPlayerSolidCollider = null;
+        foreach (var c in player.GetComponents<Collider2D>())
+        {
+            if (!c.isTrigger) { cachedPlayerSolidCollider = c; break; }
+        }
+        return cachedPlayerSolidCollider;
+    }
+
+    // Diagnostic toggle (off by default) - logs every actual rescue (stuck==true) fire to a separate
+    // batched file, same reasoning as MovementController's own DebugWallClamp (avoid unbatched
+    // File.AppendAllText hanging the Editor at Update() frequency). Flip to true for a future
+    // stuck/rescue investigation, see project_wall_wobble_unstuck memory for the bug this was built
+    // to diagnose (Unstuck's penetration-depth gate false-positiving again, etc.).
+    public static bool DebugUnstuck = false;
+    static readonly System.Text.StringBuilder unstuckLogBuffer = new System.Text.StringBuilder();
+    static int unstuckLogPendingLines = 0;
+    const int UnstuckLogFlushThreshold = 10;
+
+    static void FlushUnstuckLog()
+    {
+        if (unstuckLogBuffer.Length == 0) return;
+        System.IO.File.AppendAllText(Application.persistentDataPath + "/UnstuckDebug.log", unstuckLogBuffer.ToString());
+        unstuckLogBuffer.Clear();
+        unstuckLogPendingLines = 0;
+    }
+
+    protected virtual void OnDisable()
+    {
+        if (DebugUnstuck) FlushUnstuckLog();
+    }
+
     protected void Unstuck()
     {
         // MapManager only exists once Bootstrap.unity is part of the loaded set - true in every
@@ -135,15 +196,35 @@ public abstract class MultiAreaMap : MapBehaviour
 
         int count = Physics2D.OverlapCircleNonAlloc(Player.transform.position, UnstuckCheckRadius, unstuckHitBuffer, ObstacleQuery.ObstacleLayerMask);
         bool stuck = false;
+        var playerCollider = GetPlayerSolidCollider(Player);
         for (int i = 0; i < count; i++)
         {
-            if (!unstuckHitBuffer[i].isTrigger) { stuck = true; break; }
+            if (unstuckHitBuffer[i].isTrigger) continue;
+
+            if (playerCollider == null)
+            {
+                // No real solid collider found on the player (shouldn't happen) - fall back to the
+                // old any-overlap behavior rather than silently never rescuing.
+                stuck = true;
+                break;
+            }
+
+            var d = Physics2D.Distance(playerCollider, unstuckHitBuffer[i]);
+            if (d.isValid && d.distance < -MinStuckPenetrationDepth) { stuck = true; break; }
         }
 
         var unitController = Player.GetComponent<UnitController>();
 
         if (stuck)
         {
+            if (DebugUnstuck)
+            {
+                unstuckLogBuffer.AppendLine("[UnstuckDebug] t=" + Time.time.ToString("F3") + " frame=" + Time.frameCount +
+                    " playerPos=" + ((Vector2)Player.transform.position).ToString("F4") +
+                    " saveSpot=" + ((Vector2)unitController.saveSpot).ToString("F4") + " hitCount=" + count);
+                unstuckLogPendingLines++;
+                if (unstuckLogPendingLines >= UnstuckLogFlushThreshold) FlushUnstuckLog();
+            }
             // saveSpot is kept up to date every frame the player is confirmed NOT stuck (below),
             // so any rescue snaps back to wherever they actually just were, not an unrelated stale
             // position (e.g. from the last ChargeAttack/ShadowImpact cast, or (0,0,0) if never).

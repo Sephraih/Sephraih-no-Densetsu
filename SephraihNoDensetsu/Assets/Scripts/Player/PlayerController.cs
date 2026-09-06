@@ -33,14 +33,30 @@ public class PlayerController : UnitController
         Reset();
     }
 
-    //process movement input
+    // Actual physics-affecting movement happens here, on the fixed physics timestep, not in Update()
+    // (which runs at render framerate). Setting rb.linearVelocity once per Update() call meant it was
+    // being reasserted at a rate independent of - and out of sync with - Unity's own physics solver,
+    // which only resolves collisions once per FixedUpdate. Holding into a static wall produced a
+    // visible wobble: the solver would zero/redirect the velocity component pushing into the wall and
+    // nudge the body back out each physics step, but the next Update() (or several, at a higher
+    // framerate than the physics step) would blindly reassert full speed into the wall again before
+    // the correction ever got a chance to stick, undoing it. Setting velocity exactly once per physics
+    // step, right before it's consumed, removes that mismatch.
+    public void FixedUpdate()
+    {
+        if (!GetComponent<MovementController>().stunned)
+        {
+            GetComponent<MovementController>().Move(movementDirection, msi);
+        }
+    }
+
+    // reads movement input - the actual velocity assignment happens in FixedUpdate() above, not here,
+    // see its comment for why
     public override void Move()
     {
-        // movement based on input
         movementDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         movementDirection.Normalize();
         msi = Mathf.Clamp(movementDirection.magnitude, 0.0f, 1.0f);
-        GetComponent<MovementController>().Move(movementDirection, msi);
     }
        
 
