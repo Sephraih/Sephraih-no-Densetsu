@@ -92,6 +92,38 @@ public class Ability : MonoBehaviour
     // ability was actually aimed.
     protected const float DefaultLandingSearchRadius = 3f;
 
+    // Snap radius for the CASTER's own current position (`from`), used only to bridge the small
+    // physical gap between a real Collider2D wall and the nearest TeleportLanding-navmesh point
+    // (SpellAreaPadding/agentRadius erosion - see NavMeshObstacleSync.SpellAreaPadding) - NOT for
+    // aiming tolerance, unlike DefaultLandingSearchRadius above. Needed because
+    // `NavMesh.CalculatePath` silently fails if its start point is even slightly off-mesh rather
+    // than reliably snapping it first (see the reverted-collider-offset-correction comment below,
+    // which hit this exact failure mode) - found live when the player, now able to physically
+    // stand in that eroded gap after a collider/scale change, couldn't Teleport at all from there,
+    // even aimed back inward. 2 units, not ~0.5 (a flat wall's own padding alone would suggest) -
+    // confirmed live a player standing in an inside CORNER (two boundary segments meeting) sits up
+    // to ~1.37 units from the nearest walkable point, since both segments' padding combines there;
+    // corners are an ordinary, likely place for a player to end up hugging, not an edge case to
+    // ignore. Still bounded and small deliberately: NavMesh.SamplePosition only ever finds the
+    // nearest point within this radius, it can't bridge two genuinely disconnected navmesh islands
+    // (which sit many units apart in this project, not 2) - the real "is this actually reachable"
+    // gate stays the CalculatePath connectivity check further down, unchanged.
+    protected const float FromPositionSnapRadius = 2f;
+
+    // Snaps `from` onto the navmesh (same agent type/mask the two landing methods already use for
+    // their destination point) before it's used in a CalculatePath query - see
+    // FromPositionSnapRadius's own comment for why this is necessary rather than passing the raw
+    // position straight through. Falls back to the raw (un-snapped) point if nothing is found
+    // within radius, so behavior for a `from` that's already comfortably on-mesh (the overwhelming
+    // common case) is unchanged.
+    static Vector3 SnappedFrom(Vector2 from, int areaMask)
+    {
+        Vector3 raw = NavMesh2DUtility.ToNavMesh(from);
+        if (NavMesh.SamplePosition(raw, out var hit, FromPositionSnapRadius, LandingFilter(areaMask)))
+            return hit.position;
+        return raw;
+    }
+
     // Finds the nearest point ON the navmesh to `point`, within `searchRadius` - purely spatial,
     // makes no attempt to verify that point is actually reachable (connected by a walkable route)
     // from anywhere else. This is deliberately how a "caster teleport" should behave: it can
@@ -127,14 +159,15 @@ public class Ability : MonoBehaviour
         // mask. That asymmetry is what makes the two-check comparison meaningful: only reject when
         // removing Spell Boundary specifically from the mask is what breaks an otherwise-complete
         // route.
+        Vector3 fromNavMesh = SnappedFrom(from, NavMesh.AllAreas);
         var permissivePath = new NavMeshPath();
-        bool reachableIgnoringEverything = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, LandingFilter(NavMesh.AllAreas), permissivePath)
+        bool reachableIgnoringEverything = NavMesh.CalculatePath(fromNavMesh, hit.position, LandingFilter(NavMesh.AllAreas), permissivePath)
             && permissivePath.status == NavMeshPathStatus.PathComplete;
 
         if (reachableIgnoringEverything)
         {
             var restrictedPath = new NavMeshPath();
-            bool reachableRespectingSpellBoundary = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, LandingFilter(TeleportConnectivityMask), restrictedPath)
+            bool reachableRespectingSpellBoundary = NavMesh.CalculatePath(fromNavMesh, hit.position, LandingFilter(TeleportConnectivityMask), restrictedPath)
                 && restrictedPath.status == NavMeshPathStatus.PathComplete;
             if (!reachableRespectingSpellBoundary)
                 return false; // reachable with Spell Boundary treated as passable, not without it - that IS the blocker
@@ -163,7 +196,7 @@ public class Ability : MonoBehaviour
             return false;
 
         var path = new NavMeshPath();
-        bool ok = NavMesh.CalculatePath(NavMesh2DUtility.ToNavMesh(from), hit.position, LandingFilter(WalkableAreaMask), path);
+        bool ok = NavMesh.CalculatePath(SnappedFrom(from, WalkableAreaMask), hit.position, LandingFilter(WalkableAreaMask), path);
         if (!ok || path.status != NavMeshPathStatus.PathComplete)
             return false;
 
@@ -187,6 +220,16 @@ public class Ability : MonoBehaviour
     // If revisited, any offset correction needs to guarantee the corrected origin still resolves
     // within a tight SamplePosition radius of real navmesh - e.g. clamping the correction's magnitude
     // to something safely under the erosion radius, not applying the collider's raw offset in full.
+    //
+    // Update, later session: the "riding on CalculatePath's own internal snap-to-mesh tolerance"
+    // reliance this paragraph warns about eventually failed on its own, unprompted by any offset
+    // correction - a later collider/scale change let the player physically stand in the (still-real,
+    // just smaller) eroded gap outside the navmesh, and Teleport stopped firing from there entirely.
+    // Fixed properly via SnappedFrom() above: `from` is now explicitly SamplePosition-snapped before
+    // every CalculatePath call, rather than trusting CalculatePath's own undocumented tolerance. This
+    // doesn't change the conclusion above (an offset correction can still push the ORIGIN further
+    // than SnappedFrom's own bounded radius can rescue), but it does mean a small residual gap at
+    // `from` is no longer a silent failure mode - see FromPositionSnapRadius's own comment.
 
     // Agent type used ONLY by the two landing queries above (Teleport/ShadowImpact) - a much
     // smaller agentRadius than EnemyController's NavMeshAgent pathing bake (see MultiAreaMap's

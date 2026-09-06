@@ -48,7 +48,18 @@ public static class NavMeshObstacleSync
     // reproducing the exact same "Teleport lands inside the tree" symptom even after the floor-gap
     // fix landed, just shrunk from the whole tree down to this ring. See Sync()'s own call site below
     // for the full reasoning on the value itself.
-    const float SpellAreaPadding = 0.7f;
+    // Lowered 0.7 -> 0.35 after the player's real (non-trigger) BoxCollider2D shrank to a
+    // 0.3135-unit half-diagonal (P1.transform.localScale=0.75, applied for the Pixel Perfect
+    // Camera/assetsPPU pass) - 0.7 was tuned for a since-shrunk collider and left a real,
+    // player-walkable dead zone along every Boundary/SpellBarrier-tier wall with no
+    // TeleportLanding-navmesh at all (confirmed live: player able to stand just outside the
+    // eroded edge, Teleport refusing to fire from there even when aimed back inward - see
+    // Ability.cs's snapped-`from` fix alongside this one). 0.35 keeps the same "just above the
+    // real half-diagonal" margin the original 0.45 (pre-scale-down) value used, just rebased to
+    // the current collider size - re-tune together with the player's collider/scale if either
+    // changes again, not independently. Requires a re-Sync + re-bake (Tools/Sephraih/Sync NavMesh
+    // Obstacle Proxies, then Bake for any CityMap-style scene) to take effect on existing maps.
+    const float SpellAreaPadding = 0.35f;
     // Floor-gap-only minimum padding for BlocksSpell=false interior obstacles (every current tree) -
     // see GenerateFloor()'s use of this for the full story. Zero padding there (matching the
     // obstacle's own genuinely-unpadded NavMeshModifier proxy 1:1) gave wall-quality landings for two
@@ -710,14 +721,69 @@ public static class NavMeshObstacleSync
         // MultiAreaMap.RebuildNavMesh() at runtime - see project_navmesh_2d_gotchas bug #16); doing
         // it here removes that fragility for BOTH surfaces at once instead of adding a second manual
         // step on top of the first.
+        //
+        // Bug found and fixed in this same pass: `surface.BuildNavMesh()` alone only ever produces an
+        // in-memory NavMeshData object (confirmed live: AssetDatabase.GetAssetPath(surface.navMeshData)
+        // came back empty right after this loop ran) - it does NOT persist to the asset file the
+        // Inspector's own "Bake" button would create/update, and silently ORPHANS whatever real,
+        // on-disk NavMeshData asset the surface used to point at (confirmed live on MainCity: a
+        // pre-existing "NavMesh-NavMeshGround.asset" was left on disk but no longer referenced by the
+        // live component after this loop ran). Harmless for DungeonMap/FieldMap scenes, which rebake
+        // fresh every area entry anyway (see MultiAreaMap.RebuildNavMesh) - but exactly the failure
+        // project_navmesh_2d_gotchas bug #16 already documented for CityMap scenes (no runtime
+        // rebake), meaning every Sync() run since this auto-bake step was added had been silently
+        // NOT persisting MainCity's bake, regardless of this comment block's original (incorrect)
+        // claim that it did. PersistNavMeshData below replicates what the Inspector's Bake button
+        // does: reuse the existing asset file by GUID if the surface was already pointing at one
+        // (via CopySerialized, so every existing reference to that asset/GUID stays valid), or create
+        // a new one at the same "<SceneFolder>/<SceneName>/NavMesh-<SurfaceName>.asset" path Unity's
+        // own Inspector bake uses, if this surface has never been persisted before.
         var surfaces = Object.FindObjectsByType<NavMeshSurface>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var surface in surfaces)
         {
             if (surface == null) continue;
+            string priorPath = surface.navMeshData != null ? AssetDatabase.GetAssetPath(surface.navMeshData) : null;
             surface.BuildNavMesh();
+            PersistNavMeshData(surface, priorPath);
             EditorUtility.SetDirty(surface);
         }
         NavMesh2DUtility.InvalidateCache();
         Debug.Log("[NavMeshObstacleSync] Baked " + surfaces.Length + " NavMeshSurface(s).");
+    }
+
+    // Writes `surface.navMeshData` (freshly built, in-memory-only at this point) to a real project
+    // asset, then repoints `surface.navMeshData` at the persisted object - see the Sync() bake loop's
+    // own comment above for why this is necessary. `priorPath` is the asset path the surface's
+    // NavMeshData pointed at BEFORE this bake (captured before BuildNavMesh() replaces the reference) -
+    // reusing that exact path keeps the same GUID/file alive across repeated bakes instead of
+    // accumulating a new orphaned asset every Sync() run.
+    static void PersistNavMeshData(NavMeshSurface surface, string priorPath)
+    {
+        var freshData = surface.navMeshData;
+        if (freshData == null) return;
+
+        if (!string.IsNullOrEmpty(priorPath))
+        {
+            var existing = AssetDatabase.LoadAssetAtPath<NavMeshData>(priorPath);
+            if (existing != null)
+            {
+                EditorUtility.CopySerialized(freshData, existing);
+                surface.navMeshData = existing;
+                EditorUtility.SetDirty(existing);
+                return;
+            }
+        }
+
+        // First-ever bake for this surface (or its old asset went missing) - create a new one at the
+        // same path/naming convention the Inspector's own Bake button uses.
+        var scenePath = surface.gameObject.scene.path;
+        string sceneDir = System.IO.Path.GetDirectoryName(scenePath).Replace('\\', '/');
+        string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+        string folder = sceneDir + "/" + sceneName;
+        if (!AssetDatabase.IsValidFolder(folder))
+            AssetDatabase.CreateFolder(sceneDir, sceneName);
+        string assetPath = AssetDatabase.GenerateUniqueAssetPath(folder + "/NavMesh-" + surface.gameObject.name + ".asset");
+        AssetDatabase.CreateAsset(freshData, assetPath);
+        Debug.Log("[NavMeshObstacleSync] Created new NavMeshData asset: " + assetPath);
     }
 }

@@ -67,6 +67,27 @@ public abstract class MultiAreaMap : MapBehaviour
             foreach (var lb in root.GetComponentsInChildren<LevelBehaviour>(true))
                 if (lb.gameObject != area) lb.gameObject.SetActive(false);
 
+        // Every NavMeshAgent under this (still-inactive) area is disabled BEFORE SetActive(true),
+        // so its own OnEnable - which fires synchronously as part of SetActive, long before
+        // RebuildNavMesh() below ever runs - can't try to place itself onto whatever navmesh
+        // happens to still be baked from a PREVIOUS area. Confirmed live: this area's real geometry
+        // isn't in the navmesh yet at that point, and this project's areas deliberately sit far
+        // apart in world space (see project_navmesh_2d_gotchas memory, bug #13's update - Dungeon's
+        // Level2/3 moved to (1000,0,0)/(2000,0,0) specifically so they can't overlap), so every
+        // single agent failed with "not close enough to the NavMesh" - not a pathing bug, but real
+        // console spam once this got exercised via Field/Dungeon multi-zone use. Re-enabling each
+        // one (below) only after RebuildNavMesh() has produced fresh, area-correct geometry lets
+        // each agent's own OnEnable placement succeed normally. Agents already disabled for other
+        // reasons (e.g. a dead enemy) are left alone - only ones we ourselves just disabled get
+        // re-enabled.
+        var agentsToReEnable = new System.Collections.Generic.List<UnityEngine.AI.NavMeshAgent>();
+        foreach (var agent in area.GetComponentsInChildren<UnityEngine.AI.NavMeshAgent>(true))
+        {
+            if (!agent.enabled) continue;
+            agent.enabled = false;
+            agentsToReEnable.Add(agent);
+        }
+
         area.SetActive(true);
         activeAreaObject = area;
 
@@ -88,6 +109,11 @@ public abstract class MultiAreaMap : MapBehaviour
                 cc.GenerateGeometry();
 
         RebuildNavMesh();
+
+        // Now that the navmesh actually reflects this area, it's safe to let each agent's own
+        // OnEnable placement run for real - see the disabling loop earlier in this method.
+        foreach (var agent in agentsToReEnable)
+            agent.enabled = true;
     }
 
     // Physics-overlap check against the real (non-trigger) colliders on the Obstacles/Boundaries

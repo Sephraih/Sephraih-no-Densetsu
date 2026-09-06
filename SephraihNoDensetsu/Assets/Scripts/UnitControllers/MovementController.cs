@@ -332,7 +332,7 @@ public class MovementController : MonoBehaviour
         bool alreadyAttacking = animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack");
 
         string direction = GetFacingDirectionName();
-        string stateName = actionPrefix + direction; // base attack, always assumed to exist
+        string stateName = actionPrefix + direction; // base attack, assumed to exist below
 
         int variantNum = variantSuffix == "" ? 0 : int.Parse(variantSuffix);
         for (int v = variantNum; v >= 2; v--)
@@ -344,6 +344,15 @@ public class MovementController : MonoBehaviour
                 break;
             }
         }
+
+        // Not every character actually has ANY attack states (e.g. Mob's "Jätter" controller -
+        // its attack is a particle effect only, no swing pose) - the variant-fallback loop above
+        // only ever confirms a variant beyond the base, so a controller missing the base state
+        // entirely still reached animator.Play() unconditionally and logged a real
+        // "GotoState: State could not be found" warning every single attack. Bail out silently
+        // instead - same as "this character has no distinct attack animation," which is already
+        // true for any such character regardless of this check.
+        if (!animator.HasState(0, Animator.StringToHash(stateName))) return;
 
         float startTime = (alreadyAttacking && !repeatFromStartStates.Contains(stateName)) ? repeatAttackStartFraction : 0f;
         animator.Play(stateName, 0, startTime);
