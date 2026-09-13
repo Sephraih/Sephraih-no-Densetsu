@@ -88,6 +88,20 @@ public class EnemyController : UnitController
     private float lostSightTimer;
     private const float LostSightDelay = 3f;
 
+    // Set (to AggroGraceDuration) by HandleDamaged whenever a hit lands - protects a freshly-
+    // aggroed target from being immediately un-acquired by the very next Update() if the attacker
+    // happens to be outside the bot's own maxChaseDistance (e.g. hit by a long-range spell from
+    // beyond it). Without this, HandleDamaged's state=Chase/target=attacker was reverted within the
+    // same frame: FindNearestEnemy(isAcquiring: state != BotState.Chase) reads isAcquiring=false
+    // once state is Chase, which scans with maxChaseDistance instead of visionRange - a hit from
+    // beyond that radius made the very next re-scan find nothing, nulling `target`, which
+    // UpdateState()'s own target==null branch then read as "lost the target entirely" and flipped
+    // straight back to Return, all in one frame. Confirmed live as the actual mechanism behind "hit
+    // a mob with a max-range fireball, it briefly flickers to Chase then goes right back to
+    // Return, never actually closes the distance."
+    private float aggroGraceTimer;
+    private const float AggroGraceDuration = 3f;
+
     private NavMeshAgent agent;
     private float repathTimer;
     private Vector3 lastPathTargetPos;
@@ -110,6 +124,7 @@ public class EnemyController : UnitController
     {
         base.Awake();
         GetComponent<HealthController>().OnDeath += HandleDeath;
+        GetComponent<HealthController>().OnDamaged += HandleDamaged;
 
         // Cascading percentage -> world-units resolution, once, before any Update() reads these -
         // see the Perception fields' own doc comments for why each tier multiplies against the
@@ -157,6 +172,27 @@ public class EnemyController : UnitController
             // around them. Exclude it explicitly here so the flag actually does what obstacle
             // authoring assumes it does.
             agent.areaMask &= ~(1 << NavMesh.GetAreaFromName("Not Walkable"));
+            // "Spell Boundary" (boundary-tier obstacles, Obstacle.BlocksSpell) was missing from this
+            // exclusion entirely - found live via direct triangulation after a wizard got physically
+            // wedged against a boundary wall while pathing home: the triangle right at the stuck
+            // position was tagged area="Spell Boundary", not "Not Walkable"/"Walkable". This area is
+            // DELIBERATELY not hole-carved like "Not Walkable" is (see Ability.cs/
+            // project_teleport_wall_landing.md - the whole point is letting Teleport reach a sealed
+            // pocket behind an ordinary wall), so it keeps real, fully-connected, walkable-looking
+            // geometry unless a query's areaMask specifically excludes it. Ability.cs's own
+            // WalkableAreaMask (used by Teleport/ShadowImpact/BumpAttack's landing checks) already
+            // excludes both "Not Walkable" and "Spell Boundary" - this NavMeshAgent mask was never
+            // updated to match when "Spell Boundary" was introduced, so ordinary GetPathDirection
+            // pathing has been treating every boundary-tier wall as perfectly normal floor ever
+            // since: an agent could compute a "valid" path straight through/along a boundary wall's
+            // real (never-carved) navmesh triangles, then get physically stopped dead by the wall's
+            // very real Collider2D - reading as a stuck/wedged unit near any boundary wall its path
+            // happened to route close to, not something specific to one corner. Deliberately does
+            // NOT also exclude "Spell Barrier" - that tier is movement-permeable (BlocksMovement=
+            // false, a real trigger collider), so ordinary walking should see straight through it,
+            // matching WalkableAreaMask's own exclusion set exactly (not TeleportConnectivityMask's
+            // wider one, which excludes both spell areas for a different purpose - see Ability.cs).
+            agent.areaMask &= ~(1 << NavMesh.GetAreaFromName("Spell Boundary"));
         }
     }
 
@@ -172,6 +208,44 @@ public class EnemyController : UnitController
         // SetActive(true) again - not implemented yet. A respawn should reset `state`/`target`
         // and reposition to this unit's spawn/guard spot first, since both are frozen at wherever
         // it died.
+    }
+
+    // Subscribed to HealthController.OnDamaged in Awake() - fires on every hit that actually
+    // applies (not e.g. a hit on an already-dead unit). Being hit is its own unconditional alert:
+    // unlike ordinary acquisition (CanSense/HasLineOfSight, gated by the vision cone), a mob
+    // getting attacked from behind/off-screen/out of range should still immediately know exactly
+    // who's attacking and go after them - real damage landing is a much stronger signal than
+    // merely coming into view. Deliberately bypasses CanSense/HasLineOfSight entirely rather than
+    // routing through the normal acquisition path.
+    private void HandleDamaged(Transform attacker)
+    {
+        if (attacker == null || attacker == transform) return; // no valid attacker to chase (e.g. environmental damage)
+        var status = attacker.GetComponent<StatusController>();
+        if (status == null || status.teamID == teamID) return; // ignore friendly-fire/self-inflicted sources
+
+        target = attacker;
+        state = BotState.Chase;
+        lostSightTimer = LostSightDelay;
+        aggroGraceTimer = AggroGraceDuration;
+        AlertNearby();
+    }
+
+    // Every subclass's own Update() should call this INSTEAD of calling FindNearestEnemy and
+    // assigning `target` directly - it's the same lookup, just with the aggro-grace-timer
+    // protection HandleDamaged relies on layered in front of it. While the grace timer is still
+    // running and the current target is still a valid, active Transform, the target is left alone
+    // rather than handed to FindNearestEnemy's own (isAcquiring-dependent, range-limited) scan -
+    // see aggroGraceTimer's own doc comment for exactly which same-frame bug this prevents. Once
+    // the timer runs out (or the target goes away on its own - death, deactivation), acquisition
+    // reverts to the ordinary FindNearestEnemy scan, unchanged from before this existed.
+    protected void AcquireTarget()
+    {
+        if (aggroGraceTimer > 0f)
+        {
+            aggroGraceTimer -= Time.deltaTime;
+            if (target != null && target.gameObject.activeInHierarchy) return;
+        }
+        target = FindNearestEnemy(isAcquiring: state != BotState.Chase);
     }
 
     // Local physics scan for the nearest hostile-team unit within range, replacing the old
@@ -239,7 +313,7 @@ public class EnemyController : UnitController
 
     // Transitions between Idle / Chase / Return. Call once per Update before Move/Attack.
     //
-    // Deliberately asymmetric: ACQUIRING a target (Idle -> Chase) is gated by the full
+    // Deliberately asymmetric: ACQUIRING a target (Idle/Return -> Chase) is gated by the full
     // vision-cone/awareness/detection tiers (CanSense) plus line of sight - that's what "field of
     // view" means for noticing something. SUSTAINING an already-active chase is NOT re-gated by
     // the cone at all - only two things end a chase in progress: exceeding maxChaseDistance, or
@@ -247,6 +321,21 @@ public class EnemyController : UnitController
     // LostSightDelay seconds. A target that circles behind the bot mid-fight, or briefly ducks
     // past a corner, must not cause Return on its own - it's still "in the fight," just not
     // currently in the cone/visible, and the timer exists precisely to tolerate that.
+    //
+    // Idle and Return share the SAME re-acquisition branch (not two separate ones) - a mob heading
+    // home should notice the player again exactly as readily as one standing still, not be
+    // deliberately deaf until it physically arrives. Confirmed live as a real gap: a mob walking
+    // back to its spawn/guard spot ignored the player re-entering range entirely, only ever
+    // resuming the chase after fully arriving and settling into Idle first (state==Return hit
+    // neither branch below, so nothing ever re-checked target while it was set). Since
+    // FindNearestEnemy(isAcquiring: state != BotState.Chase) already re-scans with the full
+    // CanSense/line-of-sight filtering during Return too (every subclass's own Update() already
+    // passes isAcquiring=true whenever not actively chasing), `target` was already being correctly
+    // re-acquired the whole way home - this method just never acted on it. Also doubles as the
+    // hook a future "passive" mob (only chases once actually attacked) needs: whatever gates
+    // acquisition for Idle naturally gates re-engagement during Return too, with no separate
+    // Return-specific logic to keep in sync - "free to go unless tagged on the way back" falls out
+    // of this for free once passive detection is layered onto CanSense/FindNearestEnemy itself.
     protected void UpdateState()
     {
         if (target == null || target == transform)
@@ -259,7 +348,12 @@ public class EnemyController : UnitController
 
         if (state == BotState.Chase)
         {
-            if (dist > maxChaseDistance)
+            // Skipped while aggroGraceTimer is still running - a target acquired via a hit from
+            // beyond maxChaseDistance (see HandleDamaged/AcquireTarget) needs real time to actually
+            // close that distance, not an instant Return the moment this check would otherwise
+            // fire. Ordinary Chase (acquired within normal range to begin with) is never affected,
+            // since the timer is only ever set by HandleDamaged.
+            if (dist > maxChaseDistance && aggroGraceTimer <= 0f)
             {
                 state = BotState.Return;
                 return;
@@ -276,7 +370,7 @@ public class EnemyController : UnitController
                     state = BotState.Return;
             }
         }
-        else if (state == BotState.Idle && CanSense(target.position) && HasLineOfSight(target))
+        else if ((state == BotState.Idle || state == BotState.Return) && CanSense(target.position) && HasLineOfSight(target))
         {
             lostSightTimer = LostSightDelay;
             state = BotState.Chase;
@@ -371,10 +465,32 @@ public class EnemyController : UnitController
         // stays PathPartial/PathInvalid regardless of arrival, so it alone is the reliable signal.
         pathUnreachable = agent.pathStatus != NavMeshPathStatus.PathComplete;
 
-        if (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathInvalid)
+        if (agent.pathStatus == NavMeshPathStatus.PathInvalid)
             return Vector2.zero;
 
-        Vector2 steerTarget = NavMesh2DUtility.ToGame(agent.steeringTarget);
+        // Confirmed live (see project_navmesh_2d_gotchas.md, bug #19): agent.hasPath can get
+        // permanently stuck false - with pathStatus still PathComplete and agent.path.corners fully
+        // populated with a genuinely valid, direct route (verified independently via a raw
+        // NavMesh.CalculatePath call between the same two points, which succeeded cleanly) - and no
+        // amount of repeat SetDestination/ResetPath, or even a full disable+enable+Warp cycle, ever
+        // recovers it. This wedges the bot in place forever, since needsRepath above keeps firing
+        // (hasPath false) but the recomputed path comes back in the exact same stuck state every
+        // time. The underlying path data is trustworthy even when hasPath lies, so when hasPath is
+        // false but the path is otherwise valid, steer off agent.path.corners directly instead of
+        // giving up - agent.steeringTarget itself isn't trustworthy in this state (it tracks
+        // internal path-progress bookkeeping, the same bookkeeping that's stuck), so use the raw
+        // corner just ahead of the agent's current position instead.
+        Vector2 steerTarget;
+        if (agent.hasPath)
+        {
+            steerTarget = NavMesh2DUtility.ToGame(agent.steeringTarget);
+        }
+        else
+        {
+            var corners = agent.path.corners;
+            if (corners.Length == 0) return Vector2.zero;
+            steerTarget = NavMesh2DUtility.ToGame(corners.Length > 1 ? corners[1] : corners[0]);
+        }
         Vector2 dir = steerTarget - (Vector2)transform.position;
         lastSteerDir = dir.sqrMagnitude > 0.0001f ? dir.normalized : Vector2.zero;
         return lastSteerDir;

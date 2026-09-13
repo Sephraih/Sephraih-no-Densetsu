@@ -25,7 +25,7 @@ public class WizardBehaviour : EnemyController
 
     void Update()
     {
-        target = FindNearestEnemy(isAcquiring: state != BotState.Chase);
+        AcquireTarget();
         distanceToTarget = (target != null && target != transform)
             ? Vector2.Distance(transform.position, target.position)
             : float.MaxValue;

@@ -12,11 +12,16 @@ using UnityEngine;
 // later, gameplay ranges should stay fixed at whatever this value says, not shift with the zoom.
 // FieldOfView is a baked gameplay-balance number, hand-edited here when it needs retuning.
 //
-// Starting value (9.6) derived from the camera as configured this session: orthographic,
-// orthographicSize 6, aspect ~1.777 (16:9) -> world half-width ~10.66 -> 0.9x that ~9.6. Meant as
-// a starting point for hand-tuning, not a value to treat as exact/load-bearing on its own.
+// Value (6.75) derived from the Pixel Perfect Camera setup on Main Camera (Bootstrap.unity):
+// assetsPPU 128, reference resolution 1920x1080, no crop/stretch -> world half-width
+// 1920/128/2 = 7.5 -> 0.9x that ~6.75. The camera's own serialized Camera.orthographicSize field
+// is NOT the right number to read for this - PixelPerfectCamera computes the real view size from
+// assetsPPU/refResolution at runtime (and can leave a stale/unrelated value sitting in
+// orthographicSize in Edit mode). Re-derive from THOSE two fields, not orthographicSize, if the
+// camera's pixel-perfect config changes again. Meant as a starting point for hand-tuning, not a
+// value to treat as exact/load-bearing on its own.
 [CreateAssetMenu(fileName = "RangeSettings", menuName = "Sephraih/Range Settings")]
 public class RangeSettings : ScriptableObject
 {
-    public float FieldOfView = 9.6f;
+    public float FieldOfView = 6.75f;
 }

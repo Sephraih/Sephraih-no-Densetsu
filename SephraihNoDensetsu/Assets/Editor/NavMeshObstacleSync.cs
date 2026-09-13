@@ -555,6 +555,22 @@ public static class NavMeshObstacleSync
         int spellBoundary = NavMesh.GetAreaFromName("Spell Boundary");
         int spellBarrier = NavMesh.GetAreaFromName("Spell Barrier");
 
+        // Resolved once here (not per-obstacle) for the boundary-tier dual-proxy split below - see
+        // that loop's own comment. NavMeshModifier has no per-agent-type "affectedAgents" concept in
+        // this project's package version (confirmed via reflection - com.unity.ai.navigation's
+        // NavMeshModifier/NavMeshModifierVolume expose no such field here, unlike the older
+        // NavMeshComponents this may be remembered from) - the only way to make ONE piece of source
+        // geometry produce a DIFFERENT area for two different NavMeshSurface bakes is to put each
+        // bake's version on its own dedicated Unity Layer and point only that bake's own
+        // NavMeshSurface.layerMask at it. These two layers are reserved specifically for that (see
+        // Tools/Sephraih/Sync NavMesh Obstacle Proxies' own setup) - each scene's ordinary "Humanoid"
+        // NavMeshSurface must include NavMeshBakeBoundaryHumanoid in its layerMask, and each scene's
+        // "TeleportLanding" surface must include NavMeshBakeBoundaryTeleport, ALONGSIDE the shared
+        // NavMeshBake layer both already use for everything else. -1 (layer not found) falls back to
+        // the single-shared-proxy behavior further down if either layer is ever renamed/deleted.
+        int humanoidBoundaryLayer = LayerMask.NameToLayer("NavMeshBakeBoundaryHumanoid");
+        int teleportBoundaryLayer = LayerMask.NameToLayer("NavMeshBakeBoundaryTeleport");
+
         // "Spell Boundary"/"Spell Barrier" proxies get ZERO automatic erosion clearance from
         // adjacent walkable floor - confirmed live via NavMesh.SamplePosition probes (landed exactly
         // on the tile edge, distance 0.000). Unity's agentRadius erosion only pushes the walkable
@@ -656,24 +672,85 @@ public static class NavMeshObstacleSync
             var holder = new GameObject(HolderName);
             holder.transform.SetParent(obstacle.transform, false);
 
+            // Boundary tier (BlocksMovement AND BlocksSpell) needs to be MORE restrictive than an
+            // ordinary wall, not just differently-tagged: it has to behave exactly like a wall (a
+            // real, agentRadius-eroded hole) for ordinary Humanoid pathing, while ALSO keeping its
+            // real, non-hole-carved "Spell Boundary" geometry for the TeleportLanding bake's own
+            // connectivity check to work at all (see that area's own three-way-tagging comment
+            // above - a hole there would make Teleport unable to tell "blocked by Spell Boundary"
+            // apart from "blocked by an ordinary sealed wall", silently defeating the one thing this
+            // tier exists to guarantee). One NavMeshModifier can't encode two different area outcomes
+            // for two different bakes at the same footprint - found live via bug #20
+            // (project_navmesh_2d_gotchas): a single shared "Spell Boundary" proxy, correctly
+            // excluded from EnemyController's own agent.areaMask, still only ever got
+            // SpellAreaPadding's smaller, Teleport-tuned clearance margin instead of the full
+            // agentRadius-based erosion an ordinary wall gets automatically - a real wizard was found
+            // physically wedged with effectively zero safety gap between its own collider and the
+            // navmesh edge, right at a boundary corner. Fixed by generating TWO proxies at the
+            // identical footprint instead of one, each restricted via NavMeshModifier.affectedAgents
+            // to only the bake it's meant for - every other tier (ordinary walls, spellBarrier) keeps
+            // the original single-proxy behavior, applying identically to every bake, since neither
+            // of them has this same "must differ per bake" requirement.
+            bool boundaryTier = obstacle.BlocksMovement && obstacle.BlocksSpell;
+            bool canSplitPerBake = humanoidBoundaryLayer >= 0 && teleportBoundaryLayer >= 0;
+
             foreach (var b in boxes)
             {
-                var proxy = new GameObject("proxy");
-                proxy.transform.SetParent(holder.transform, false);
-                proxy.transform.position = b.center;
-                proxy.layer = bakeLayer;
-                var box = proxy.AddComponent<BoxCollider>();
-                // BlocksSpell obstacles get padded by SpellAreaPadding on every side (see the comment
-                // above) - ordinary BlocksMovement-only obstacles don't need this, since
-                // "Not Walkable" already gets real erosion for free.
-                float pad = obstacle.BlocksSpell ? SpellAreaPadding * 2f : 0f;
-                box.size = new Vector3(Mathf.Max(b.size.x, 0.05f) + pad, Mathf.Max(b.size.y, 0.05f) + pad, ZThickness);
-                var mod = proxy.AddComponent<NavMeshModifier>();
-                mod.overrideArea = true;
-                mod.area = obstacle.BlocksSpell
-                    ? (obstacle.BlocksMovement ? spellBoundary : spellBarrier)
-                    : notWalkable;
-                totalBoxes++;
+                if (boundaryTier && canSplitPerBake)
+                {
+                    // Humanoid-only layer: unpadded, "Not Walkable" - identical treatment to an
+                    // ordinary wall, so it gets Unity's automatic agentRadius erosion for free instead
+                    // of SpellAreaPadding's smaller, Teleport-tuned margin. Only the "Humanoid"
+                    // NavMeshSurface's layerMask includes this layer, so this proxy is invisible to
+                    // the TeleportLanding bake entirely.
+                    var proxyWalk = new GameObject("proxy_walk");
+                    proxyWalk.transform.SetParent(holder.transform, false);
+                    proxyWalk.transform.position = b.center;
+                    proxyWalk.layer = humanoidBoundaryLayer;
+                    var boxWalk = proxyWalk.AddComponent<BoxCollider>();
+                    boxWalk.size = new Vector3(Mathf.Max(b.size.x, 0.05f), Mathf.Max(b.size.y, 0.05f), ZThickness);
+                    var modWalk = proxyWalk.AddComponent<NavMeshModifier>();
+                    modWalk.overrideArea = true;
+                    modWalk.area = notWalkable;
+                    totalBoxes++;
+
+                    // TeleportLanding-only layer: unchanged from before this fix - padded, "Spell
+                    // Boundary", real (non-hole-carved) geometry. Only the "TeleportLanding" surface's
+                    // layerMask includes this layer, so this proxy is invisible to the ordinary
+                    // Humanoid pathing bake entirely (no more overlap with the unpadded proxy above).
+                    var proxyTeleport = new GameObject("proxy_teleport");
+                    proxyTeleport.transform.SetParent(holder.transform, false);
+                    proxyTeleport.transform.position = b.center;
+                    proxyTeleport.layer = teleportBoundaryLayer;
+                    var boxTeleport = proxyTeleport.AddComponent<BoxCollider>();
+                    float padTeleport = SpellAreaPadding * 2f;
+                    boxTeleport.size = new Vector3(Mathf.Max(b.size.x, 0.05f) + padTeleport, Mathf.Max(b.size.y, 0.05f) + padTeleport, ZThickness);
+                    var modTeleport = proxyTeleport.AddComponent<NavMeshModifier>();
+                    modTeleport.overrideArea = true;
+                    modTeleport.area = spellBoundary;
+                    totalBoxes++;
+                }
+                else
+                {
+                    // Ordinary wall ("Not Walkable"), or spellBarrier (BlocksSpell only, movement-
+                    // permeable) - unchanged single-proxy behavior, applies identically to every bake.
+                    var proxy = new GameObject("proxy");
+                    proxy.transform.SetParent(holder.transform, false);
+                    proxy.transform.position = b.center;
+                    proxy.layer = bakeLayer;
+                    var box = proxy.AddComponent<BoxCollider>();
+                    // BlocksSpell obstacles get padded by SpellAreaPadding on every side (see the
+                    // comment above) - ordinary BlocksMovement-only obstacles don't need this, since
+                    // "Not Walkable" already gets real erosion for free.
+                    float pad = obstacle.BlocksSpell ? SpellAreaPadding * 2f : 0f;
+                    box.size = new Vector3(Mathf.Max(b.size.x, 0.05f) + pad, Mathf.Max(b.size.y, 0.05f) + pad, ZThickness);
+                    var mod = proxy.AddComponent<NavMeshModifier>();
+                    mod.overrideArea = true;
+                    mod.area = obstacle.BlocksSpell
+                        ? (obstacle.BlocksMovement ? spellBoundary : spellBarrier)
+                        : notWalkable;
+                    totalBoxes++;
+                }
             }
             processed++;
         }

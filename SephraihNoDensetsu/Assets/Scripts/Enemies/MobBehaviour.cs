@@ -14,7 +14,7 @@ public class MobBehaviour : EnemyController
     {
         if (GetComponent<MovementController>().stunned) { return; }
 
-        target = FindNearestEnemy(isAcquiring: state != BotState.Chase);
+        AcquireTarget();
         UpdateState();
         Move();
         if (state == BotState.Chase) Aim();

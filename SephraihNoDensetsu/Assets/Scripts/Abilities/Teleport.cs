@@ -5,6 +5,21 @@ public class Teleport : Ability
     public GameObject teleportEffect; // sparse world-space sparks left trailing behind as the user walks away
     public GameObject teleportOutlineEffect; // bold ring flash rigidly attached to the user
 
+    // Off by default - the player's own Teleport relies on TryFindWalkableLanding's deliberate
+    // "can land in a sealed-off pocket" behavior (see that method's own doc comment), which is fine
+    // for the player since they're never NavMeshAgent-pathed - if a landing spot happens to be
+    // disconnected from the rest of the floor, the player just explores/walks out some other way,
+    // never gets structurally "stuck." A NavMeshAgent-driven caster (WizardBehaviour's own flee-
+    // teleport, GetComponentInChildren<AbilityController>().Invoke(6, ...)) has no such fallback:
+    // GetPathDirection can never route across a genuinely disconnected pocket by definition, so a
+    // wizard landing in one after fleeing is stranded outside the reachable navmesh permanently
+    // (confirmed live: Dungeon Level3, wizard fled into an out-of-bounds sliver and never pathed
+    // back). Set true on a per-instance basis (e.g. the wizard's own Teleport component, on its
+    // Abilities child) to use TryFindReachableLanding instead - same connectivity mask ordinary
+    // NavMeshAgent pathing uses, so a landing that passes it is guaranteed reachable-back-from by
+    // construction, not just less likely to fail. Leave false for the player's own instance.
+    [SerializeField] bool requireReachableLanding = false;
+
     // Two separate effects, not one: a single system tuned to look right both as a bold "landing
     // flash" AND a sparse decaying trail fought its own settings - the flash needs to stay dense and
     // rigidly glued to the user (Local sim space), while the trail needs to be sparse and left behind
@@ -51,7 +66,10 @@ public class Teleport : Ability
         // fooled by a destination merely sitting near a wall's corner the way the old SpellBlocked
         // raycast was.
         Vector2 candidate = (Vector2)user.transform.position + (Vector2)direction * range;
-        if (TryFindWalkableLanding(user.transform.position, candidate, DefaultLandingSearchRadius, out Vector2 landing))
+        bool foundLanding = requireReachableLanding
+            ? TryFindReachableLanding(user.transform.position, candidate, DefaultLandingSearchRadius, out Vector2 landing)
+            : TryFindWalkableLanding(user.transform.position, candidate, DefaultLandingSearchRadius, out landing);
+        if (foundLanding)
         {
             if (cd <= 0f) // if ability ready to use
             {
@@ -77,7 +95,10 @@ public class Teleport : Ability
         // Single-shot - see the comment in Use() above for why there's no more SpellBlocked check
         // or shrink-until-clear loop, and for the Spell Boundary connectivity check that replaced it.
         Vector2 candidate = (Vector2)user.transform.position + direction * distance;
-        if (TryFindWalkableLanding(user.transform.position, candidate, DefaultLandingSearchRadius, out Vector2 landing))
+        bool foundLanding = requireReachableLanding
+            ? TryFindReachableLanding(user.transform.position, candidate, DefaultLandingSearchRadius, out Vector2 landing)
+            : TryFindWalkableLanding(user.transform.position, candidate, DefaultLandingSearchRadius, out landing);
+        if (foundLanding)
         {
             if (cd <= 0f) // if ability ready to use
             {

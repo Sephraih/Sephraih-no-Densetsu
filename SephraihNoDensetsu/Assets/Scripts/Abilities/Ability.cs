@@ -9,6 +9,14 @@ public class Ability : MonoBehaviour
     public float acd; // ability cd
     protected float cd = 0; //remaining cd
     public float range;
+
+    // Read-only check for "would calling Use()/UseMouse() right now actually do anything, cooldown-
+    // wise" - added so a caller can gate a SIDE EFFECT that should happen once per real cast (e.g.
+    // GoblinBehaviour firing its own attack-animation trigger) without duplicating each ability's
+    // own internal `if (cd <= 0)` gate via reflection. Doesn't account for the separate `stunned`
+    // gate in Ability.Invoke/InvokeMouse - callers already past that check (e.g. anything running
+    // inside a bot's own Update(), which already bailed out earlier if stunned) don't need it here.
+    public bool IsReady => cd <= 0f;
     
 
     
@@ -350,8 +358,23 @@ public class Ability : MonoBehaviour
         return true;
     }
 
+    // Every real ability-invocation path in the game funnels through these two methods - every
+    // enemy behaviour via AbilityController.Invoke/InvokeMouse, the player via GM.cs's own
+    // AbilityController.InvokeMouse calls, and even the slime's directly-looked-up BumpAttack via
+    // BumpAttack.Invoke (BumpAttack : Ability, so it's this same method) - gating stunned here once
+    // covers all of them, matching this project's whole point of routing every unit's abilities
+    // through one shared, generically-queryable surface rather than each caller re-implementing its
+    // own checks. Movement already refuses to move while stunned (MovementController.Move) but
+    // nothing stopped an ability from firing anyway - confirmed live as a real gap: a charged/
+    // stunned unit could still attack/cast normally, just standing still while doing it. Checked
+    // BEFORE `this.user`/`attackPos` are even reassigned and before Use()/UseMouse() runs, so a
+    // blocked attempt doesn't touch `cd` either - being stunned isn't an extra cooldown penalty on
+    // top of not being able to act, the ability is simply unavailable for the stun's duration and
+    // behaves exactly as if it was never called at all.
     public void InvokeMouse(Transform user)
     {
+        var movement = user.GetComponent<MovementController>();
+        if (movement != null && movement.stunned) return;
         this.user = user;
         this.attackPos = user.GetComponent<UnitController>().attackingDirection.transform;
         UseMouse();
@@ -359,6 +382,8 @@ public class Ability : MonoBehaviour
 
     public void Invoke(Transform user)
     {
+        var movement = user.GetComponent<MovementController>();
+        if (movement != null && movement.stunned) return;
         this.user = user;
         this.attackPos = user.GetComponent<UnitController>().attackingDirection.transform;
         Use();

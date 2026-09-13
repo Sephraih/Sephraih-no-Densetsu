@@ -20,6 +20,13 @@ public class HealthController : MonoBehaviour
     // react to this instead of polling health every frame. dmger is passed through so a death
     // handler can know who landed the killing blow.
     public event System.Action<Transform> OnDeath;
+    // Fires on every hit that actually applies (i.e. not ignored because already dead) - separate
+    // from OnDeath, which only fires on the killing blow. dmger may be null (environmental/no
+    // attacker damage) - subscribers must handle that themselves. Added so a bot can react to
+    // "something just hit me" immediately (e.g. start chasing the attacker) regardless of whether
+    // it could otherwise perceive them - being hit is its own, unconditional alert, not gated by
+    // line of sight/vision cone the way merely spotting a target is.
+    public event System.Action<Transform> OnDamaged;
     public bool isDead { get; private set; }
 
     void Start()
@@ -44,6 +51,8 @@ public class HealthController : MonoBehaviour
     public void TakeDamage(int damage, Transform dmger)
     {
         if (isDead) return; // already dead - ignore further hits (e.g. two hits landing the same frame)
+
+        OnDamaged?.Invoke(dmger);
 
         // Splurt away from the attacker rather than a random/fixed direction - the effect's own
         // Shape module is centered on local +Y (see BloodEffectPrefab), so rotate it to point +Y
