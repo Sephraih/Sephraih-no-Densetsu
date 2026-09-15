@@ -432,6 +432,61 @@ public static class NavMeshObstacleSync
             }
         }
 
+        // Second pass: pick up any OTHER connected non-wall region InteriorSeed's own flood fill
+        // never reached - a genuinely sealed room (a teleport-only vault, or a doorway not painted
+        // yet) with no walkable path back to the seed's main region. Without this, such a room got
+        // literally zero floor geometry on EITHER bake - not because Teleport was excluded, but
+        // because no floor box existed there at all for anything to sample. Confirmed live in
+        // Dungeon Level3: a fully walled TowerWall room with real brick floor art showed neither
+        // walkable nor teleportable NavMesh, direct instrumentation of this exact method showed its
+        // interior cells sitting in `visited=False` despite `IsWall=False` (open, just unreached).
+        // This project's own Teleport design explicitly wants to reach these ("a walkable pocket
+        // that's otherwise fully sealed off" - see Ability.TryFindWalkableLanding's own comment) -
+        // that only works at all if the pocket has real baked geometry to land on in the first
+        // place, which the single-seed flood fill alone can never provide for a truly disconnected
+        // region.
+        //
+        // Each extra region is included UNLESS it touches the search grid's own outer edge
+        // (xMin/xMax-1/yMin/yMax-1) - that specific signature is what distinguishes a real sealed
+        // interior room (walled on every side by this boundary's own BoundaryObstacles) from the
+        // ORIGINAL bug this flood-fill approach was built to fix (a non-rectangular boundary's
+        // phantom bounding-rect corner, e.g. a diamond's corners - genuinely outside the map, never
+        // walled on every side, so it always spills out to the search bounds' own edge instead of
+        // terminating against real wall tiles). A region entirely bounded by real walls can never
+        // touch that outer edge unless the level geometry itself is unbounded there, which would be
+        // its own separate authoring problem, not this method's concern.
+        var globalVisited = new HashSet<Vector2Int>(visited);
+        for (int gx = xMin; gx < xMax; gx++)
+        for (int gy = yMin; gy < yMax; gy++)
+        {
+            var p = new Vector2Int(gx, gy);
+            if (globalVisited.Contains(p) || IsWall(CellWorldCenter(gx, gy))) continue;
+
+            var region = new List<Vector2Int>();
+            var regionStack = new Stack<Vector2Int>();
+            bool touchesOuterEdge = false;
+            regionStack.Push(p);
+            globalVisited.Add(p);
+            while (regionStack.Count > 0)
+            {
+                var c = regionStack.Pop();
+                region.Add(c);
+                if (c.x == xMin || c.x == xMax - 1 || c.y == yMin || c.y == yMax - 1)
+                    touchesOuterEdge = true;
+                foreach (var d in new[] { new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(0, -1) })
+                {
+                    var n = c + d;
+                    if (n.x < xMin || n.x >= xMax || n.y < yMin || n.y >= yMax) continue;
+                    if (globalVisited.Contains(n) || IsWall(CellWorldCenter(n.x, n.y))) continue;
+                    globalVisited.Add(n);
+                    regionStack.Push(n);
+                }
+            }
+
+            if (!touchesOuterEdge)
+                foreach (var c in region) visited.Add(c);
+        }
+
         // Merge each row's cells into contiguous horizontal runs - one box per run instead of one
         // per cell, keeping box count proportional to the boundary's silhouette complexity (a
         // handful of runs per row) rather than its full interior cell count (thousands for a large
@@ -692,6 +747,23 @@ public static class NavMeshObstacleSync
             // the original single-proxy behavior, applying identically to every bake, since neither
             // of them has this same "must differ per bake" requirement.
             bool boundaryTier = obstacle.BlocksMovement && obstacle.BlocksSpell;
+            // "Walk-only" tiers (high wall / high / low - BlocksMovement=true, BlocksSpell=false):
+            // should carve a real hole for ordinary ground pathing but stay entirely invisible to the
+            // TeleportLanding bake, the same way `boundary` already keeps its Teleport-side geometry
+            // real/non-hole - the whole point of NOT setting BlocksSpell on these tiers is that spells
+            // and Teleport should pass through them, unlike `boundary`. Before this branch existed,
+            // every walk-only obstacle used the single shared `bakeLayer` for its "Not Walkable" proxy
+            // - and BOTH NavMeshSurfaces must include `bakeLayer` in their layerMask regardless (it's
+            // also where the walkable floor itself lives), so that "hole" was silently visible to the
+            // TeleportLanding bake too. Harmless for a wall with open floor on both sides, but for a
+            // fully enclosed high/low-wall room it split the interior away from the rest of the floor
+            // as a disconnected island - and unlike a genuinely sealed `boundary` vault, there was
+            // never a surviving non-hole "Spell Boundary"-style proxy to let Teleport reach it, so the
+            // interior became silently unreachable by Teleport with no working landing path at all.
+            // Confirmed live: an enclosed `DungeonWall1Obstacle`/`TowerWallObstacle` ("high wall" tier)
+            // room's interior failed every TryFindWalkableLanding probe until this proxy moved off the
+            // shared layer.
+            bool walkOnlyTier = obstacle.BlocksMovement && !obstacle.BlocksSpell;
             bool canSplitPerBake = humanoidBoundaryLayer >= 0 && teleportBoundaryLayer >= 0;
 
             foreach (var b in boxes)
@@ -730,10 +802,31 @@ public static class NavMeshObstacleSync
                     modTeleport.area = spellBoundary;
                     totalBoxes++;
                 }
+                else if (walkOnlyTier && canSplitPerBake)
+                {
+                    // Single proxy, Humanoid-bake-only layer, unpadded "Not Walkable" - identical
+                    // treatment to an ordinary wall, just never placed on the shared `bakeLayer` so the
+                    // TeleportLanding surface (which must include `bakeLayer` for the floor's sake)
+                    // never sees it and never carves a hole here. No Teleport-side counterpart proxy at
+                    // all - unlike `boundary`, this tier has no "block spells but stay real geometry"
+                    // semantics to preserve, so Teleport should see nothing here whatsoever.
+                    var proxyWalk = new GameObject("proxy_walk");
+                    proxyWalk.transform.SetParent(holder.transform, false);
+                    proxyWalk.transform.position = b.center;
+                    proxyWalk.layer = humanoidBoundaryLayer;
+                    var boxWalk = proxyWalk.AddComponent<BoxCollider>();
+                    boxWalk.size = new Vector3(Mathf.Max(b.size.x, 0.05f), Mathf.Max(b.size.y, 0.05f), ZThickness);
+                    var modWalk = proxyWalk.AddComponent<NavMeshModifier>();
+                    modWalk.overrideArea = true;
+                    modWalk.area = notWalkable;
+                    totalBoxes++;
+                }
                 else
                 {
-                    // Ordinary wall ("Not Walkable"), or spellBarrier (BlocksSpell only, movement-
-                    // permeable) - unchanged single-proxy behavior, applies identically to every bake.
+                    // spellBarrier (BlocksSpell only, movement-permeable), or a walk-only obstacle when
+                    // the two boundary-split layers aren't available (fallback to the old shared-layer
+                    // behavior rather than silently generating no proxy at all) - unchanged single-
+                    // proxy behavior, applies identically to every bake.
                     var proxy = new GameObject("proxy");
                     proxy.transform.SetParent(holder.transform, false);
                     proxy.transform.position = b.center;

@@ -42,38 +42,18 @@ public class PortalBehaviour : MonoBehaviour
     }
 #endif
 
-    // Without this, Use() fired on every single FixedUpdate the player's collider overlapped the
-    // portal's radius - harmless while just walking past, but a real bug the moment a level's own
-    // entry spawn point lands within that same radius (common: entries are usually placed near a
-    // portal). Arriving there left the player still "inside" a portal trigger the very next fixed
-    // frame, immediately re-firing Use() and chaining into another transition before the player
-    // could move away - surfacing as an apparently random extra teleport right after entering a
-    // level. Now Use() only fires once per approach; armed again after the player fully leaves the
-    // radius.
-    private bool triggered = false;
-
-    private void FixedUpdate()
+    // Reacts to this GameObject's own Collider2D (must be isTrigger=true) instead of polling a
+    // hardcoded radius around transform.position - lets a portal's trigger area be authored as
+    // whatever shape/size actually fits the level (a big BoxCollider2D over a painted portal-tile
+    // floor, a PolygonCollider2D for an irregular one, etc) rather than always being a fixed 0.3-unit
+    // circle regardless of how the portal actually looks. Unity's own Enter/Exit pairing replaces
+    // the old manual `triggered` bool for free - Use() fires once on entry, and naturally re-arms
+    // only once the player's collider actually leaves, with no risk of re-firing on every FixedUpdate
+    // tick the way the old per-frame OverlapCircleAll poll did.
+    private void OnTriggerEnter2D(Collider2D other)
     {
-
-        Collider2D[] overlapColliders = Physics2D.OverlapCircleAll(transform.position, 0.3f); //a circle located at the portal's position scanning for any colliders overlapped
-
-        bool playerInRange = false;
-        foreach (Collider2D collider in overlapColliders)
-            if (collider.isTrigger && collider.CompareTag("Player")) // all enemy colliders, each character has 2 colliders, only the trigger collider is used
-            {
-                playerInRange = true;
-                break;
-            }
-
-        if (playerInRange && !triggered)
-        {
-            triggered = true;
+        if (other.isTrigger && other.CompareTag("Player")) // the player's own trigger collider, not its solid one
             Use();
-        }
-        else if (!playerInRange)
-        {
-            triggered = false;
-        }
     }
 
     void Use()
