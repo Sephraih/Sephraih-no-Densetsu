@@ -27,6 +27,48 @@ public class GoblinBehaviour : EnemyController
     [SerializeField] RuntimeAnimatorController downController;
     [SerializeField] RuntimeAnimatorController upController;
 
+    // Which of the Down-bucket (the "down" controller's own facing, SE by this project's convention)
+    // actions need SetFacing's flip-sign INVERTED relative to the Up-bucket's own plain rule
+    // (flipX = dir.x < 0). This is a per-CHARACTER trait, not a universal constant - it depends
+    // entirely on which physical direction each action's own source art happens to face, which
+    // varies per sprite sheet/artist and isn't guaranteed to agree between actions on the SAME
+    // character, let alone between different characters reusing this same script.
+    //
+    // Confirmed live, twice, that this genuinely varies: Goblin's own art (this struct's default
+    // values below) needs Idle AND Walk inverted but Attack not. Gobking - despite reusing this
+    // exact same script/formula - needed a DIFFERENT combination (Idle inverted, Walk NOT), because
+    // its Walk-Down sheet happens to be drawn facing the opposite physical direction from its own
+    // Idle-Down sheet - a real inconsistency between those two specific sheets' own art, not a
+    // formula bug. Set this explicitly per new character based on a live playtest; don't assume
+    // Goblin's own defaults carry over just because the script does.
+    //
+    // A character whose source art is drawn with BOTH buckets consistently facing the SAME physical
+    // direction for every action (e.g. every sheet, every action, always drawn facing screen-right)
+    // needs all three flags OFF - flipX alone already handles every case symmetrically in that case,
+    // no per-action exception needed at all. That's the recommended convention for any future
+    // character built with this script, specifically to avoid this exact class of bug recurring -
+    // if adopted, just leave every flag false rather than copying Goblin's true/true/false.
+    [System.Serializable]
+    public struct DownBucketInvert
+    {
+        public bool idle;
+        public bool walk;
+        public bool attack;
+    }
+    [SerializeField] DownBucketInvert downInvert = new DownBucketInvert { idle = true, walk = true, attack = false };
+
+    // How close counts as "melee range" - was a bare hardcoded `1.0f` literal (duplicated in both
+    // Move() and Attack() below) until Gobking's own bigger Transform.localScale (1.2, vs Goblin's
+    // 0.75) exposed it as a real problem: Collider2D size/offset and NavMeshAgent.radius both scale
+    // automatically with the Transform, but a plain float distance comparison in code does NOT - a
+    // bigger character's own real physical footprint (collider + NavMesh clearance) grows while this
+    // stayed fixed, so Move() kept trying to close the gap to the SAME absolute 1.0 units it always
+    // did, but the two characters' now-larger colliders physically shoved them apart before that
+    // distance was reachable - reading as "he tries to ram the player, never quite gets close enough
+    // to actually attack." Serialized so each character can scale this proportionally to their own
+    // Transform.localScale rather than sharing Goblin's original tuning unconditionally.
+    [SerializeField] float meleeRange = 1.0f;
+
     // null until the first SetFacing call - deliberately not initialized to a real bool so the
     // very first call always applies its controller, even if dir.y happens to make "facingUp"
     // evaluate the same as the field's default would have.
@@ -46,18 +88,13 @@ public class GoblinBehaviour : EnemyController
     // holds its last direction while idle, matching how the rest of this project's directional
     // sprites already behave.
     //
-    // The flipX sign is NOT the same for every row - confirmed live (user report: "south walks
-    // seem inversed, SE walks SW and vice versa") and verified directly against the source art
-    // afterward. Walk/Idle's two rows face OPPOSITE natural sides: row0 (Up, NE) is drawn facing
-    // right, but row1 (Down, SW) is drawn facing LEFT - so Down needs the flip sign inverted
-    // relative to Up, not the same rule reused. Attack's two rows, by contrast, BOTH face right
-    // (confirmed the same way) - Attack's Down row (SE, not SW - its row order is inverted, see
-    // GoblinBehaviour's class comment) needs the ordinary, non-inverted rule, same as Up. So the
-    // correct sign for "Down" depends on which ACTION is currently showing, not just which row -
-    // read back live from the Animator's current state rather than threaded through as a
-    // parameter, since Move() keeps re-calling SetFacing every single frame the melee-range branch
-    // is active, including every frame of an in-progress attack swing - a one-shot override passed
-    // in only from Attack() would get silently clobbered by Move()'s very next call.
+    // The flipX sign is NOT the same for every row, and not even the same for every ACTION within
+    // the Down bucket - see downInvert's own comment for why this is a per-character, per-action
+    // config rather than a hardcoded formula. Read back live from the Animator's current state
+    // rather than threaded through as a parameter, since Move() keeps re-calling SetFacing every
+    // single frame the melee-range branch is active, including every frame of an in-progress attack
+    // swing or walk cycle - a one-shot override passed in only from Attack() would get silently
+    // clobbered by Move()'s very next call.
     public void SetFacing(Vector2 dir)
     {
         if (dir.sqrMagnitude < 0.0001f) return;
@@ -69,8 +106,11 @@ public class GoblinBehaviour : EnemyController
             animator.runtimeAnimatorController = wantsUp ? upController : downController;
         }
 
-        bool isAttacking = animator.GetCurrentAnimatorStateInfo(0).IsName("Attack");
-        bool invert = !wantsUp && !isAttacking;
+        var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        bool needsInvert = stateInfo.IsName("Attack") ? downInvert.attack
+            : stateInfo.IsName("Walk") ? downInvert.walk
+            : downInvert.idle;
+        bool invert = !wantsUp && needsInvert;
         spriteRenderer.flipX = invert ? (dir.x > 0f) : (dir.x < 0f);
     }
 
@@ -92,7 +132,7 @@ public class GoblinBehaviour : EnemyController
         {
             case BotState.Chase:
                 float dist = Vector2.Distance(transform.position, target.position);
-                if (dist < 1.0f)
+                if (dist < meleeRange)
                 {
                     movementDirection = Vector2.zero;
                     SetFacing((Vector2)(target.position - transform.position));
@@ -127,7 +167,7 @@ public class GoblinBehaviour : EnemyController
     public override void Attack()
     {
         if (state != BotState.Chase || target == null || target == transform) return;
-        if (Vector2.Distance(transform.position, target.position) < 1.0f)
+        if (Vector2.Distance(transform.position, target.position) < meleeRange)
         {
             // BasicAttack.Use()'s own PlayDirectionalAttack("Attack") call resolves a CARDINAL
             // state name (AttackUp/Down/Left/Right, from GetFacingDirectionName's moveX/moveY

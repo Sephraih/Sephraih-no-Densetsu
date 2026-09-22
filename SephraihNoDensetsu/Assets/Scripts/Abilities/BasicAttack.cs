@@ -17,8 +17,15 @@ public class BasicAttack : Ability
     // fall back to the old look instead of attacking silently.
     public bool useParticleSlashEffect = false;
 
-    private float attackRangeX = 2.5f;
-    private float attackRangeY = 1.5f;
+    // Size of the OverlapBoxAll hit-detection box below - was private (shared, identical value for
+    // every character regardless of size) until Gobking's bigger Transform.localScale exposed the
+    // need for this to scale per-character too: Collider2D/NavMeshAgent both have their own separate
+    // scale-awareness stories (see GoblinBehaviour.meleeRange's own comment), but this box has NONE
+    // at all - it's a flat world-space size with no connection to the user's Transform.localScale
+    // whatsoever. Serialized so a bigger (or smaller) character's own BasicAttack instance can be
+    // tuned to match their own actual reach instead of silently sharing this default forever.
+    [SerializeField] float attackRangeX = 2.5f;
+    [SerializeField] float attackRangeY = 1.5f;
 
     private GameObject slashEffect;
 
@@ -42,8 +49,19 @@ public class BasicAttack : Ability
     {
         Use();
     }
+
+    // Cursor-aimed variant: Use() (called directly by AI callers, and by this project's other player-
+    // input paths) keeps attacking in whatever direction the character is already facing/moving -
+    // unchanged. This, the actual mouse-triggered path (reached via AbilityController.InvokeMouse ->
+    // Ability.InvokeMouse -> this), instead faces/aims toward wherever the cursor currently is.
+    // LookAt() already updates BOTH the Animator's moveX/moveY (so PlayDirectionalAttack resolves the
+    // correct directional clip - Up/Down/Left/Right) AND attackPos (the OverlapBoxAll hit-detection
+    // anchor used below in Use()) from one shared call - no separate Animator setup needed, since
+    // PlayDirectionalAttack/GetFacingDirectionName only ever reads back whatever's currently in
+    // moveX/moveY, regardless of whether movement or this set it.
     public override void UseMouse()
     {
+        user.GetComponent<MovementController>().LookAt(MousePosition());
         Use();
     }
 

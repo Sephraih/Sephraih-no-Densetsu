@@ -83,14 +83,19 @@ public class BumpAttack : Ability
         // it does for ChargeAttack) while the Attack clip's squash plays. Colliders go to trigger and
         // the body to Kinematic HERE, not after windup - see the tail of this coroutine for why they
         // now stay that way clear through landing recovery too, not just the jump itself.
+        //
+        // Both locks are reference-counted on MovementController (BeginKinematicLock/BeginPassThrough),
+        // not saved/restored locally here - a local save-and-restore (this used to be one) breaks the
+        // instant something ELSE also toggles the same Rigidbody2D concurrently, e.g. this creature
+        // getting stunned mid-jump: StunCoroutine's own save would capture "Kinematic" as the
+        // "original" body type since the jump had already set it, and whichever of the two finished
+        // last would permanently strand the creature Kinematic. See MovementController's own comment
+        // on BeginKinematicLock for the full story (found via the equivalent ChargeAttack-vs-Stun bug).
         movement.stuck = true;
         rb.linearVelocity = Vector2.zero;
         if (animator != null && animator.isInitialized) animator.SetTrigger("Attack");
-        var originalBodyType = rb.bodyType;
-        rb.bodyType = RigidbodyType2D.Kinematic;
-        var colliders = user.GetComponents<Collider2D>();
-        var originalTrigger = new bool[colliders.Length];
-        for (int i = 0; i < colliders.Length; i++) { originalTrigger[i] = colliders[i].isTrigger; colliders[i].isTrigger = true; }
+        movement.BeginKinematicLock();
+        movement.BeginPassThrough();
 
         yield return new WaitForSeconds(windupTime);
 
@@ -255,8 +260,8 @@ public class BumpAttack : Ability
         }
         log?.AppendLine($"post-recovery (before restoring bodyType/colliders): rb.position={rb.position:F3} transform.position={(Vector2)user.position:F3} driftFromPreRecovery={Vector2.Distance(posBeforeRecovery, rb.position):F3}");
 
-        rb.bodyType = originalBodyType;
-        for (int i = 0; i < colliders.Length; i++) colliders[i].isTrigger = originalTrigger[i];
+        movement.EndKinematicLock();
+        movement.EndPassThrough();
         movement.stuck = false;
 
         log?.AppendLine($"=== ATTACK END t={Time.time:F2} rb.position={rb.position:F3} transform.position={(Vector2)user.position:F3} ===");

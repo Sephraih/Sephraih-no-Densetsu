@@ -17,9 +17,9 @@ public class Ability : MonoBehaviour
     // gate in Ability.Invoke/InvokeMouse - callers already past that check (e.g. anything running
     // inside a bot's own Update(), which already bailed out earlier if stunned) don't need it here.
     public bool IsReady => cd <= 0f;
-    
 
-    
+
+
     protected Transform user;
     protected Transform attackPos;
 

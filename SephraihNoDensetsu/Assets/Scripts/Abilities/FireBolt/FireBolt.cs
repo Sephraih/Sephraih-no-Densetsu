@@ -23,6 +23,16 @@ public class FireBolt : Ability
     // instance independently while still deriving from the one shared global distance.
     public float rangePercent = 1.0f;
 
+    // World-space Y offset added to the bolt's spawn point (user.position) - compensates for units
+    // whose sprite pivot sits at their feet (e.g. Goblin/Gobwiz's hand-drawn sheets, pivot (0.5,0))
+    // rather than near body-center (Player/Guard/Wizard's placeholder Samurai art, pivot ~(0.66,0.49))
+    // - see SubmersionController.checkOffsetY for the same compensation pattern applied to a
+    // different per-unit concern. Without this, a feet-pivoted caster's bolt visually launches from
+    // ground level instead of roughly chest/hand height, since Bolt() spawns exactly at
+    // user.position and that IS the feet for those units. 0 (default) is correct for a center-
+    // pivoted unit; tune per-instance for any bottom-pivoted caster.
+    public float spawnHeightOffset = 0f;
+
     private void Awake()
     {
         range = (rangeSettings != null ? rangeSettings.FieldOfView : 0f) * rangePercent;
@@ -58,7 +68,7 @@ public class FireBolt : Ability
         if (cd <= 0)
         {
             //instantiate and assign values to a firebolt projectile, which handles damaging, position and collision logic based on the fireboltprojectile script attached to it.
-            var bolt = Instantiate(projectile, user.position, attackPos.transform.rotation);
+            var bolt = Instantiate(projectile, user.position + Vector3.up * spawnHeightOffset, attackPos.transform.rotation);
             bolt.GetComponent<FireBoltProjectile>().user = user;
             bolt.GetComponent<FireBoltProjectile>().maxRange = range;
             bolt.GetComponent<FireBoltProjectile>().dmg = dmg * (user.GetComponent<StatusController>().lvl + user.transform.GetComponent<StatusController>().Int); //+= this.GetComponent<StatusController>().matk;

@@ -197,16 +197,14 @@ public class MovementController : MonoBehaviour
 
     // Getting stunned again while already stunned (e.g. two charge attacks landing back to back)
     // starts a second, fully independent StunCoroutine - Unity doesn't cancel/replace running
-    // coroutines by default. Without tracking how many are active, each one blindly does its own
-    // setup/teardown: the second capture of "original body type" would actually read back
-    // Kinematic (since the first coroutine already set it), permanently stranding the character as
-    // Kinematic once the second coroutine "restores" it; and each Instantiate() overwrites the
-    // single shared stunEffectInstance reference, orphaning whichever instance isn't referenced
+    // coroutines by default. Without tracking how many are active, each Instantiate() would overwrite
+    // the single shared stunEffectInstance reference, orphaning whichever instance isn't referenced
     // anymore - nothing is left to ever Destroy() it, so it just keeps looping indefinitely. This
-    // depth counter makes overlapping stuns share one setup/teardown: only the first entry captures
-    // state and spawns the effect, only the last exit (depth back to 0) restores/destroys it.
+    // depth counter makes overlapping stuns share one setup/teardown: only the first entry sets
+    // stunned/spawns the effect, only the last exit (depth back to 0) clears them. The Rigidbody2D
+    // Kinematic toggle itself is delegated to BeginKinematicLock/EndKinematicLock below rather than
+    // handled here directly - see that pair's own comment for why.
     private int stunDepth = 0;
-    private RigidbodyType2D preStunBodyType;
 
     IEnumerator StunCoroutine(float time)
     {
@@ -219,13 +217,10 @@ public class MovementController : MonoBehaviour
             // normal dynamic Rigidbody2D sitting still is still fully shovable by anything solid
             // that walks into it (e.g. the attacker that just landed the stun standing close by),
             // and stunned means the player can't move away to mask it. Kinematic bodies are
-            // immovable by collision response, so toggling to Kinematic for the stun's duration -
-            // the same trick ChargeAttack uses for its own dash - makes the stunned character
-            // genuinely immune to being pushed instead of just not pushing itself.
-            var rb2d = GetComponent<Rigidbody2D>();
-            preStunBodyType = rb2d.bodyType;
-            rb2d.bodyType = RigidbodyType2D.Kinematic;
-            rb2d.linearVelocity = Vector2.zero;
+            // immovable by collision response, so toggling to Kinematic for the stun's duration
+            // makes the stunned character genuinely immune to being pushed instead of just not
+            // pushing itself.
+            BeginKinematicLock();
 
             var stunEffectPrefab = Resources.Load("Prefabs/Effects/StunEffect") as GameObject;
             if (stunEffectPrefab != null)
@@ -246,8 +241,82 @@ public class MovementController : MonoBehaviour
         if (stunDepth == 0)
         {
             if (stunEffectInstance != null) { Destroy(stunEffectInstance); stunEffectInstance = null; }
-            GetComponent<Rigidbody2D>().bodyType = preStunBodyType;
             stunned = false;
+            // Paired with the single BeginKinematicLock() call above (also gated to the first
+            // entrant only) - only the last stun to exit releases the lock, matching stunDepth's own
+            // first-in/last-out gating exactly.
+            EndKinematicLock();
+        }
+    }
+
+    // Shared, reference-counted "temporarily immovable" lock on this character's own Rigidbody2D -
+    // used by Stun (above) AND by any dash-style ability that needs to be immune to physical
+    // collision response for a while (ChargeAttack, BumpAttack). Before this was shared, each of
+    // those systems independently saved/restored rb.bodyType on its own, with no idea the others
+    // existed - confirmed live as a real corruption: a guard's ChargeAttack stunning the player
+    // WHILE the player's own ChargeAttack/Teleport dash was independently also toggling the same
+    // Rigidbody2D to Kinematic let StunCoroutine's own save capture "Kinematic" as the "original"
+    // body type (since the player's own dash had already set it), and whichever of the two systems
+    // finished LAST then "restored" the player straight back to permanently Kinematic - a body with
+    // no further physical collision response at all, free to walk straight through walls/map
+    // boundaries. A depth counter fixes this exactly like stunDepth already fixes stun-vs-stun above:
+    // only the very first caller (depth 0->1) captures the TRUE pre-existing body type, and only the
+    // very last one out (depth 1->0) restores it - regardless of which system entered/exited in which
+    // order, or how many are nested at once.
+    private int kinematicLockDepth = 0;
+    private RigidbodyType2D preKinematicLockBodyType;
+
+    public void BeginKinematicLock()
+    {
+        kinematicLockDepth++;
+        if (kinematicLockDepth == 1)
+        {
+            preKinematicLockBodyType = rb.bodyType;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.linearVelocity = Vector2.zero;
+        }
+    }
+
+    public void EndKinematicLock()
+    {
+        kinematicLockDepth = Mathf.Max(0, kinematicLockDepth - 1);
+        if (kinematicLockDepth == 0)
+            rb.bodyType = preKinematicLockBodyType;
+    }
+
+    // Same reference-counted approach as BeginKinematicLock/EndKinematicLock, but for the OTHER half
+    // of the "dash through things" trick: switching this character's own Collider2D(s) to triggers so
+    // there's no physical collision response with anything at all while active. Deliberately a
+    // SEPARATE counter/lock from the kinematic one, not folded into it - Stun wants immovable-but-
+    // still-solid (so other units still can't walk through a stunned character), while a dash wants
+    // immovable-and-passable, two different combinations of the same two underlying toggles. Only
+    // ChargeAttack/BumpAttack use this one; Stun does not.
+    private int passThroughDepth = 0;
+    private bool[] prePassThroughTriggerStates;
+
+    public void BeginPassThrough()
+    {
+        passThroughDepth++;
+        if (passThroughDepth == 1)
+        {
+            var colliders = GetComponents<Collider2D>();
+            prePassThroughTriggerStates = new bool[colliders.Length];
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                prePassThroughTriggerStates[i] = colliders[i].isTrigger;
+                colliders[i].isTrigger = true;
+            }
+        }
+    }
+
+    public void EndPassThrough()
+    {
+        passThroughDepth = Mathf.Max(0, passThroughDepth - 1);
+        if (passThroughDepth == 0 && prePassThroughTriggerStates != null)
+        {
+            var colliders = GetComponents<Collider2D>();
+            for (int i = 0; i < colliders.Length && i < prePassThroughTriggerStates.Length; i++)
+                colliders[i].isTrigger = prePassThroughTriggerStates[i];
         }
     }
 

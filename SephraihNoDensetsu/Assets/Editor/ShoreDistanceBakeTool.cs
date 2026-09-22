@@ -30,17 +30,66 @@ public static class ShoreDistanceBakeTool
 {
     const string OutputFolder = "Assets/Generated/ShoreDistance";
 
+    // Selecting a specific DualGridTilemapModule GameObject still bakes just that one (fast re-bake
+    // after retouching one material's art/shape without waiting on every other water body too). With
+    // nothing selected, bakes every shoreGradient-enabled module across all currently loaded/open
+    // scenes in one pass - the common case, since a map's water bodies otherwise each need this run
+    // by hand one at a time. shoreGradient is opt-in per material (Dungeonwater, for instance,
+    // deliberately doesn't have it) so this never touches a material that doesn't use the shader.
     [MenuItem("Tools/Sephraih/Water/Bake Shore Distance Field")]
-    public static void BakeSelected()
+    public static void BakeSelectedOrAll()
     {
         var go = Selection.activeGameObject;
-        var module = go != null ? go.GetComponent<DualGridTilemapModule>() : null;
-        if (module == null)
+        var selectedModule = go != null ? go.GetComponent<DualGridTilemapModule>() : null;
+        if (selectedModule != null)
         {
-            Debug.LogError("[ShoreDistanceBakeTool] Select a GameObject with a DualGridTilemapModule first.");
+            Bake(selectedModule);
             return;
         }
-        Bake(module);
+
+        var modules = FindShoreGradientModulesInOpenScenes();
+        if (modules.Count == 0)
+        {
+            Debug.LogError("[ShoreDistanceBakeTool] Nothing with a DualGridTilemapModule is selected, " +
+                "and no shoreGradient-enabled material was found in any open scene.");
+            return;
+        }
+
+        int baked = 0;
+        foreach (var module in modules)
+        {
+            if (module == null) continue;
+            var so = new SerializedObject(module);
+            var dataTilemap = so.FindProperty("dataTilemap").objectReferenceValue as Tilemap;
+            if (dataTilemap != null)
+            {
+                dataTilemap.CompressBounds();
+                if (dataTilemap.cellBounds.size.x <= 0 || dataTilemap.cellBounds.size.y <= 0)
+                {
+                    Debug.LogWarning($"[ShoreDistanceBakeTool] Skipping '{module.name}' - no painted cells.");
+                    continue;
+                }
+            }
+            Bake(module);
+            baked++;
+        }
+        Debug.Log($"[ShoreDistanceBakeTool] Baked {baked} shore-gradient material(s) across all open scenes.");
+    }
+
+    // shoreGradient is a private [SerializeField], so this reads it the same way the rest of this file
+    // already reads other private module fields - via SerializedObject, not a public accessor added
+    // just for this tool.
+    static List<DualGridTilemapModule> FindShoreGradientModulesInOpenScenes()
+    {
+        var result = new List<DualGridTilemapModule>();
+        var all = Object.FindObjectsByType<DualGridTilemapModule>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var m in all)
+        {
+            var so = new SerializedObject(m);
+            if (so.FindProperty("shoreGradient").boolValue)
+                result.Add(m);
+        }
+        return result;
     }
 
     // maxShoreDistance (world units): the real-world distance from shore at which a water body reaches

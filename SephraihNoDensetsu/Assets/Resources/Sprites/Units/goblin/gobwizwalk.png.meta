@@ -1,0 +1,597 @@
+fileFormatVersion: 2
+guid: 6052b9a5019bbf843b347c26d0fbb2a8
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1783353506015165984
+    second: gobwizwalk_0
+  - first:
+      213: 5447156910604427838
+    second: gobwizwalk_1
+  - first:
+      213: 6628775707743075459
+    second: gobwizwalk_2
+  - first:
+      213: -8764271247506111574
+    second: gobwizwalk_3
+  - first:
+      213: -4940853348458048023
+    second: gobwizwalk_4
+  - first:
+      213: 5553540005585710657
+    second: gobwizwalk_5
+  - first:
+      213: -1067124269724800679
+    second: gobwizwalk_6
+  - first:
+      213: -3519372216607084192
+    second: gobwizwalk_7
+  - first:
+      213: -8986979294303073147
+    second: gobwizwalk_8
+  - first:
+      213: -2013124949404058707
+    second: gobwizwalk_9
+  - first:
+      213: 7600191128724660814
+    second: gobwizwalk_10
+  - first:
+      213: 2024502922535377285
+    second: gobwizwalk_11
+  - first:
+      213: 1859751140925108125
+    second: gobwizwalk_12
+  - first:
+      213: 4387430219954976421
+    second: gobwizwalk_13
+  - first:
+      213: -1131259990910874048
+    second: gobwizwalk_14
+  - first:
+      213: -7245883294227986211
+    second: gobwizwalk_15
+  - first:
+      213: 2849159277971965370
+    second: gobwizwalk_0_0
+  - first:
+      213: 5049555727280310942
+    second: gobwizwalk_0_1
+  - first:
+      213: -4249361646990680420
+    second: gobwizwalk_0_2
+  - first:
+      213: -759450362705031867
+    second: gobwizwalk_0_3
+  - first:
+      213: -8180346669947826811
+    second: gobwizwalk_1_0
+  - first:
+      213: 8520670319424949777
+    second: gobwizwalk_1_1
+  - first:
+      213: -3595095451747678127
+    second: gobwizwalk_1_2
+  - first:
+      213: -5724858023306629276
+    second: gobwizwalk_1_3
+  - first:
+      213: 1382544870391688396
+    second: gobwizwalk_2_0
+  - first:
+      213: -6080403792040912065
+    second: gobwizwalk_2_1
+  - first:
+      213: 8271404109223175090
+    second: gobwizwalk_2_2
+  - first:
+      213: 8360150997922967224
+    second: gobwizwalk_2_3
+  - first:
+      213: 5164512167963645529
+    second: gobwizwalk_3_0
+  - first:
+      213: -5570464961559200787
+    second: gobwizwalk_3_1
+  - first:
+      213: -1214541721021936808
+    second: gobwizwalk_3_2
+  - first:
+      213: -8341569804238071002
+    second: gobwizwalk_3_3
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 1
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: gobwizwalk_0_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab50700944f3a8720800000000000000
+      internalID: 2849159277971965370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_0_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9a05162e20a31640800000000000000
+      internalID: 5049555727280310942
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_0_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9e93fc981c3705c0800000000000000
+      internalID: -4249361646990680420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_0_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54dcc6a3be3e575f0800000000000000
+      internalID: -759450362705031867
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_1_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58dc5368b02997e80800000000000000
+      internalID: -8180346669947826811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_1_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 128
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11ec985d2808f3670800000000000000
+      internalID: 8520670319424949777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_1_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 128
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15805f8fbb7ab1ec0800000000000000
+      internalID: -3595095451747678127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_1_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 128
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46f634b95f73d80b0800000000000000
+      internalID: -5724858023306629276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_2_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccc2cbd0c39cf2310800000000000000
+      internalID: 1382544870391688396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_2_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 64
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3b967c67f01e9ba0800000000000000
+      internalID: -6080403792040912065
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_2_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 64
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b324fba63ee9c270800000000000000
+      internalID: 8271404109223175090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_2_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 64
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8be63d3e909350470800000000000000
+      internalID: 8360150997922967224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_3_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 956d7a934780ca740800000000000000
+      internalID: 5164512167963645529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_3_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: debf08c81abb1b2b0800000000000000
+      internalID: -5570464961559200787
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_3_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85b88995db4152fe0800000000000000
+      internalID: -1214541721021936808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gobwizwalk_3_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62bd345657acc3c80800000000000000
+      internalID: -8341569804238071002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      gobwizwalk_0: -1783353506015165984
+      gobwizwalk_0_0: 2849159277971965370
+      gobwizwalk_0_1: 5049555727280310942
+      gobwizwalk_0_2: -4249361646990680420
+      gobwizwalk_0_3: -759450362705031867
+      gobwizwalk_1: 5447156910604427838
+      gobwizwalk_10: 7600191128724660814
+      gobwizwalk_11: 2024502922535377285
+      gobwizwalk_12: 1859751140925108125
+      gobwizwalk_13: 4387430219954976421
+      gobwizwalk_14: -1131259990910874048
+      gobwizwalk_15: -7245883294227986211
+      gobwizwalk_1_0: -8180346669947826811
+      gobwizwalk_1_1: 8520670319424949777
+      gobwizwalk_1_2: -3595095451747678127
+      gobwizwalk_1_3: -5724858023306629276
+      gobwizwalk_2: 6628775707743075459
+      gobwizwalk_2_0: 1382544870391688396
+      gobwizwalk_2_1: -6080403792040912065
+      gobwizwalk_2_2: 8271404109223175090
+      gobwizwalk_2_3: 8360150997922967224
+      gobwizwalk_3: -8764271247506111574
+      gobwizwalk_3_0: 5164512167963645529
+      gobwizwalk_3_1: -5570464961559200787
+      gobwizwalk_3_2: -1214541721021936808
+      gobwizwalk_3_3: -8341569804238071002
+      gobwizwalk_4: -4940853348458048023
+      gobwizwalk_5: 5553540005585710657
+      gobwizwalk_6: -1067124269724800679
+      gobwizwalk_7: -3519372216607084192
+      gobwizwalk_8: -8986979294303073147
+      gobwizwalk_9: -2013124949404058707
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

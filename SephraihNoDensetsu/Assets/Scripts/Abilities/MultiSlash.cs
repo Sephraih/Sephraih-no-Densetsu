@@ -31,8 +31,18 @@ public class MultiSlash : Ability
         slashEffect = Resources.Load("Prefabs/Effects/ParticleSlashPrefab") as GameObject;
     }
 
+    // Cursor-aimed: the actual mouse-triggered path (AbilityController.InvokeMouse -> Ability.
+    // InvokeMouse -> this) faces/aims toward wherever the cursor currently is, rather than whatever
+    // direction the character is already facing/moving. LookAt() already updates BOTH the Animator's
+    // moveX/moveY (so PlayDirectionalAttack resolves the correct directional clip) AND attackPos (the
+    // OverlapBoxAll hit-detection anchor used below in Use()) from one shared call - no separate
+    // Animator setup needed. Re-aims on every combo step too, since this runs again each time the
+    // player re-clicks to continue the combo - lets a player redirect mid-combo by moving the mouse
+    // between swings, which reads as correct rather than a bug (BasicAttack has the identical variant
+    // for the same reason - see its own comment).
     public override void UseMouse()
     {
+        user.GetComponent<MovementController>().LookAt(MousePosition());
         Use();
     }
 
